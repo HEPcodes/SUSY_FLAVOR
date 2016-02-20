@@ -52,10 +52,10 @@ c     B->X_s gamma decay:
       bxgamma = bxg_nl(delb,amiu_b) ! BR(B -> X_S gamma)
 
 c     top -> Higgs+quark decays
-      br_tuh = br_suu(2,1)      ! BR(t -> u h)
-      br_tch = br_suu(2,2)      ! BR(t -> c h)
-c      gam_tuh = gam_suu(2,1)    ! Gamma(t -> u h)
-c      gam_tch = gam_suu(2,2)    ! Gamma(t -> c h)
+      br_tuh = br_suu(2,1)      ! BR(t -> h u)
+      br_tch = br_suu(2,2)      ! BR(t -> h c)
+c      gam_tuh = gam_suu(2,1)    ! Gamma(t -> h u)
+c      gam_tch = gam_suu(2,2)    ! Gamma(t -> h c)
 
 c     Delta F = 2 processes
 c     KK mixing:

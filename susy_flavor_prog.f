@@ -238,6 +238,11 @@ c     Physical quantities for BR(B->X_s g) calculation
       write(*,99)'BR(B -> X_s gamma) = ',bxg_nl(delb,amiu_b)
       write(*,*)
 
+c     top to Higgs decays
+      write(*,99)'BR(t -> h u) = ', br_suu(2,1)
+      write(*,99)'BR(t -> h c) = ', br_suu(2,2)
+      write(*,*)
+
       write(*,99)'KK mixing:'
       call dd_kaon(eps_k,delta_mk)
       write(*,99)'eps_K     = ',eps_k
