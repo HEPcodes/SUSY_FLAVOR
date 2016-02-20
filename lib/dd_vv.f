@@ -201,9 +201,12 @@ c     Full A^V_L formfactor
       implicit double precision (a-h,o-z)
       double complex dd_vv_l_sm,dd_vv_l_h,dd_vv_l_c,dd_vv_l_n,dd_vv_l_gl
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
-      dd_vv_l = dd_vv_l_sm(i,j,k,l)
-      if (ih.eq.1) dd_vv_l = dd_vv_l + dd_vv_l_h(i,j,k,l)
+      common/debug_4q/ih,ic,in,ig
+      dd_vv_l = (0.d0,0.d0)
+      if (ih.eq.1) then
+         dd_vv_l = dd_vv_l + dd_vv_l_sm(i,j,k,l)
+         dd_vv_l = dd_vv_l + dd_vv_l_h(i,j,k,l)
+      end if
       if (in.eq.1) dd_vv_l = dd_vv_l + dd_vv_l_n(i,j,k,l)
       if (ic.eq.1) dd_vv_l = dd_vv_l + dd_vv_l_c(i,j,k,l)
       if (ig.eq.1) dd_vv_l = dd_vv_l + dd_vv_l_gl(i,j,k,l)
@@ -380,9 +383,12 @@ c     Full A^V_R formfactor
       implicit double precision (a-h,o-z)
       double complex dd_vv_r_sm,dd_vv_r_h,dd_vv_r_c,dd_vv_r_n,dd_vv_r_gl
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
-      dd_vv_r = dd_vv_r_sm(i,j,k,l)
-      if (ih.eq.1) dd_vv_r = dd_vv_r + dd_vv_r_h(i,j,k,l)
+      common/debug_4q/ih,ic,in,ig
+      dd_vv_r = (0.d0,0.d0)
+      if (ih.eq.1) then
+         dd_vv_r = dd_vv_r + dd_vv_r_sm(i,j,k,l)
+         dd_vv_r = dd_vv_r + dd_vv_r_h(i,j,k,l)
+      end if
       if (in.eq.1) dd_vv_r = dd_vv_r + dd_vv_r_n(i,j,k,l)
       if (ic.eq.1) dd_vv_r = dd_vv_r + dd_vv_r_c(i,j,k,l)
       if (ig.eq.1) dd_vv_r = dd_vv_r + dd_vv_r_gl(i,j,k,l)

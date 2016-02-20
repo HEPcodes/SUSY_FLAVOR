@@ -19,8 +19,27 @@ c     Running number of active flavors
       implicit double precision (a-h,o-z)
       common/lamqcd/qcd4,qcd5,qcd6,qstep(6),qerr
       nflav = 0
-      do 10 i=1,6
-10      if (q.ge.qstep(i)) nflav = nflav + 1
+      do i=1,6
+         if (q.ge.qstep(i)) nflav = nflav + 1
+      end do
+      return
+      end
+
+      subroutine qstep_update
+c     update squark masses in qstep array(s)
+      implicit double precision (a-h,o-z)
+      common/lamqcd/qcd4,qcd5,qcd6,qstep(6),qerr
+      common/lamqcd_nlo/qcd4_nlo,qcd5_nlo,qcd6_nlo,qstep_nlo(6),qerr_nlo
+      common/fmass/em(3),um(3),dm(3)
+      qstep(1) = min(um(1),dm(1))
+      qstep(2) = max(um(1),dm(1))
+      qstep(3) = dm(2)
+      qstep(4) = um(2)
+      qstep(5) = dm(3)
+      qstep(6) = um(3)
+      do i=1,6
+         qstep_nlo(i) = qstep(i)
+      end do 
       return
       end
 
@@ -63,14 +82,8 @@ c     Lambda QCD calculation for 5 flavors and given alpha_s(Mz)
       common/lamqcd/qcd4,qcd5,qcd6,qstep(6),qerr
       common/fmass/em(3),um(3),dm(3)
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-c      update commmon/qstep/
-      qstep(1) = min(um(1),dm(1))
-      qstep(2) = max(um(1),dm(1))
-      qstep(3) = dm(2)
-      qstep(4) = um(2)
-      qstep(5) = dm(3)
-      qstep(6) = um(3)
-c      calculate lambda for 4,5,6 flavours
+      call qstep_update         !     update array qstep
+c     calculate lambda for 4,5,6 flavours
       nf = 5
       b0 = 11 - 2*nf/3.d0
       b1 = 102 - 38*nf/3.d0
@@ -164,10 +177,10 @@ c     Update new qcd4 values
       common/lamqcd/qcd4,qcd5,qcd6,qstep(6),qerr
       common/lamqcd_nlo/qcd4_nlo,qcd5_nlo,qcd6_nlo,qstep_nlo(6),qerr_nlo
       data qcd4,qcd5,qcd6/288.20d-3,208.36d-3,91.838d-3/
-      data qstep/4.d-3,7.d-3,1.5d-1,1.5d0,4.3d0,175.d0/
+      data qstep/2.15d-3,4.7d-3,9.35d-2,1.275d0,4.18d0,163.2d0/
       data qerr/1.d-3/
       data qcd4_nlo,qcd5_nlo,qcd6_nlo/324.81d-3,226.23d-3,95.222d-3/
-      data qstep_nlo/4.d-3,7.d-3,1.5d-1,1.5d0,4.3d0,175.d0/
+      data qstep_nlo/2.15d-3,4.7d-3,9.35d-2,1.275d0,4.18d0,163.2d0/
       data qerr_nlo/1.d-3/
       data g0,dz3/-8.d0,438.5513262d0/
       end
@@ -295,14 +308,8 @@ c     NLO Lambda QCD calculation for 5 flavors and given alpha_s(Mz)
       common/lamqcd_nlo/qcd4,qcd5,qcd6,qstep(6),qerr
       common/fmass/em(3),um(3),dm(3)
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-c      update commmon/qstep/
-      qstep(1) = min(um(1),dm(1))
-      qstep(2) = max(um(1),dm(1))
-      qstep(3) = dm(2)
-      qstep(4) = um(2)
-      qstep(5) = dm(3)
-      qstep(6) = um(3)
-c      calculate lambda for 4,5,6 flavours
+      call qstep_update         ! update array qstep
+c     calculate lambda for 4,5,6 flavours
       nf = 5
       b0 = 11 - 2*nf/3.d0
       b1 = 102 - 38*nf/3.d0
@@ -405,3 +412,19 @@ c     qmass_nlo returns running quark mass at scale amu for given qm(amu0)
       return
       end
 
+      double precision function qm_pole_nlo(qm)
+c     calculates pole quark mass for given running MSbar mass qm(qm)
+      implicit double precision (a-h,o-z)
+      common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
+      common/lamqcd/qcd4,qcd5,qcd6,qstep(6),qerr
+      al = alfas(qm)/pi
+      nl = nflav(qm) - 1
+      delm = 0.d0
+      do i=1,nl
+         delm = delm + 1 - 4/3.d0*qstep(i)/qm
+      end do
+      qm_pole_nlo = qm*(1 + 4/3.d0*al 
+     $     + (13.4434d0 - 1.0414d0*delm)*al*al)
+c     $     + (0.6527*nl*nl - 26.655*nl + 190.595)*al*al*al) ! 3rd loop
+      return
+      end

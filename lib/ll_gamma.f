@@ -64,7 +64,7 @@ c     Full coefficients
       implicit double precision (a-h,o-z)
       double complex cfl(5),cfr(5)
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       do k=1,5
         cfl(k) = (0.d0,0.d0)
         cfr(k) = (0.d0,0.d0)

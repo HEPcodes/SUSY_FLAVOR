@@ -79,6 +79,9 @@ obj/db_fun.o: lib/db_fun.f
 obj/c_fun.o: lib/c_fun.f
 	$(COMP) -c lib/c_fun.f
 	mv c_fun.o obj
+obj/c_fun_exp.o: lib/c_fun_exp.f
+	$(COMP) -c lib/c_fun_exp.f
+	mv c_fun_exp.o obj
 obj/qcd_fun.o: lib/qcd_fun.f
 	$(COMP) -c lib/qcd_fun.f
 	mv qcd_fun.o obj
@@ -142,6 +145,13 @@ obj/sff_fun.o: lib/sff_fun.f
 	$(COMP) -c lib/sff_fun.f
 	mv sff_fun.o obj
 
+obj/uu_gluon.o: lib/uu_gluon.f
+	$(COMP) -c lib/uu_gluon.f
+	mv uu_gluon.o obj
+obj/vff_fun.o: lib/vff_fun.f
+	$(COMP) -c lib/vff_fun.f
+	mv vff_fun.o obj
+
 
 libfcnc.a: obj/bsg_nl.o obj/ddg_fun.o obj/dd_gamma.o obj/dd_gluon.o	\
 	obj/dd_vv.o obj/dd_ll.o obj/dd_mix.o obj/uu_mix.o		\
@@ -152,7 +162,8 @@ libfcnc.a: obj/bsg_nl.o obj/ddg_fun.o obj/dd_gamma.o obj/dd_gluon.o	\
 	obj/cdm_g.o obj/vegas.o obj/edm_q.o obj/sflav_io.o		\
 	obj/yuk_ren.o obj/q_self0_dlim.o obj/sflav_main.o		\
 	obj/l_self0_dlim.o obj/ll_gamma.o obj/phen_2l.o obj/u_self.o	\
-	obj/sff_fun.o obj/suu_vert.o obj/vh_def.o
+	obj/sff_fun.o obj/suu_vert.o obj/vh_def.o obj/c_fun_exp.o	\
+	obj/vff_fun.o obj/uu_gluon.o
 
 	ar crs libfcnc.a obj/bsg_nl.o obj/ddg_fun.o obj/dd_gamma.o	\
 	obj/dd_gluon.o obj/dd_vv.o obj/dd_ll.o obj/dd_mix.o		\
@@ -164,7 +175,7 @@ libfcnc.a: obj/bsg_nl.o obj/ddg_fun.o obj/dd_gamma.o obj/dd_gluon.o	\
 	obj/sflav_io.o obj/yuk_ren.o obj/q_self0_dlim.o			\
 	obj/sflav_main.o obj/l_self0_dlim.o obj/ll_gamma.o		\
 	obj/phen_2l.o obj/u_self.o obj/sff_fun.o obj/suu_vert.o		\
-	obj/vh_def.o
+	obj/vh_def.o obj/c_fun_exp.o obj/vff_fun.o obj/uu_gluon.o
 
 
 #
@@ -172,11 +183,16 @@ libfcnc.a: obj/bsg_nl.o obj/ddg_fun.o obj/dd_gamma.o obj/dd_gluon.o	\
 #	ar ts libfcnc.a
 #
 
+sscan:	susy_flavor_scan.f mssm_constraints.f libfcnc.a 
+	$(COMP) -o sscan susy_flavor_scan.f  -L. -lfcnc
+	@echo "Executing TEST..."
+	./sscan
+
 sfile:	susy_flavor_file.f libfcnc.a 
 	$(COMP) -o sfile susy_flavor_file.f  -L. -lfcnc
 	@echo "Executing SUSY_FLAVOR..."
 	./sfile
-	cat susy_flavor.out
+#	cat susy_flavor.out
 
 sprog:	susy_flavor_prog.f libfcnc.a 
 	$(COMP) -o sprog susy_flavor_prog.f  -L. -lfcnc
@@ -184,7 +200,7 @@ sprog:	susy_flavor_prog.f libfcnc.a
 	./sprog
 
 clean:
-	rm -rf *.o obj/*.o *.a *~ lib/*~ sprog sfile
+	rm -rf *.o obj/*.o *.a *~ lib/*~ sprog sfile sscan
 
 tar:	
 	rm -rf obj/*

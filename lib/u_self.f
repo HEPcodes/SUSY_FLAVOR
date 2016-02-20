@@ -178,19 +178,22 @@ c     Full bare up quark self-energy, left vector part
       double complex uvl_sig_z,uvl_sig_w,uvl_sig_h,uvl_sig_s,uvl_sig_p,
      $     uvl_sig_n,uvl_sig_c,uvl_sig_gl
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       uvl_self = (0.d0,0.d0)
-      if (ih.ne.0) then
-         uvl_self = uvl_self + uvl_sig_z(s,i,j) + uvl_sig_w(s,i,j) +
-     $        uvl_sig_h(s,i,j) + uvl_sig_s(s,i,j) + uvl_sig_p(s,i,j)
+      if (ih.eq.1) then
+         uvl_self = uvl_self + uvl_sig_z(s,i,j)
+         uvl_self = uvl_self + uvl_sig_w(s,i,j)
+         uvl_self = uvl_self + uvl_sig_h(s,i,j)
+         uvl_self = uvl_self + uvl_sig_s(s,i,j)
+         uvl_self = uvl_self + uvl_sig_p(s,i,j)
       end if
-      if (in.ne.0) then
+      if (in.eq.1) then
          uvl_self = uvl_self + uvl_sig_n(s,i,j)
       end if
-      if (ic.ne.0) then
+      if (ic.eq.1) then
          uvl_self = uvl_self + uvl_sig_c(s,i,j)
       end if
-      if (ig.ne.0) then
+      if (ig.eq.1) then
          uvl_self = uvl_self + uvl_sig_gl(s,i,j)
       end if
       uvl_self = uvl_self/16/pi/pi
@@ -250,13 +253,6 @@ c     Up quark + pseudoscalar in loop
       end
 
 c     flavor violating contributions
-
-      double complex function uvr_sig_w(s,i,j)
-c     Down quark-W in loop
-      implicit double precision (a-h,o-z)
-      uvr_sig_w = (0.d0,0.d0)
-      return
-      end
 
       double complex function uvr_sig_h(s,i,j)
 c     Down quark+charged Higgs in loop
@@ -335,22 +331,24 @@ c     gluino-up squark in loop
       double complex function uvr_self(s,i,j)
 c     Full bare up quark self-energy, right vector part
       implicit double precision (a-h,o-z)
-      double complex uvr_sig_z,uvr_sig_w,uvr_sig_h,uvr_sig_s,uvr_sig_p,
+      double complex uvr_sig_z,uvr_sig_h,uvr_sig_s,uvr_sig_p,
      $     uvr_sig_n,uvr_sig_c,uvr_sig_gl
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       uvr_self = (0.d0,0.d0)
-      if (ih.ne.0) then
-         uvr_self = uvr_self + uvr_sig_z(s,i,j) + uvr_sig_w(s,i,j) +
-     $        uvr_sig_h(s,i,j) + uvr_sig_s(s,i,j) + uvr_sig_p(s,i,j)
+      if (ih.eq.1) then
+         uvr_self = uvr_self + uvr_sig_z(s,i,j)
+         uvr_self = uvr_self + uvr_sig_h(s,i,j)
+         uvr_self = uvr_self + uvr_sig_s(s,i,j)
+         uvr_self = uvr_self + uvr_sig_p(s,i,j)
       end if
-      if (in.ne.0) then
+      if (in.eq.1) then
          uvr_self = uvr_self + uvr_sig_n(s,i,j)
       end if
-      if (ic.ne.0) then
+      if (ic.eq.1) then
          uvr_self = uvr_self + uvr_sig_c(s,i,j)
       end if
-      if (ig.ne.0) then
+      if (ig.eq.1) then
          uvr_self = uvr_self + uvr_sig_gl(s,i,j)
       end if
       uvr_self = uvr_self/16/pi/pi
@@ -492,19 +490,21 @@ c     Full bare up quark self-energy, scalar part
       double complex usl_sig_z,usl_sig_h,usl_sig_s,usl_sig_p,usl_sig_n,
      $     usl_sig_c,usl_sig_gl
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       usl_self = (0.d0,0.d0)
-      if (ih.ne.0) then
-         usl_self = usl_self + usl_sig_z(s,i,j) + usl_sig_h(s,i,j) +
-     $        usl_sig_s(s,i,j) + usl_sig_p(s,i,j)
+      if (ih.eq.1) then
+         usl_self = usl_self + usl_sig_z(s,i,j)
+         usl_self = usl_self + usl_sig_h(s,i,j)
+         usl_self = usl_self + usl_sig_s(s,i,j)
+         usl_self = usl_self + usl_sig_p(s,i,j)
       end if
-      if (in.ne.0) then
+      if (in.eq.1) then
          usl_self = usl_self + usl_sig_n(s,i,j)
       end if
-      if (ic.ne.0) then
+      if (ic.eq.1) then
          usl_self = usl_self + usl_sig_c(s,i,j)
       end if
-      if (ig.ne.0) then
+      if (ig.eq.1) then
          usl_self = usl_self + usl_sig_gl(s,i,j)
       end if
       usl_self = usl_self/16/pi/pi
@@ -645,19 +645,21 @@ c     Full bare up quark self-energy, scalar part
       double complex usr_sig_z,usr_sig_h,usr_sig_s,usr_sig_p,usr_sig_n,
      $     usr_sig_c,usr_sig_gl
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       usr_self = (0.d0,0.d0)
-      if (ih.ne.0) then
-         usr_self = usr_self + usr_sig_z(s,i,j) + usr_sig_h(s,i,j) +
-     $        usr_sig_s(s,i,j) + usr_sig_p(s,i,j)
+      if (ih.eq.1) then
+         usr_self = usr_self + usr_sig_z(s,i,j)
+         usr_self = usr_self + usr_sig_h(s,i,j)
+         usr_self = usr_self + usr_sig_s(s,i,j)
+         usr_self = usr_self + usr_sig_p(s,i,j)
       end if
-      if (in.ne.0) then
+      if (in.eq.1) then
          usr_self = usr_self + usr_sig_n(s,i,j)
       end if
-      if (ic.ne.0) then
+      if (ic.eq.1) then
          usr_self = usr_self + usr_sig_c(s,i,j)
       end if
-      if (ig.ne.0) then
+      if (ig.eq.1) then
          usr_self = usr_self + usr_sig_gl(s,i,j)
       end if
       usr_self = usr_self/16/pi/pi

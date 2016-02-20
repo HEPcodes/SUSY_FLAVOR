@@ -261,7 +261,7 @@ c     matrix in the decoupling limit v1,v2 << M_SUSY
       common/yukawa_eff/yhl(3,3,2),yhr(3,3,2),ysu(3,3,2),ypu(3,3,2),
      $     ysd(3,3,2),ypd(3,3,2),init_yukawa_eff
       common/yukawa_lept/yhlr(3,3,2),ysl(3,3,2),ypl(3,3,2),init_yukawa_l
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       common/declim_ih/ihr
       ierr = 0
 c     reset status of effective yukawa calculation

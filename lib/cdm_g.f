@@ -25,7 +25,7 @@ c     Definition of VEGAS integrand
       end
       
       double precision function cdm_g()
-c     Full gluon CDM (only stops contribution for now...)
+c     Full gluon CDM (only stops/gluino contribution included)
       implicit double precision (a-h,o-z)
       double complex zu0,zd0
       double complex zu
@@ -39,7 +39,12 @@ c     Full gluon CDM (only stops contribution for now...)
       common/vegas_result/avgi,sd,ti,tsi,nnew
       common/gmass/gm1,gm2,gm3
       common/fmass/em(3),um(3),dm(3)
+      common/debug_4q/ih,ic,in,ig
       external cdm_g_vegas,init_cdm_g
+      if (ig.ne.1) then  
+         cdm_g = 0.d0
+         return
+      end if
       if (init_alpha_susy) call init_alpha_s_susy
 c     identify left and right stop
       zlmax = 0
@@ -59,7 +64,7 @@ c     identify left and right stop
       z3 = (um(3)/gm1)**2
       call vegas(cdm_g_vegas,errin,3,npoint,itmax,nprn,igraph)
       cdm_g = 3.d0*pi/8*um(3)*(g3u/2/pi)**5/gm1/gm1/gm1
-     $    *(z1 - z2)*dimag(zu(6,ir)*dconjg(zu(3,ir)))*avgi
+     $     *(z1 - z2)*dimag(zu(6,ir)*dconjg(zu(3,ir)))*avgi
       return
       end
       
@@ -84,8 +89,12 @@ c     separate stop mass matrix diagonalization
       common/vegas_result/avgi,sd,ti,tsi,nnew
       common/gmass/gm1,gm2,gm3
       common/fmass/em(3),um(3),dm(3)
+      common/debug_4q/ih,ic,in,ig
       external cdm_g_vegas,init_cdm_g
-      cdm_g_stop = 0
+      if (ig.ne.1) then  
+         cdm_g_stop = 0.d0
+         return
+      end if
       vmin = v1*v1 - v2*v2
 c     Stop mass matrix initialization
       tmp(1,1) = dconjg(qms(3,3)) - e2*vmin*(1-4*ct2)/24/sct2 + um(3)**2

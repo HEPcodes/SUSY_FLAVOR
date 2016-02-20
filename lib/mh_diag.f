@@ -88,12 +88,18 @@ c     Slepton masses and mixing angles
      $          + e2/8*(1 - 2*ct2)/sct2*vmin + abs(v1*yl(i))**2/2
             sl_mat(i+3,j+3) = sl_mat(i+3,j+3) - e2/4/ct2*vmin
      $           + abs(v1*yl(i))**2/2
-c     check yukawa star below!!!
             sl_mat(i,j+3)   = sl_mat(i,j+3) + v2/sq2*dconjg(h*yl(i))
           end if
           sl_mat(j+3,i)     = dconjg(sl_mat(i,j+3))
         end do
       end do
+
+c      call cr_mat_print(sv_mat,3,6)
+c      call ci_mat_print(sv_mat,3,6)
+c      call cr_mat_print(sl_mat,6,6)
+c      call ci_mat_print(sl_mat,6,6)
+c      stop
+
       do i=1,6
         do j=1,6
           msl(i,j)  = dble(sl_mat(i,j))
@@ -177,7 +183,6 @@ c      D-squark mass matrix initialization
      $          + abs(yd(i)*v1)**2/2
             sd_mat(i+3,j+3) = sd_mat(i+3,j+3) - e2*vmin/12/ct2
      $          + abs(yd(i)*v1)**2/2
-c     check yukawa star below!!!
             sd_mat(i,j+3)   = sd_mat(i,j+3) + v2/sq2*dconjg(h*yd(i))
           end if
           sd_mat(j+3,i)     = dconjg(sd_mat(i,j+3))
@@ -196,12 +201,16 @@ c      U-squark mass matrix initialization
      $            + abs(yu(i)*v2)**2/2
             su_mat(i+3,j+3) = su_mat(i+3,j+3) + e2/6/ct2*vmin
      $           + abs(yu(i)*v2)**2/2
-c     check yukawa star below!!!
             su_mat(i,j+3)   = su_mat(i,j+3) - v1/sq2*h*yu(i)
           end if
           su_mat(j+3,i)     = dconjg(su_mat(i,j+3))
         end do
       end do
+
+c      call cr_mat_print(sd_mat,6,6)
+c      call ci_mat_print(sd_mat,6,6)
+c      stop
+
       do i=1,6
         do j=1,6
           msd(i,j)  = dble(sd_mat(i,j))
@@ -265,6 +274,11 @@ c     Chargino mass matrix initialization
       x(1,2) = e*v2/sq2/st*eps_u
       x(2,1) = e*v1/sq2/st*eps_d
       x(2,2) = h
+
+c      call cr_mat_print(x,2,6)
+c      call ci_mat_print(x,2,6)
+c      stop
+
 c     Build X*Xherm and X*hermX
       do i=1,2
         do j=1,2
@@ -563,26 +577,190 @@ c     Initialize common/hmass_mssm/
       return
       end
 
-      double precision function alpha_eff(nh)
-c     Effective alpha calculated from the corrections to h/H self-energy
+      subroutine correct_unitarity(z,n)
+c     improves numerical accuracy of complex matrix unitarity
       implicit double precision (a-h,o-z)
-      double complex zms,zmp
+      parameter (nmax=6)
+      double complex z(n,n),eps(nmax,nmax),v(nmax,nmax)
+c     check array sizes
+      if (n.gt.nmax) stop
+     $     'increase array sizes in routine correct_unitarity'
+c     build matrix eps = 1 - (Z^+ Z - 1)/2 = 3/2 - (Z^+ Z)/2
+c     also, store z in auxiliary matrix v
+      do i=1,n
+         do j=1,n
+            eps(i,j) = (0.d0,0.d0)
+            v(i,j) = z(i,j)
+            do k=1,n
+               eps(i,j) = eps(i,j) - dconjg(z(k,i))*z(k,j)/2
+            end do
+         end do
+         eps(i,i) = 1.5d0 + eps(i,i)
+      end do
+c     correct initial matrix Z -> Z*eps
+      do i=1,n
+         do j=1,n
+            z(i,j) = (0.d0,0.d0)
+            do k=1,n
+               z(i,j) = z(i,j) + v(i,k)*eps(k,j)
+            end do
+         end do
+      end do
+      return
+      end
+
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c     The following set of routines computes approximate 2-loop masses c
+c     and mixing angles of Higgs particles in the MSSM                 c
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+
+      double precision function alpha_eff(nh)
+      implicit double precision (a-h,o-z)
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/hangle/ca,sa,cb,sb
-      common/zext/zs(2),zms(2,2),zp(2),zmp(2,2),zz,zw,zeps
-c     Effective alpha calculated from the corrections to ZZh/H vertex
-      if ((nh.ne.1).and.(nh.ne.2)) stop 'Bad Higgs index in alpha_eff'
-      sab = sa*cb - sb*ca
-      cab = sa*sb + ca*cb
-      if (nh.eq.1) then
-         is = -1
-      else
-         is = 1
+      common/hmass_EPA/pm,hm1,hm2,sa,ca,sb,cb
+c     Effective alpha (argument nh unused).
+      alpha_eff = atan(sa/ca)
+      if (alpha_eff.gt.0) alpha_eff = alpha_eff - pi
+      return
+      end
+
+      subroutine mhcorr_app2(ierr)
+c     approximate version of 2-loop corrections to mh/mH based on 
+c     hep-ph/9903404
+      implicit double precision (a-h,o-z)
+      double complex sd_mat,su_mat,mu
+      common/sq_matrix/sd_mat(6,6),su_mat(6,6)
+      common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
+      common/fmass/em(3),um(3),dm(3)
+      common/qmass_pole/ump(3),dmp(3)     
+      common/hmass/cm(2),rm(2),ppm(2),zr(2,2),zh(2,2)
+      common/hmass_EPA/pm,hm1,hm2,sa,ca,sb,cb
+      common/hpar/hmpar1,hmpar2,hmpar12,mu
+      common/fermi/g_fermi
+      pm = ppm(1)               ! M_A
+      sb = zh(1,1)              ! sin(beta)
+      cb = zh(2,1)              ! cos(beta)
+      tm = ump(3)**2            ! pole mt^2
+      bm = dmp(3)**2            ! pole mb^2
+c     stop mass eigenstates^2 (no flavor mixing included!)
+      stm1 = dble(su_mat(3,3) + su_mat(6,6) 
+     $     - sqrt((su_mat(3,3) - su_mat(6,6))**2 
+     $     + 4*abs(su_mat(3,6))**2))/2
+      stm2 = dble(su_mat(3,3) + su_mat(6,6) 
+     $     + sqrt((su_mat(3,3) - su_mat(6,6))**2 
+     $     + 4*abs(su_mat(3,6))**2))/2
+c     sbottom mass eigenstates^2 (no flavor mixing included!)
+      sbm1 = dble(sd_mat(3,3) + sd_mat(6,6) 
+     $     - sqrt((sd_mat(3,3) - sd_mat(6,6))**2 
+     $     + 4*abs(sd_mat(3,6))**2))/2
+      sbm2 = dble(sd_mat(3,3) + sd_mat(6,6) 
+     $     + sqrt((sd_mat(3,3) - sd_mat(6,6))**2 
+     $     + 4*abs(sd_mat(3,6))**2))/2
+
+      if ((stm1.le.0).or.(stm2.le.0).or.(sbm1.le.0).or.(sbm2.le.0)) then
+c     negative eigemass^2
+        ierr = 2
+        return
       end if
-      sabe = dble(zs(nh)*(sab - is*zms(nh,2)*cab))
-      cabe = dble(zs(nh)*(cab + is*zms(nh,2)*sab))
-      tabe = sabe/cabe
-      alpha_eff = atan(tabe) + atan(sb/cb) - pi
+
+c     averaged stop and sbottom mass^2
+      stm =  sqrt(stm1*stm2 + tm*(stm1 + stm2) + tm*tm)
+      sbm =  sqrt(sbm1*sbm2 + bm*(sbm1 + sbm2) + bm*bm)
+c     "M^t_LR^2/M_S^2" and "M^b_LR^2/M_S^2" of hep-ph/9903404
+      dsm = abs(su_mat(3,6)/um(3))**2/stm
+      dbm = abs(sd_mat(3,6)/dm(3))**2/sbm
+c     on-shell s_W^2 
+      sw2 = 1 - wm2/zm2
+c     auxiliary variables
+      pt = 1.d0 - 8*sw2/3 + 32.d0/9*sw2*sw2
+      xt = zm2/tm               ! MZ^2/mt^2
+      xb = bm/zm2               ! mb^2/MZ^2
+      xs = tm/stm               ! mt^2/M_stop^2
+      sl = log(xs)
+      gf = g_fermi*sq2/pi/pi*zm2*zm2
+
+c     corrections from top/stop sector to CP-even Higgs self energy,
+c     factor g_fermi*sq2/pi/pi*zm**4 extracted
+c     1-loop
+      se11 = cb*cb*pt*sl/8.d0
+      se12 = - cb/sb*(pt*sb*sb - 3/xt)*sl/8.d0
+      se22 = (- 2*xt + 1.1d0*xt*xt + (12 - 6*xt*sb*sb + pt*xt*xt*sb**4)
+     $     *sl + dsm*(- 12 + 4*xt + 6*xs) + dsm**2*(1 - 4*xs + 3*xs*xs)
+     $     + dsm**3*xs*(3/5.d0 - 12/5.d0*xs + 2*xs*xs) + dsm**4*xs*xs
+     $     *(3/7.d0 - 12/7.d0*xs + 1.5d0*xs*xs))/xt/xt/sb/sb/8
+c     2-loop
+      se22 = se22 + 3*alfas(sqrt(stm))/pi*(sl*sl - 2*sl - 2*sqrt(dsm) -
+     $     dsm*sl + dsm*dsm/4)/xt/xt/sb/sb
+
+c     corrections from other SUSY sectors (hep-ph/9307201)
+c     no treshold (non-logarithmic) corrections from Ab!
+      pt = 3*pt
+      pf = 21 - 40*sw2 + 160/3.d0*sw2*sw2
+      pg = - 44 + 106*sw2 - 62*sw2*sw2
+      pg1 = 10 + 34*sw2 - 26*sw2*sw2
+      ph = - 10 + 2*sw2 - 2*sw2*sw2
+      ph1 = 8 - 22*sw2 + 10*sw2*sw2
+
+      se11 = se11 + cb*cb*(36*xb*xb/cb**4 - 18*xb/cb/cb + pf + pg + ph)
+     $     *log(sbm/zm2)/24.d0
+      se12 = se12 + sb*cb*(9*xb/cb/cb - pf - pg1 - ph1)*log(sbm/zm2)
+     $     /24.d0
+      se22 = se22 + sb*sb*(pf + pg + ph)*log(sbm/zm2)/24.d0
+
+c     CP-even Higgs mass matrix
+      a =   zm2*cb*cb + pm*pm*sb*sb - gf*se11 
+      b =   zm2*sb*sb + pm*pm*cb*cb - gf*se22 
+      c = - (zm2 + pm*pm)*sb*cb - gf*se12
+
+      x = atan(2*c/(a - b))/2
+      if (x.gt.0.d0) then
+        ix = int(2*x/pi)
+        x = x - (ix + 1)*pi/2.d0
+      end if
+
+      nrot = 0
+ 10   sa = sin(x)
+      ca = cos(x)
+      hm1 = a*ca*ca + b*sa*sa + 2*c*ca*sa
+      hm2 = a*sa*sa + b*ca*ca - 2*c*ca*sa
+      hm1 = sign(sqrt(abs(hm1)),hm1)
+      hm2 = sign(sqrt(abs(hm2)),hm2)
+      if (hm1.lt.hm2) then
+        if (nrot.eq.0) then
+          nrot = 1
+          x = x - pi/2
+          goto 10
+        else
+          ierr = 3
+          return
+        end if
+      end if
+
+c     subleading (non-logarithmic sbottom sector and 2-loop Y_t)
+c     corrections to mh (hep-ph/990340 eq.25) in large M_A limit
+c     trilinear sbottom corrections
+      dmhb = 1.5d0*gf*xb*xb*dbm*(1 - dbm/12) - gf*(cb*cb - sb*sb)*(3*xb
+     $     *dbm + abs(sd_mat(3,6)*(sd_mat(3,6) + 2*dconjg(mu)*dm(3)*sb
+     $     /cb))/sbm/zm2)/8
+c     2-loop Yt corrections
+      if ((abs(stm1-stm2)/(stm1+stm2)).le.1.d-4) then
+         dsf = 0.d0
+      else
+         dsf = 2 - (stm2 + stm1)/(stm2 - stm1)*log(stm2/stm1)
+      end if
+      sin2t = abs(su_mat(3,6)**2/(su_mat(3,6)**2 + (su_mat(3,3) -
+     $     su_mat(6,6))**2/4))  ! sin^2(2 theta_t)
+      dst = (stm2 - stm1)/4/um(3)**2*sin2t
+      xxt = dst*dst*dsf + 2*dst*log(stm2/stm1)
+      tl = log(stm1*stm2/um(3)**4)/2
+      dmhy = (3*g_fermi*um(3)**3/4.d0/pi/pi)**2*tl*(xxt + tl)
+c     corrected physical m_h
+      hm2sq = hm2*hm2 + dmhb + dmhy
+      if (hm2sq.le.0.d0) then
+         ierr = 4
+         return
+      end if
+      hm2 = sqrt(hm2sq)
       return
       end
 
@@ -594,10 +772,8 @@ c     hm1,hm2:       H/h masses
 c     hmc:           H^+ mass
 c     istat defines the required action (istat value is stored in
 c     common/2hdm_args/):
-c     istat=0    Restores tree level MSSM mixing angles and masses
+c     istat=1    Restores tree level MSSM mixing angles and masses
 c                Subroutine mh_diag has to be called first!
-c     istat=1    MSSM alpha_eff and 1-loop mh/mH used in FDC approximation
-c                Subroutines hm_solve and z_ext has to be called first!
 c     istat=2    MSSM alpha_eff and 1-loop mh/mH used in EPA approximation
 c                Subroutines corr_EPA or fcorr_EPA has to be called first!
 c     istat=3    Sets completely free values of masses and mixing angles.
@@ -616,7 +792,6 @@ c                Values of parameters alpha,...,hmc important only in this case
       common/hmass_mssm/cmm(2),rmm(2),pmm(2),zzr(2,2),zzh(2,2)
       common/thdm/alpha0,beta0,am0,hm10,hm20,hmc0,istat0
       common/hmass_EPA/pme,hm1e,hm2e,sae,cae,sbe,cbe
-      common/hm_phys/frm(2),frm2(2)
       common/zzs_stat/zzs_cra,zzs_crb,zzs_cr,ss,nh,zzs_stat
       common/zps_stat/zps_cr,ssa,nha,zps_stat
       common/rsl/vlls(6,6,2),init_lls
@@ -651,7 +826,7 @@ c     Store parameter values
 c     Cross sections should be recalculated after this procedure
       zzs_stat = .false.
       zps_stat = .false.
-      if (istat.eq.0) then
+      if (istat.eq.1) then
          do i=1,2
             cm(i) = cmm(i)
             pm(i) = pmm(i)
@@ -665,16 +840,6 @@ c     Cross sections should be recalculated after this procedure
          ca = zr(1,1)
          sb = zh(1,1)
          cb = zh(2,1)
-      else if (istat.eq.1) then
-         rm(1) = frm(1)
-         rm(2) = frm(2)
-         al = alpha_eff(2)
-         sa = sin(al)
-         ca = cos(al)
-         zr(1,1) = ca
-         zr(1,2) = - sa
-         zr(2,1) = sa
-         zr(2,2) = ca
       else if (istat.eq.2) then
          rm(1) = hm1e
          rm(2) = hm2e
@@ -708,262 +873,10 @@ c     Cross sections should be recalculated after this procedure
       return
       end
 
-      subroutine correct_unitarity(z,n)
-c     improves numerical accuracy of complex matrix unitarity
-      implicit double precision (a-h,o-z)
-      parameter (nmax=6)
-      double complex z(n,n),eps(nmax,nmax),v(nmax,nmax)
-c     check array sizes
-      if (n.gt.nmax) stop
-     $     'increase array sizes in routine correct_unitarity'
-c     build matrix eps = 1 - (Z^+ Z - 1)/2 = 3/2 - (Z^+ Z)/2
-c     also, store z in auxiliary matrix v
-      do i=1,n
-         do j=1,n
-            eps(i,j) = (0.d0,0.d0)
-            v(i,j) = z(i,j)
-            do k=1,n
-               eps(i,j) = eps(i,j) - dconjg(z(k,i))*z(k,j)/2
-            end do
-         end do
-         eps(i,i) = 1.5d0 + eps(i,i)
-      end do
-c     correct initial matrix Z -> Z*eps
-      do i=1,n
-         do j=1,n
-            z(i,j) = (0.d0,0.d0)
-            do k=1,n
-               z(i,j) = z(i,j) + v(i,k)*eps(k,j)
-            end do
-         end do
-      end do
-      return
-      end
-
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c     The following set of routines computes 1-loop  masses and mixing c
-c     angles of Higgs particles in the MSSM in the EPA approach.       c
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-
-      subroutine corr_EPA(tanb,pm,top,am,amsq,ys,ierr)
-      implicit double precision (a-h,o-z)
-      common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/fmass/em(3),um(3),dm(3)
-      common/hmass_EPA/ppm,hm1,hm2,sa,ca,sb,cb
-
-      amsus2 = amsq*amsq
-      tm2 = top*top
-      bm2 = dm(3)*dm(3)
-      at = ys*amsq
-      ab = ys*amsq
-      ierr = 0
-
-      cb  = 1/sqrt(1 + tanb*tanb)
-      sb  = tanb/sqrt(1 + tanb*tanb)
-      c2b = cb*cb - sb*sb
-
-      amt1 = sqrt(tm2*(at + am*cb/sb)**2 + ((8*wm2 - 5*zm2)*c2b/12)**2)
-      amt2 = tm2 + amsus2 + zm2*c2b/4 - amt1
-      amt1 = tm2 + amsus2 + zm2*c2b/4 + amt1
-
-      amb1 = sqrt(bm2*(ab + am*sb/cb)**2 + ((4*wm2 - zm2)*c2b/12)**2)
-      amb2 = bm2 + amsus2 - zm2*c2b/4 - amb1
-      amb1 = bm2 + amsus2 - zm2*c2b/4 + amb1
-
-      if ((amt1.le.0).or.(amt2.le.0).or.(amb1.le.0).or.(amb2.le.0)) then
-        ierr = 2
-        return
-      end if
-
-      if (amt1.eq.amt2) then
-        alt  = 0
-        altm = 0
-      else
-        alt  = at*(at + am*cb/sb)/(amt1 - amt2)
-        altm = am*(at + am*cb/sb)/(amt1 - amt2)
-      end if
-      if (amb1.eq.amb2) then
-        alb  = 0
-        albm = 0
-      else
-        alb  = ab*(ab + am*sb/cb)/(amb1 - amb2)
-        albm = am*(ab + am*sb/cb)/(amb1 - amb2)
-      end if
-
-      d11 = bm2*bm2/cb/cb*(log(amb1*amb2/bm2/bm2) + 2*alb*log(amb1/amb2)
-     $     + alb*alb*sfun(amb1,amb2)) + tm2*tm2/sb/sb*altm*altm
-     $     *sfun(amt1,amt2)
-
-      d22 = tm2*tm2/sb/sb*(log(amt1*amt2/tm2/tm2) + 2*alt*log(amt1/amt2)
-     $     + alt*alt*sfun(amt1,amt2)) + bm2*bm2/cb/cb*albm*albm
-     $     *sfun(amb1,amb2)
-
-      d12 = tm2*tm2/sb/sb*altm*(log(amt1/amt2) + alt*sfun(amt1,amt2)) +
-     $     bm2*bm2/cb/cb*albm*(log(amb1/amb2) + alb*sfun(amb1,amb2))
-
-      dd = pm*pm*sb*cb
-      a =   zm2*cb*cb + sb*dd/cb + 3.d0*e2/wm2/st2/pi/pi/16*d11
-      b =   zm2*sb*sb + cb*dd/sb + 3.d0*e2/wm2/st2/pi/pi/16*d22
-      c = - zm2*sb*cb - dd + 3.d0*e2/wm2/st2/pi/pi/16*d12
-
-      x = atan(2*c/(a - b))/2
-      if (x.gt.0) then
-        ix = int(2*x/pi)
-        x = x - (ix + 1)*pi/2.d0
-      end if
-      nrot = 0
-
- 10   sa = sin(x)
-      ca = cos(x)
-      hm1 = a*ca*ca + b*sa*sa + 2*c*ca*sa
-      hm2 = a*sa*sa + b*ca*ca - 2*c*ca*sa
-      hm1 = sign(sqrt(abs(hm1)),hm1)
-      hm2 = sign(sqrt(abs(hm2)),hm2)
-      if (hm1.lt.hm2) then
-        if (nrot.eq.0) then
-          nrot = 1
-          x = x - pi/2
-          goto 10
-        else
-          ierr = 3
-          return
-        end if
-      end if
-      ppm = pm
-
-      return
-      end
-
-      double precision function sfun(am1,am2)
-      implicit double precision (a-h,o-z)
-      sfun = 0
-      if (am1.eq.am2) return
-      sfun = 2 - (am1 + am2)/(am1 - am2)*log(am1/am2)
-      return
-      end
-
-      subroutine fcorr_EPA(tanb,pm,top,am,stbl,sbr,str,ybs,yts,ierr)
-      implicit double precision (a-h,o-z)
-      common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/fmass/em(3),um(3),dm(3)
-      common/hmass_EPA/ppm,hm1,hm2,sa,ca,sb,cb
-
-      t = (tanb**2 - 1)/(tanb**2 + 1)
-
-      aat = (stbl*stbl + top*top + t*(zm2 - 4*wm2)/6)/zm2
-      bbt = (abs(str)*str + top*top - 2*t*(zm2 - wm2)/3)/zm2
-      cct = - top*(yts*sqrt(stbl*str) + am/tanb)/zm2
-        tm2 = (aat + bbt - sqrt((aat - bbt)**2 + 4*cct**2))/2
-        tm1 = (aat + bbt + sqrt((aat - bbt)**2 + 4*cct**2))/2
-      aab = (stbl*stbl + dm(3)*dm(3) + t*(zm2 + 2*wm2)/6)/zm2
-      bbb = ( sbr*sbr  + dm(3)*dm(3) + t*(zm2 - wm2)/3)/zm2
-      ccb = - dm(3)*(ybs*sqrt(stbl*sbr) + am*tanb)/zm2
-        bm2 = (aab + bbb - sqrt((aab-bbb)**2 + 4*ccb**2))/2
-        bm1 = (aab + bbb + sqrt((aab-bbb)**2 + 4*ccb**2))/2
-
-      if ((tm1.le.0).or.(tm2.le.0).or.(bm1.le.0).or.(bm2.le.0)) then
-        ierr = 2
-        return
-      end if
-
-      cb = 1/sqrt(1 + tanb*tanb)
-      sb = tanb/sqrt(1 + tanb*tanb)
-
-      at = yts*abs(stbl)
-      ab = ybs*abs(stbl)
-
-      if (tm1.eq.tm2) then
-        tla = 0.d0
-        tlm = 0.d0
-      end if
-      if (tm2.lt.tm1) then
-        tla =  at*(at + am/tanb)/(tm1 - tm2)/zm2
-        tlm =  am*(at + am/tanb)/(tm1 - tm2)/zm2
-      end if
-      if (bm1.eq.bm2) then
-        bla = 0.d0
-        blm = 0.d0
-      end if
-      if (bm2.lt.bm1) then
-        bla =  ab*(ab + am*tanb)/(bm1 - bm2)/zm2
-        blm =  am*(ab + am*tanb)/(bm1 - bm2)/zm2
-      end if
-      D11 = log(bm1*bm2) - 4*log(dm(3)/zm) + 2*bla*log(bm1/bm2)
-      D11 = D11 + bla*bla*sfun2(bm1,bm2)
-      D11 = D11*(dm(3)*dm(3)/cb)**2
-      D11 = D11 + tlm*tlm*sfun2(tm1,tm2)*(top*top/sb)**2
-      D22 = log(tm1*tm2)-4*log(top/zm) + 2*tla*log(tm1/tm2)
-      D22 = D22 + tla*tla*sfun2(tm1,tm2)
-      D22 = D22*(top*top/sb)**2
-      D22 = D22 + blm*blm*sfun2(bm1,bm2)*(dm(3)*dm(3)/cb)**2
-      D12 = tlm*(log(tm1/tm2)+tla*sfun2(tm1,tm2))*(top*top/sb)**2
-     1    + blm*(log(bm1/bm2)+bla*sfun2(bm1,bm2))*(dm(3)*dm(3)/cb)**2
-      DD = pm*pm*sb*cb
-
-      a =   zm2*cb*cb + 3*alpha*D11/st2/pi/wm2/4.d0 + sb*DD/cb
-      b =   zm2*sb*sb + 3*alpha*D22/st2/pi/wm2/4.d0 + cb*DD/sb
-      c = - zm2*sb*cb + 3*alpha*D12/st2/pi/wm2/4.d0 - DD
-
-      x = atan(2*c/(a - b))/2
-      if (x.gt.0) then
-        ix = int(2*x/pi)
-        x = x - (ix + 1)*pi/2.d0
-      end if
-      nrot = 0
-
- 10   sa = sin(x)
-      ca = cos(x)
-      hm1 = a*ca*ca + b*sa*sa + 2*c*ca*sa
-      hm2 = a*sa*sa + b*ca*ca - 2*c*ca*sa
-      hm1 = sign(sqrt(abs(hm1)),hm1)
-      hm2 = sign(sqrt(abs(hm2)),hm2)
-      if (hm1.lt.hm2) then
-        if (nrot.eq.0) then
-          nrot = 1
-          x = x - pi/2
-          goto 10
-        else
-          ierr = 3
-          return
-        end if
-      end if
-      ppm = pm
-
-      return
-      end
-
-      double precision function sfun1(a1,a2)
-      implicit double precision (a-h,o-z)
-      common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      sfun1 = (a1 + a2)/4 - a1*a2*log(a1/a2)/(a1 - a2)/2
-      sfun1 = sfun1/16/pi/pi
-      return
-      end
-
-      double precision function sfun2(a1,a2)
-      implicit double precision (a-h,o-z)
-      if (a1.eq.a2) then
-        sfun2 = 0
-      else
-        sfun2 = 2 - (a1 + a2)/(a1 - a2)*log(a1/a2)
-      end if
-      return
-      end
-
-      double precision function alpha_eff_EPA(nh)
-      implicit double precision (a-h,o-z)
-      common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/hmass_EPA/pm,hm1,hm2,sa,ca,sb,cb
-c     Effective alpha calculated in EPA
-c     Argument nh unused (important for the FDC only).
-      alpha_eff_EPA = atan(sa/ca)
-      if (alpha_eff_EPA.gt.0) alpha_eff_EPA = alpha_eff_EPA - pi
-      return
-      end
-
       block data init_nc_diag
       implicit double precision (a-h,o-z)
       common/nc_suppress/eps_d,eps_u,acc
       data eps_d,eps_u/2*1.d0/
       data acc/1.d-7/
       end
+

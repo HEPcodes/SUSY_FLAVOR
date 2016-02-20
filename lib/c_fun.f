@@ -10,12 +10,14 @@ c     Preventing overflows in c0 for alfa=0,1
 c     Revised: 06: 6:2013 (J.R.)
 c     Added moment to list of C-functions arguments; simplified
 c     resetting after argument change - now automatic and inside c0 only
-
+c     Revised: 17.11.2013 (J.R.)
+c     New code with for c0 written to prevent loss of accuracy due to
+c     strong cancellations. Error in c0 phase corrected (coming from
+c     misprint in original PV paper!)
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     This file contains three-point standard loop integrals         c
 c     c0(p2,q2,pq;m1,m2,m3), c11, c12, c21, c22, c23, c24.           c
-c     Arguments p2,q2,pq are transferred via commom/cargs/p2,q2,pq   c
 c     For definitions of these functions see:                        c
 c     A.Axelrod@Nucl.Phys.B209(1982)p.349 (compare: Chankowski,      c
 c     Pokorski,Rosiek, Nucl.Phys.B423(1994)p.437 available as        c
@@ -33,6 +35,13 @@ c               \     |                                              c
 c            m3   \   |                                              c
 c                   \ |_________ q (outgoing)                        c
 c                                                                    c
+c                                                                    c
+c                                                                    c
+c     -i/(4 pi)^2 c0 = INT d^4k/(2 pi)^4                             c
+c            1/(k^2-m2^2)/((k-q)^2-m3^2)/((k+p)^2-m1^2)              c
+c                    = INT d^4k/(2 pi)^4                             c
+c            1/(k^2-m1^2)/((k+p)^2-m2^2)/((k+p+q)^2-m3^2)            c
+c                                                                    c
 c   p2 = p^2    q2 = q^2    pq = 1/2 ((p + q)^2 - p^2 - q^2)         c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
@@ -45,13 +54,25 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
         c11 = (0.d0,0.d0)
         return
       end if
+c     check momenta and mass scales. 
       det = p2*q2 - pq*pq
-      s1 = p2 + a1*a1 - a2*a2
-      s2 = q2 + 2*pq + a2*a2 - a3*a3
-      x = p2 + q2 + 2*pq
-      c11 = q2*(b0(x,a1,a3) - b0(q2,a2,a3) + s1*c0(p2,q2,pq,a1,a2,a3))
-     $     - pq*(b0(p2,a1,a2) - b0(x,a1,a3) + s2*c0(p2,q2,pq,a1,a2,a3))
-      c11 = - c11/det/2
+      scp = abs(det)**0.25d0
+      scm = max(abs(a1),abs(a2),abs(a3))
+c     call full or expanded version of c-fun code
+      if ((p2.le.(a1+a2)**2).and.(q2.le.(a2+a3)**2)
+     $     .and.((p2+2*pq+q2).le.(a1+a3)**2)
+     $     .and.((scp/scm).le.0.2d0)) then 
+         c11 = c11exp(p2,q2,pq,a1,a2,a3)
+      else
+         s1 = p2 + a1*a1 - a2*a2
+         s2 = q2 + 2*pq + a2*a2 - a3*a3
+         x = p2 + q2 + 2*pq
+         c11 = q2*(b0(x,a1,a3) - b0(q2,a2,a3) 
+     $        + s1*c0(p2,q2,pq,a1,a2,a3))
+     $        - pq*(b0(p2,a1,a2) - b0(x,a1,a3) 
+     $        + s2*c0(p2,q2,pq,a1,a2,a3))
+         c11 = - c11/det/2
+      end if
       return
       end
 
@@ -64,13 +85,25 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
         c12 = (0.d0,0.d0)
         return
       end if
+c     check momenta and mass scales. 
       det = p2*q2 - pq*pq
-      s1 = p2 + a1*a1 - a2*a2
-      s2 = q2 + 2*pq + a2*a2 - a3*a3
-      x = p2 + q2 + 2*pq
-      c12 = - pq*(b0(x,a1,a3) - b0(q2,a2,a3) + s1*c0(p2,q2,pq,a1,a2,a3))
-     $     + p2*(b0(p2,a1,a2) - b0(x,a1,a3) + s2*c0(p2,q2,pq,a1,a2,a3))
-      c12 = - c12/det/2
+      scp = abs(det)**0.25d0
+      scm = max(abs(a1),abs(a2),abs(a3))
+c     call full or expanded version of c-fun code
+      if ((p2.le.(a1+a2)**2).and.(q2.le.(a2+a3)**2)
+     $     .and.((p2+2*pq+q2).le.(a1+a3)**2)
+     $     .and.((scp/scm).le.0.2d0)) then 
+         c12 = c12exp(p2,q2,pq,a1,a2,a3)
+      else
+         s1 = p2 + a1*a1 - a2*a2
+         s2 = q2 + 2*pq + a2*a2 - a3*a3
+         x = p2 + q2 + 2*pq
+         c12 = - pq*(b0(x,a1,a3) - b0(q2,a2,a3) 
+     $        + s1*c0(p2,q2,pq,a1,a2,a3))
+     $        + p2*(b0(p2,a1,a2) - b0(x,a1,a3) 
+     $        + s2*c0(p2,q2,pq,a1,a2,a3))
+         c12 = - c12/det/2
+      end if
       return
       end
 
@@ -163,7 +196,10 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     if arguments changed, calculate new c0 value; use old one otherwise 
       if (max(abs(p2-p2_0),abs(q2-q2_0),abs(pq-pq_0),abs(a1-a1_0),
      $     abs(a2-a2_0),abs(a3-a3_0)).ge.eps_c0) then
-         c0 = c0_body(p2,q2,pq,a1,a2,a3)
+c     rescale momenta to maximal one to avoid cancellations
+         r = max(abs(p2)**0.5d0,abs(q2)**0.5d0,abs(pq)**0.5d0,
+     $        abs(a1),abs(a2),abs(a3))
+         c0 = c0_body(p2/r/r,q2/r/r,pq/r/r,a1/r,a2/r,a3/r)/r/r
          p2_0 = p2
          q2_0 = q2
          pq_0 = pq
@@ -213,6 +249,9 @@ c     if arguments changed, calculate new c0 value; use old one otherwise
          sf3 = (0.d0,0.d0)
       end if
       c0_body = (sf1 - sf2 + sf3)/(c + 2*b*alfa)
+c     check if phase is just due to numerical error
+      if ((p2.le.(a1+a2)**2).and.(q2.le.(a2+a3)**2)
+     $     .and.((p2+2*pq+q2).le.(a1+a3)**2)) c0_body = dble(c0_body)
       return
       end
 
@@ -235,8 +274,8 @@ c     if arguments changed, calculate new c0 value; use old one otherwise
       y2 = ( - b + sqrt(delta))/2/a
       z1 = a
       z2 = c/a
-      s3 = R(y0,y1) + R(y0,y2) + log(1 - 1/y0)*(eta(y0 - y1,y0 - y2)
-     1   - eta( - y1, - y2) + eta(z1,z2) - eta(z1,y0*(y0 + b/a) + z2))
+      s3 = R(y0,y1) + R(y0,y2) - log(1 - 1/y0)*(eta(y0 - y1,y0 - y2)
+     $   - eta( - y1, - y2) + eta(z1,z2) - eta(z1,y0*(y0 + b/a) + z2))
       return
       end
 
@@ -244,8 +283,8 @@ c     if arguments changed, calculate new c0 value; use old one otherwise
       implicit double precision (a-h,o-z)
       double complex eta,li2,z0,z1
       R = li2(z0/(z0 - z1)) - li2((z0 - 1)/(z0 - z1))
-     1  + eta( - z1,1/(z0 - z1))*log(z0/(z0 - z1))
-     2  - eta(1 - z1,1/(z0 - z1))*log((z0 - 1)/(z0 - z1))
+     $     + eta( - z1,1/(z0 - z1))*log(z0/(z0 - z1))
+     $     - eta(1 - z1,1/(z0 - z1))*log((z0 - 1)/(z0 - z1))
       return
       end
 
@@ -256,8 +295,8 @@ c     if arguments changed, calculate new c0 value; use old one otherwise
       zi1 = dimag(z1)
       zi2 = dimag(z2)
       zi12 = dimag(z1*z2)
-      eta = 2*pi*(0.d0,1.d0)*(theta( - zi1)*theta( - zi2)*theta(zi12)
-     1    - theta(zi1)*theta(zi2)*theta( - zi12))
+      eta = dcmplx(0.d0,2*pi)*(theta( - zi1)*theta( - zi2)*theta(zi12)
+     $     - theta(zi1)*theta(zi2)*theta( - zi12))
       return
       end
 

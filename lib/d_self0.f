@@ -115,11 +115,14 @@ c      Full bare down quark self-energy, vector part
       implicit double precision (a-h,o-z)
       double complex dv_sig0_w,dv_sig0_h,dv_sig0_n,dv_sig0_c,dv_sig0_g
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       common/d_self_stat/iv,ia,is,ip
       external init_d_self
-      dv_sig0 = dv_sig0_w(i,j)
-      if (ih.eq.1) dv_sig0 = dv_sig0 + dv_sig0_h(i,j)
+      dv_sig0 = (0.d0,0.d0)
+      if (ih.eq.1) then
+         dv_sig0 = dv_sig0 + dv_sig0_w(i,j)
+         dv_sig0 = dv_sig0 + dv_sig0_h(i,j)
+      end if
       if (in.eq.1) dv_sig0 = dv_sig0 + dv_sig0_n(i,j)
       if (ic.eq.1) dv_sig0 = dv_sig0 + dv_sig0_c(i,j)
       if (ig.eq.1) dv_sig0 = dv_sig0 + dv_sig0_g(i,j)
@@ -233,11 +236,14 @@ c     Full bare down quark self-energy, axial part
       implicit double precision (a-h,o-z)
       double complex da_sig0_w,da_sig0_h,da_sig0_n,da_sig0_c,da_sig0_g
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       common/d_self_stat/iv,ia,is,ip
       external init_d_self
-      da_sig0 = da_sig0_w(i,j)
-      if (ih.eq.1) da_sig0 = da_sig0 + da_sig0_h(i,j) 
+      da_sig0 = (0.d0,0.d0)
+      if (ih.eq.1) then
+         da_sig0 = da_sig0 + da_sig0_w(i,j)
+         da_sig0 = da_sig0 + da_sig0_h(i,j)
+      end if
       if (in.eq.1) da_sig0 = da_sig0 + da_sig0_n(i,j) 
       if (ic.eq.1) da_sig0 = da_sig0 + da_sig0_c(i,j) 
       if (ig.eq.1) da_sig0 = da_sig0 + da_sig0_g(i,j) 
@@ -333,11 +339,11 @@ c     Gluino and down squark in loop
       implicit double precision (a-h,o-z)
       double complex ds_sig0_h,ds_sig0_n,ds_sig0_c,ds_sig0_g
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       common/d_self_stat/iv,ia,is,ip
       external init_d_self
       ds_sig0 = (0.d0,0.d0)
-      if (ih.eq.1) ds_sig0 = ds_sig0 + ds_sig0_h(i,j) 
+      if (ih.eq.1) ds_sig0 = ds_sig0 + ds_sig0_h(i,j)
       if (in.eq.1) ds_sig0 = ds_sig0 + ds_sig0_n(i,j) 
       if (ic.eq.1) ds_sig0 = ds_sig0 + ds_sig0_c(i,j) 
       if (ig.eq.1) ds_sig0 = ds_sig0 + ds_sig0_g(i,j) 
@@ -433,11 +439,11 @@ c     Gluino and down squark in loop
       implicit double precision (a-h,o-z)
       double complex dp_sig0_h,dp_sig0_n,dp_sig0_c,dp_sig0_g
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       common/d_self_stat/iv,ia,is,ip
       external init_d_self
       dp_sig0 = (0.d0,0.d0)
-      if (ih.eq.1) dp_sig0 = dp_sig0 + dp_sig0_h(i,j) 
+      if (ih.eq.1) dp_sig0 = dp_sig0 + dp_sig0_h(i,j)
       if (in.eq.1) dp_sig0 = dp_sig0 + dp_sig0_n(i,j) 
       if (ic.eq.1) dp_sig0 = dp_sig0 + dp_sig0_c(i,j) 
       if (ig.eq.1) dp_sig0 = dp_sig0 + dp_sig0_g(i,j) 

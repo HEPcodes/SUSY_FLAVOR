@@ -20,60 +20,63 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       double complex sdmi_lrp(3,3),sumi_lrp(3,3)
       double complex amg,amgg,amue
       common/sf_cont/eps,indx(3,3),iconv
+c     common/ph_units/hbar,gev_cm,gev_s
       dimension corr_l(3),corr_d(3),corr_u(3),corr_ckm(3,3)
       
-      common/ph_units/hbar,gev_cm,gev_s
-
 c     Parameters defined inside the code.  
 
 c     Input parameters convention choice
-c     iconv = 1                 ! SLHA2 input conventions
-      iconv = 2                 ! hep-ph/9511250 input conventions
+      iconv = 1                 ! SLHA2 input conventions
+c     iconv = 2                 ! hep-ph/9511250 input conventions
       
 c     fixes the treatment of enhanced chiral correction resummation
-      ilev = 0                  ! no resummation, SUSY corrections strictly 1-loop
-      ilev = 1                  ! resummation using the decoupling limit
+c     ilev = 0                  ! no resummation, SUSY corrections strictly 1-loop
+c     ilev = 1                  ! resummation using the decoupling limit
       ilev = 2                  ! exact iterative solution, may not always converge
       
-      call sprog_input          ! reset default SM and hadronic parameters
+c     choose MSSM sectors to include
+      ih = 1                    ! Higgs + gauge diagrams included
+      ic = 1                    ! chargino diagrams included
+      in = 1                    ! neutralino diagrams included
+      ig = 1                    ! gluino diagrams included
+
+      call set_active_sector(ih,ic,in,ig) ! set control variables
+
+      call sflav_sm             ! initialize auxiliary SM parameters
 
 c     SM basic input initialization
       zm0 = 91.1876d0           ! M_Z
       wm0 = 80.398d0            ! M_W
       alpha_z = 1/127.934d0     ! alpha_em(M_Z)
-      st2_new = 0.232d0         ! s_W^2 (here MSbar value)
+      st2_new = 0.23116d0       ! s_W^2 (here MSbar value)
       call vpar_update(zm0,wm0,alpha_z,st2_new)
 
-c     QCD parameters
-      alpha_s = 0.1174d0        ! alpha_s(MZ)
-      call lam_fit(alpha_s)     ! fits Lambda_QCD at 3 loop level
-      call lam_fit_nlo(alpha_s) ! fits Lambda_QCD at NLO level
+c     QCD parameters and fermion mass initialization
+      alpha_s = 0.1172d0        ! alpha_s(MZ)
+      top_scale = 163.09d0
+      top = 163.09d0            ! MSbar running m_t(top_scale)
+      bot_scale = 4.18d0
+      bot = 4.18d0              ! MSbar running m_b(bot_scale)
+      call init_fermion_sector(alpha_s,top,top_scale,bot,bot_scale)
 
 c     CKM matrix initialization
-      alam = 0.22543d0          ! lambda
-      apar = 0.812d0            ! A
-      rhobar = 0.145d0          ! rho bar
-      etabar = 0.343d0          ! eta bar
+      alam = 0.2258d0           ! lambda
+      apar = 0.808d0            ! A
+      rhobar = 0.177d0          ! rho bar
+      etabar = 0.36d0           ! eta bar
       call ckm_wolf(alam,apar,rhobar,etabar)
-
-c     Fermion mass initialization, input: MSbar running quark masses
-      top_scale = 163.09d0
-      top = 163.09d0             ! running m_t(top_scale)
-      bot_scale = 4.17d0
-      bot = 4.17d0              ! running m_b(bot_scale)
-      call init_fermion_sector(top,top_scale,bot,bot_scale)
 
 c     Higgs sector parameters
       pm    = 200               ! M_A
-      tanbe = 10                 ! tan(beta)
+      tanbe = 4                 ! tan(beta)
       amue  = (200.d0,100.d0)   ! mu
       call init_higgs_sector(pm,tanbe,amue,ierr)
       if (ierr.ne.0) stop 'negative tree level Higgs mass^2?'
       
 c     Gaugino sector parameters. CAUTION: if M1 is set to 0 here then
 c     program sets M1 and M2 GUT-related, i.e. M1 = 5/3 s_W^2/c_W^2*M2
-      amgg  = (200.d0,-100.d0)  ! M1 (bino mass)
-      amg   = (300.d0,200.d0)   ! M2 (wino mass)
+      amgg  = (200.d0,0.d0)     ! M1 (bino mass)
+      amg   = (300.d0,0.d0)     ! M2 (wino mass)
       amglu = 600               ! M3 (gluino mass)
       call init_ino_sector(amgg,amg,amglu,amue,tanbe,ierr)
       if (ierr.ne.0) write(*,*) '-ino mass below M_Z/2?'
@@ -145,12 +148,10 @@ c     non-holomorphic LR mixing terms
 c     Example: diagonal entries normalized to Y_d,Y_u as in SUGRA  
       sumi_lr(1,1) = dcmplx(1.d-5,0.d0)
       sumi_lr(2,2) = dcmplx(4.d-3,0.d0)
-      sumi_lr(3,3) = dcmplx(1.d0,-0.5d0)
+      sumi_lr(3,3) = dcmplx(1.d0,0.d0)
       sdmi_lr(1,1) = dcmplx(-1.d-4,0.d0)
       sdmi_lr(2,2) = dcmplx(-2.d-3,0.d0)
-      sdmi_lr(3,3) = dcmplx(-8.d-2,4.d-2)
-      sumi_lr(2,3) = (2.0d-2,1.d-2) ! example, non-vanishing up LR 23 entry
-      sumi_lr(3,2) = (5.0d-2,1.d-2) ! example, non-vanishing up LR 23 entry
+      sdmi_lr(3,3) = dcmplx(-8.d-2,0.d0)
       sdmi_lr(2,3) = (1.d-2,-1.d-2) ! example, non-vanishing down LR 23 entry
 c     Calculate physical masses and mixing angles
       call init_squark_sector(amsq,amsu,amsd,sqmi_l,sumi_r,sdmi_r,
@@ -159,23 +160,25 @@ c     Calculate physical masses and mixing angles
 
 c     reset status of physical Higgs mass after parameter changes
       call reset_phys_data
-c     Neutral CP-even Higgs masses in the 1-loop Effective Potential
-c     Approximation. Only real mu, A_t, A_b allowed - replaced x->abs(x)
-      call fcorr_EPA(tanbe,pm,top,abs(amue),amsq(3),amsd(3),amsu(3)
-     $     ,abs(sdmi_lr(3,3)),abs(sumi_lr(3,3)),ierr)
-      if (ierr.ne.0) stop 'negative 1-loop EPA CP-even Higgs mass^2?'
+
+c     Neutral CP-even Higgs masses with the 2-loop approximate formula
+c     (see SUS_FlAVOR v2.5 manual Section 6)
+      call mhcorr_app2(ierr)
+      if (ierr.ne.0) stop 'negative CP-even Higgs mass^2?'
 
 c     !!! End of input section !!!
 
-      ilev = 2                  ! resummation level
-
 c     perform resummation of chirally enhanced corrections
       call set_resummation_level(ilev,ierr)
+      if (ierr.ne.0) write(*,*)ierr,
+     $     'Error in chiral corrections resummation!'
 
- 97   format('Physical results for resummation level ',i1,
-     $     ' (error code ',i1,')')
-      write(*,97)ilev,ierr
-      write(*,*)
+c     print output to susy_flavor.out
+
+      call susy_flavor          ! main routine calculating physical observables
+      call sflav_output(ilev,ierr) ! output written to susy_flavor.out
+
+c     repeat calculations and print them to screen
 
       call chiral_corr_size(corr_l,corr_d,corr_u,corr_ckm)
  
@@ -223,15 +226,16 @@ c     Results for implemented observables:
       write(*,99)'BR(B_s -> mu^+ mu^-) = ',b_ll(3,2,2,2)
       
       write(*,99)'BR(B_s -> mu^+ e^-)  = ',b_ll(3,2,2,1)
-      call b_taunu(br_taunu,dtaunu_ratio)
-      write(*,99)'BR(B_u -> tau nu)    = ',br_taunu
-      write(*,99)'BR(B_u -> D tau nu)/BR(B_u -> D l nu) = ',dtaunu_ratio
+      call b_taunu(br_taunu,dtaunu_ratio,dstaunu_ratio)
+      write(*,99)'BR(B -> tau nu)    = ',br_taunu
+      write(*,99)'BR(B -> D tau nu)/BR(B -> D l nu) = ',dtaunu_ratio
+      write(*,99)'BR(B -> D* tau nu)/BR(B -> D* l nu) = ',dstaunu_ratio
       write(*,*)
 
 c     Physical quantities for BR(B->X_s g) calculation
       delb = 0.99d0             ! Photon energy infrared cutoff
       amiu_b= 4.8d0             ! Renormalization scale miu_b
-      write(*,99)'BR(B -> X_S gamma) = ',bxg_nl(delb,amiu_b)
+      write(*,99)'BR(B -> X_s gamma) = ',bxg_nl(delb,amiu_b)
       write(*,*)
 
       write(*,99)'KK mixing:'
@@ -257,12 +261,6 @@ c     write(*,99)'Delta m_B_d  = ',delta_mbd*gev_s/1.d12 ! in ps^-1
       write(*,99)'Delta m_B_s  = ',delta_mbs
 c     write(*,99)'Delta m_B_s  = ',delta_mbs*gev_s/1.d12 ! in ps^-1
       write(*,*)
-
-c     repeat calculations and print them to susy_flavor.out, not to
-c     screen
-
-      call susy_flavor          ! main routine calculating physical observables
-      call sflav_output(ilev,ierr) ! output written to susy_flavor.out
 
  99   format(a,6(1pe11.4,1x))
       end

@@ -84,7 +84,7 @@ c     Br(B->X_s gamma) in the non-leading order, A function
       al = alfas(bm)/pi
       dl = log(delta)
       a_bsg = 0
-      if (fm_init.or.(delta.ne.d_old))call fm_bsg_init(delta) 
+      if (fm_init.or.(delta.ne.d_old)) call fm_bsg_init(delta) 
       do j=1,8
          do i=1,j
             a_bsg = a_bsg 
@@ -178,10 +178,14 @@ c     non-leading order c_7 effective cofficients at bm scale
       double complex c7_bsg_l,c8_bsg_l,z,li2
       common/vpar/st,ct,st2,ct2,sct,sct2,q,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/ceff_pow/p(6),cc(6,8),h(8),a(8),e(8),g(8),f(8)
-      common/qmass_pole/um(3),dm(3)
+      common/fmass/em(3),um(3),dm(3)
       if (i.ne.7) stop 'c1_eff_l(i,bm) defined for i=7 only'
       eta = alfas(wm)/alfas(bm)
-      x = um(3)*um(3)/wm2
+c     MS bar top quark mass at M_W
+      aw = alfas(wm)
+      at = alfas(um(3))
+      tm_w = um(3)*(aw/at)**(12.d0/23)
+      x = tm_w*tm_w/wm2
       z = dcmplx(1 - 1/x,0.d0)
       ex = - x*(18 - 11*x - x*x)/12/(x - 1)**3 - 2.d0*log(x)/3
      $     + x*x*(15 - 16*x + 4*x*x)/6/(x - 1)**4*log(x)
@@ -420,19 +424,10 @@ c     Results stored in common/bsg_fm/fmc(8,8)
       common/vpar/st,ct,st2,ct2,sct,sct2,q,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/bsg_dat/al1,al2,br_cev,al_em,xi3,r(8),gam(8),bxg_init
       common/ceff_pow/p(6),cc(6,8),h(8),a(8),e(8),g(8),f(8)
-      common/qmass_pole/ump(3),dmp(3)
-      common/fmass/em(3),um(3),dm(3)
+      common/qmass_pole/um(3),dm(3)
 c     ceff_pow initialization
       data p0/-2.d0,1.d0/
       data a0/7.d0,8.d0,3.d0,-6.d0/
-      do i=1,3
-         ump(i) = um(i)
-         dmp(i) = dm(i)
-      end do
-c     MS bar top quark mass calculated from pole mass
-      aw = alfas(wm)
-      at = alfas(um(3))
-      ump(3) = um(3)*(aw/at)**(12.d0/23)*sqrt((1 - 8.d0*at/3/pi))
 c     c_eff coefficients
       do i=1,2
          p(i) = 6.d0*p0(i)/23

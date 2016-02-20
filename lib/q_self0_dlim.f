@@ -33,41 +33,52 @@ c     decoupling limit
       common/vev/v1,v2
       common/alpha_s_susy/g3u,g3d,init_alpha_susy
       common/soft/ls(3,3),ks(3,3),ds(3,3),es(3,3),us(3,3),ws(3,3)
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       eps_dd = (0.d0,0.d0)
 c     Neutralino+gluino contribution, terms proportional to Yukawa couplings
-      do m=1,6
-         eps_dd = eps_dd - in*e2/st2/2.d0*gm2*mu*abs(zd(i,m))**2
-     $        * cp0(abs(mu),abs(gm2),sdm(m))
-     $        - in*e2/ct2*gm3*mu/6.d0*(abs(zd(i,m))**2
-     $        + 2*abs(zd(i+3,m))**2)*cp0(abs(mu),abs(gm3),sdm(m))
-         do n=1,6
-            eps_dd = eps_dd + abs(zd(i,m)*zd(i+3,n))**2*mu
-     $           * (ig*8/3.d0*g3d*g3d*gm1*cp0(gm1,sdm(m),sdm(n))
-     $           - in*e2/ct2/9.d0*gm3*cp0(abs(gm3),sdm(m),sdm(n)))
-         end do
-      end do
-c     Chargino contribution
-      do m=1,6
-         eps_dd = eps_dd - ic*e2/st2*mu*gm2*abs(zd(i,m))**2
-     $        * cp0(abs(mu),abs(gm2),sdm(m))
-         do n=1,6
-            tmp  = (0.d0,0.d0)
-            tmp1 = (0.d0,0.d0)
-            tmp2 = (0.d0,0.d0)
-            do l=1,3
-               tmp  = tmp + yu(l)*dconjg(ckm(l,i)*zu(l+3,m))
-               tmp1 = tmp1 + ckm(l,i)*zu(l,n)
-               do k=1,3
-                  tmp2 = tmp2 + zu(k+3,m)*(us(l,k) + v1/v2*ws(l,k))
-     $                 * dconjg(zu(l,n))
-               end do
-               tmp2 = tmp2 + v1/v2*zu(l+3,m)*dconjg(mu*yu(l)*zu(l,n))
+      if (in.eq.1) then
+         do m=1,6
+            eps_dd = eps_dd - e2/st2/2.d0*gm2*mu*abs(zd(i,m))**2
+     $           * cp0(abs(mu),abs(gm2),sdm(m))
+     $           - e2/ct2*gm3*mu/6.d0*(abs(zd(i,m))**2
+     $           + 2*abs(zd(i+3,m))**2)*cp0(abs(mu),abs(gm3),sdm(m))
+            do n=1,6
+               eps_dd = eps_dd - abs(zd(i,m)*zd(i+3,n))**2*mu
+     $              * e2/ct2/9.d0*gm3*cp0(abs(gm3),sdm(m),sdm(n))
             end do
-            eps_dd = eps_dd - ic*mu*tmp*tmp1*tmp2
-     $           * cp0(abs(mu),sum(m),sum(n))
          end do
-      end do
+      end if
+      if (ig.eq.1) then
+         do m=1,6
+            do n=1,6
+               eps_dd = eps_dd + abs(zd(i,m)*zd(i+3,n))**2*mu
+     $              * 8/3.d0*g3d*g3d*gm1*cp0(gm1,sdm(m),sdm(n))
+            end do
+         end do
+      end if
+c     Chargino contribution
+      if (ic.eq.1) then
+         do m=1,6
+            eps_dd = eps_dd - e2/st2*mu*gm2*abs(zd(i,m))**2
+     $           * cp0(abs(mu),abs(gm2),sdm(m))
+            do n=1,6
+               tmp  = (0.d0,0.d0)
+               tmp1 = (0.d0,0.d0)
+               tmp2 = (0.d0,0.d0)
+               do l=1,3
+                  tmp  = tmp + yu(l)*dconjg(ckm(l,i)*zu(l+3,m))
+                  tmp1 = tmp1 + ckm(l,i)*zu(l,n)
+                  do k=1,3
+                     tmp2 = tmp2 + zu(k+3,m)*(us(l,k) + v1/v2*ws(l,k))
+     $                    * dconjg(zu(l,n))
+                  end do
+                  tmp2 = tmp2 + v1/v2*zu(l+3,m)*dconjg(mu*yu(l)*zu(l,n))
+               end do
+               eps_dd = eps_dd - mu*tmp*tmp1*tmp2
+     $              * cp0(abs(mu),sum(m),sum(n))
+            end do
+         end do
+      end if
       eps_dd = - eps_dd/16/pi/pi
       return
       end
@@ -87,7 +98,7 @@ c     self energy, part proportional to V_CKM in the decoupling limit
       common/yukawa/yl(3),yu(3),yd(3)
       common/soft/ls(3,3),ks(3,3),ds(3,3),es(3,3),us(3,3),ws(3,3)
       common/fmass/em(3),um(3),dm(3)
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       eps_fc = (0.d0,0.d0)
 c     Chargino contribution only
       if (ic.ne.1) return
@@ -117,16 +128,22 @@ c     d and s self energy, part propotional to Yb, in the decoupling limit
       common/alpha_s_susy/g3u,g3d,init_alpha_susy
       common/hpar/hm1,hm2,hs,mu
       common/yukawa/yl(3),yu(3),yd(3)
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       sig_dd_yb = (0.d0,0.d0)
       if (init_alpha_susy) call init_alpha_s_susy
 c     Neutralino+gluino contribution
       do m=1,6
          do n=1,6
-            sig_dd_yb = sig_dd_yb + yd(3)*v2/sq2*mu
-     $           * dconjg(zd(6,n)*zd(i,m))*zd(3,m)*zd(i+3,n)
-     $           * (- ig*8/3.d0*g3d*g3d*gm1*cp0(gm1,sdm(m),sdm(n))
-     $           + in*e2/ct2/9.d0*gm3*cp0(abs(gm3),sdm(m),sdm(n)))
+            if (in.eq.1) then
+               sig_dd_yb = sig_dd_yb + yd(3)*v2/sq2*mu
+     $              * dconjg(zd(6,n)*zd(i,m))*zd(3,m)*zd(i+3,n)
+     $              * e2/ct2/9.d0*gm3*cp0(abs(gm3),sdm(m),sdm(n))
+            end if
+            if (ig.eq.1) then
+               sig_dd_yb = sig_dd_yb - yd(3)*v2/sq2*mu
+     $              * dconjg(zd(6,n)*zd(i,m))*zd(3,m)*zd(i+3,n)
+     $              * 8/3.d0*g3d*g3d*gm1*cp0(gm1,sdm(m),sdm(n))
+         end if
          end do
       end do
       sig_dd_yb = - sig_dd_yb/16/pi/pi
@@ -153,50 +170,59 @@ c     to down Yukawa, in the decoupling limit
       common/alpha_s_susy/g3u,g3d,init_alpha_susy
       common/hpar/hm1,hm2,hs,mu
       common/yukawa/yl(3),yu(3),yd(3)
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       common/ckm/ckm(3,3)
       if (init_alpha_susy) call init_alpha_s_susy
       sig_dd_y = (0.d0,0.d0)
 c     Neutralino+gluino contribution
       do m=1,6
-         sig_dd_y = sig_dd_y + in*e2/st2*v2/sq2/2.d0*yd(j)
-     $        * gm2*mu*zd(j,m)*dconjg(zd(i,m))
-     $        * cp0(abs(mu),abs(gm2),sdm(m))
-     $        + in*e2/ct2*v2/sq2*gm3*mu/6.d0
-     $        * cp0(abs(mu),abs(gm3),sdm(m))
-     $        * (dconjg(zd(i,m))*zd(j,m)*yd(j)
-     $        + 2*dconjg(zd(i+3,m))*zd(j+3,m)*yd(i))
+         if (in.eq.1) then
+            sig_dd_y = sig_dd_y + e2/st2*v2/sq2/2.d0*yd(j)
+     $           * gm2*mu*zd(j,m)*dconjg(zd(i,m))
+     $           * cp0(abs(mu),abs(gm2),sdm(m))
+     $           + e2/ct2*v2/sq2*gm3*mu/6.d0
+     $           * cp0(abs(mu),abs(gm3),sdm(m))
+     $           * (dconjg(zd(i,m))*zd(j,m)*yd(j)
+     $           + 2*dconjg(zd(i+3,m))*zd(j+3,m)*yd(i))
+         end if
          do n=1,6
             tmp = (0.d0,0.d0)
             do l=1,3
                tmp = tmp + zd(l,m)*dconjg(zd(l+3,n))*yd(l)
             end do
-            sig_dd_y = sig_dd_y + mu*v2/sq2*dconjg(zd(i,m))*zd(j+3,n)
-     $           *(- ig*8/3.d0*g3d*g3d*gm1*cp0(gm1,sdm(m),sdm(n))
-     $           + in*e2/ct2/9.d0*gm3*cp0(abs(gm3),sdm(m),sdm(n)))*tmp
+            if (in.eq.1) then
+               sig_dd_y = sig_dd_y + mu*v2/sq2*dconjg(zd(i,m))*zd(j+3,n)
+     $              * e2/ct2/9.d0*gm3*cp0(abs(gm3),sdm(m),sdm(n))*tmp
+            end if
+            if (ig.eq.1) then
+               sig_dd_y = sig_dd_y - mu*v2/sq2*dconjg(zd(i,m))*zd(j+3,n)
+     $              * 8/3.d0*g3d*g3d*gm1*cp0(gm1,sdm(m),sdm(n))*tmp
+            end if
          end do
       end do
 c     Chargino contribution
-      do m=1,6
-         sig_dd_y = sig_dd_y + ic*e2/st2*v2/sq2*yd(j)*gm2*mu
-     $        * dconjg(zd(i,m))*zd(j,m)*cp0(abs(mu),abs(gm2),sdm(m))
-         do n=1,6
-            tmp  = (0.d0,0.d0)
-            tmp1 = (0.d0,0.d0)
-            tmp2 = (0.d0,0.d0)
-            do l=1,3
-               tmp  = tmp + yu(l)*dconjg(ckm(l,i)*zu(l+3,m))
-               tmp1 = tmp1 + ckm(l,j)*zu(l,n)
-               do k=1,3
-                  tmp2 = tmp2 + zu(k+3,m)*(v2*us(l,k) + v1*ws(l,k))
-     $                 * dconjg(zu(l,n))
+      if (ic.eq.1) then
+         do m=1,6
+            sig_dd_y = sig_dd_y + ic*e2/st2*v2/sq2*yd(j)*gm2*mu
+     $           * dconjg(zd(i,m))*zd(j,m)*cp0(abs(mu),abs(gm2),sdm(m))
+            do n=1,6
+               tmp  = (0.d0,0.d0)
+               tmp1 = (0.d0,0.d0)
+               tmp2 = (0.d0,0.d0)
+               do l=1,3
+                  tmp  = tmp + yu(l)*dconjg(ckm(l,i)*zu(l+3,m))
+                  tmp1 = tmp1 + ckm(l,j)*zu(l,n)
+                  do k=1,3
+                     tmp2 = tmp2 + zu(k+3,m)*(v2*us(l,k) + v1*ws(l,k))
+     $                    * dconjg(zu(l,n))
+                  end do
+                  tmp2 = tmp2 + v1*zu(l+3,m)*dconjg(mu*yu(l)*zu(l,n))
                end do
-               tmp2 = tmp2 + v1*zu(l+3,m)*dconjg(mu*yu(l)*zu(l,n))
+               sig_dd_y = sig_dd_y + yd(j)/sq2*mu*tmp*tmp1*tmp2*
+     $              cp0(abs(mu),sum(m),sum(n))
             end do
-            sig_dd_y = sig_dd_y + ic/sq2*yd(j)*mu*tmp*tmp1*tmp2*
-     $           cp0(abs(mu),sum(m),sum(n))
          end do
-      end do
+      end if
       sig_dd_y = - sig_dd_y/16/pi/pi
       return
       end
@@ -216,7 +242,7 @@ c     propotional* to Yukawa_d, in the decoupling limit
       common/vev/v1,v2
       common/soft/ls(3,3),ks(3,3),ds(3,3),es(3,3),us(3,3),ws(3,3)
       common/alpha_s_susy/g3u,g3d,init_alpha_susy
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       if (init_alpha_susy) call init_alpha_s_susy
 c     Neutralino+gluino contribution
       sig_dd_ny = (0.d0,0.d0)
@@ -229,9 +255,14 @@ c     Neutralino+gluino contribution
      $                 - v2*es(l,k)))
                end do
             end do
-            sig_dd_ny = sig_dd_ny + tmp/sq2*dconjg(zd(i,m))*zd(i+3,n)
-     $           * (- ig*8/3.d0*g3d*g3d*gm1*cp0(gm1,sdm(m),sdm(n))
-     $           + in*e2/ct2/9.d0*gm3*cp0(abs(gm3),sdm(m),sdm(n)))
+            if (in.eq.1) then
+               sig_dd_ny = sig_dd_ny + tmp/sq2*dconjg(zd(i,m))*zd(i+3,n)
+     $              * e2/ct2/9.d0*gm3*cp0(abs(gm3),sdm(m),sdm(n))
+            end if
+            if (ig.eq.1) then
+               sig_dd_ny = sig_dd_ny - tmp/sq2*dconjg(zd(i,m))*zd(i+3,n)
+     $              * 8/3.d0*g3d*g3d*gm1*cp0(gm1,sdm(m),sdm(n))
+            end if
          end do
       end do
       sig_dd_ny = - sig_dd_ny/16/pi/pi
@@ -257,7 +288,7 @@ c     CKM elements, in the decoupling limit
       common/alpha_s_susy/g3u,g3d,init_alpha_susy
       common/hpar/hm1,hm2,hs,mu
       common/yukawa/yl(3),yu(3),yd(3)
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       if (init_alpha_susy) call init_alpha_s_susy
 c     Neutralino+gluino contribution, terms without Yukawa couplings
       sig_dd_nckm = (0.d0,0.d0)
@@ -270,37 +301,51 @@ c     Neutralino+gluino contribution, terms without Yukawa couplings
      $                 - v2*es(l,k)))
                end do
             end do
-            sig_dd_nckm = sig_dd_nckm
-     $           + tmp/sq2*dconjg(zd(i,m))*zd(j+3,n)
-     $           * (- ig*8/3.d0*g3d*g3d*gm1*cp0(gm1,sdm(m),sdm(n))
-     $           + in*e2/ct2/9.d0*gm3*cp0(abs(gm3),sdm(m),sdm(n)))
+            if (in.eq.1) then
+               sig_dd_nckm = sig_dd_nckm + tmp*dconjg(zd(i,m))*zd(j+3,n)
+     $              * e2/ct2/sq2/9.d0*gm3*cp0(abs(gm3),sdm(m),sdm(n))
+            end if
+            if (ig.eq.1) then
+               sig_dd_nckm = sig_dd_nckm - tmp*dconjg(zd(i,m))*zd(j+3,n)
+     $              * 8/sq2/3.d0*g3d*g3d*gm1*cp0(gm1,sdm(m),sdm(n))
+            end if
          end do
       end do
 c     Neutralino+gluino contribution, terms proportional to Yukawa couplings
       do m=1,6
-         sig_dd_nckm = sig_dd_nckm + in*e2/st2*v2/sq2/2.d0*yd(j)
-     $        * gm2*mu*zd(j,m)*dconjg(zd(i,m))
-     $        * cp0(abs(mu),abs(gm2),sdm(m))
-     $        + in*e2/ct2*v2/sq2*gm3*mu/6.d0
-     $        * cp0(abs(mu),abs(gm3),sdm(m))
-     $        * (dconjg(zd(i,m))*zd(j,m)*yd(j)
-     $        + 2*dconjg(zd(i+3,m))*zd(j+3,m)*yd(i))
+         if (in.eq.1) then
+            sig_dd_nckm = sig_dd_nckm + e2/st2*v2/sq2/2.d0*yd(j)
+     $           * gm2*mu*zd(j,m)*dconjg(zd(i,m))
+     $           * cp0(abs(mu),abs(gm2),sdm(m))
+     $           + e2/ct2*v2/sq2*gm3*mu/6.d0
+     $           * cp0(abs(mu),abs(gm3),sdm(m))
+     $           * (dconjg(zd(i,m))*zd(j,m)*yd(j)
+     $           + 2*dconjg(zd(i+3,m))*zd(j+3,m)*yd(i))
+         end if
          do n=1,6
             tmp = (0.d0,0.d0)
             do l=1,3
                tmp = tmp + zd(l,m)*dconjg(zd(l+3,n))*yd(l)
             end do
-            sig_dd_nckm = sig_dd_nckm
-     $           + tmp*v2/sq2*dconjg(zd(i,m))*zd(j+3,n)*mu
-     $           * (- ig*8/3.d0*g3d*g3d*gm1*cp0(gm1,sdm(m),sdm(n))
-     $           + in*e2/ct2/9.d0*gm3*cp0(abs(gm3),sdm(m),sdm(n)))
+            if (in.eq.1) then
+               sig_dd_nckm = sig_dd_nckm
+     $              + tmp*v2/sq2*dconjg(zd(i,m))*zd(j+3,n)*mu
+     $              * e2/ct2/9.d0*gm3*cp0(abs(gm3),sdm(m),sdm(n))
+            end if
+            if (ig.eq.1) then
+               sig_dd_nckm = sig_dd_nckm
+     $              - tmp*v2/sq2*dconjg(zd(i,m))*zd(j+3,n)*mu
+     $              * 8/3.d0*g3d*g3d*gm1*cp0(gm1,sdm(m),sdm(n))
+            end if
          end do
       end do
 c     Chargino contribution
-      do m=1,6
-         sig_dd_nckm = sig_dd_nckm + ic*e2/st2*v2/sq2*yd(j)*gm2*mu
-     $        * dconjg(zd(i,m))*zd(j,m)*cp0(abs(mu),abs(gm2),sdm(m))
-      end do
+      if (ic.eq.1) then
+         do m=1,6
+            sig_dd_nckm = sig_dd_nckm + e2/st2*v2/sq2*yd(j)*gm2*mu
+     $           * dconjg(zd(i,m))*zd(j,m)*cp0(abs(mu),abs(gm2),sdm(m))
+         end do
+      end if
       sig_dd_nckm = - sig_dd_nckm/16/pi/pi
       return
       end
@@ -320,7 +365,7 @@ c     elements, in the decoupling limit
       common/hpar/hm1,hm2,hs,mu
       common/yukawa/yl(3),yu(3),yd(3)
       common/ckm/ckm(3,3)
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       sig_dd_ckm = (0.d0,0.d0)
 c     Chargino contribution only
       if (ic.ne.1) return
@@ -367,7 +412,7 @@ c     propotional to v2 in the decoupling limit
       common/alpha_s_susy/g3u,g3d,init_alpha_susy
       common/hpar/hm1,hm2,hs,mu
       common/yukawa/yl(3),yu(3),yd(3)
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       if (init_alpha_susy) call init_alpha_s_susy
 c     Neutralino+gluino contribution, terms without Yukawa couplings
       sig_dd_nhol = (0.d0,0.d0)
@@ -379,47 +424,61 @@ c     Neutralino+gluino contribution, terms without Yukawa couplings
                   tmp = tmp - zd(l,m)*dconjg(zd(k+3,n)*es(l,k))
                end do
             end do
-            sig_dd_nhol = sig_dd_nhol + tmp*dconjg(zd(i,m))*zd(j+3,n)
-     $           * (- ig*8/3.d0*g3d*g3d*gm1*cp0(gm1,sdm(m),sdm(n))
-     $           + in*e2/ct2/9.d0*gm3*cp0(abs(gm3),sdm(m),sdm(n)))
+            if (in.eq.1) then
+               sig_dd_nhol = sig_dd_nhol + tmp*dconjg(zd(i,m))*zd(j+3,n)
+     $              * e2/ct2/9.d0*gm3*cp0(abs(gm3),sdm(m),sdm(n))
+            end if
+            if (ig.eq.1) then
+               sig_dd_nhol = sig_dd_nhol - tmp*dconjg(zd(i,m))*zd(j+3,n)
+     $              * 8/3.d0*g3d*g3d*gm1*cp0(gm1,sdm(m),sdm(n))
+            end if
          end do
       end do
 c     Neutralino+gluino contribution, terms proportional to Yukawa couplings
       do m=1,6
-         sig_dd_nhol = sig_dd_nhol + in*e2/st2/2.d0*yd(j)*gm2*mu
-     $        * zd(j,m)*dconjg(zd(i,m))*cp0(abs(mu),abs(gm2),sdm(m))
-     $        + in*e2/ct2*gm3*mu/6.d0*cp0(abs(mu),abs(gm3),sdm(m))
-     $        * (dconjg(zd(i,m))*zd(j,m)*yd(j)
-     $        + 2*dconjg(zd(i+3,m))*zd(j+3,m)*yd(i))
+         if (in.eq.1) then
+            sig_dd_nhol = sig_dd_nhol + e2/st2/2.d0*yd(j)*gm2*mu
+     $           * zd(j,m)*dconjg(zd(i,m))*cp0(abs(mu),abs(gm2),sdm(m))
+     $           + e2/ct2*gm3*mu/6.d0*cp0(abs(mu),abs(gm3),sdm(m))
+     $           * (dconjg(zd(i,m))*zd(j,m)*yd(j)
+     $           + 2*dconjg(zd(i+3,m))*zd(j+3,m)*yd(i))
+         end if
          do n=1,6
             tmp = (0.d0,0.d0)
             do l=1,3
                tmp = tmp + zd(l,m)*dconjg(zd(l+3,n))*yd(l)
             end do
-            sig_dd_nhol = sig_dd_nhol + tmp*dconjg(zd(i,m))*zd(j+3,n)*mu
-     $           * (- ig*8/3.d0*g3d*g3d*gm1*cp0(gm1,sdm(m),sdm(n))
-     $           + in*e2/ct2/9.d0*gm3*cp0(abs(gm3),sdm(m),sdm(n)))
+            if (in.eq.1) then
+               sig_dd_nhol = sig_dd_nhol + tmp*dconjg(zd(i,m))*zd(j+3,n)
+     $              * mu*e2/ct2/9.d0*gm3*cp0(abs(gm3),sdm(m),sdm(n))
+            end if
+            if (ig.eq.1) then
+               sig_dd_nhol = sig_dd_nhol - tmp*dconjg(zd(i,m))*zd(j+3,n)
+     $              * mu*8/3.d0*g3d*g3d*gm1*cp0(gm1,sdm(m),sdm(n))
+            end if
          end do
       end do
 c     Chargino contribution
-      do m=1,6
-         sig_dd_nhol = sig_dd_nhol + ic*e2/st2*yd(j)*gm2*mu*zd(j,m)
-     $        * dconjg(zd(i,m))*cp0(abs(mu),abs(gm2),sdm(m))
-         do n=1,6
-            tmp  = (0.d0,0.d0)
-            tmp1 = (0.d0,0.d0)
-            tmp2 = (0.d0,0.d0)
-            do l=1,3
-               tmp  = tmp + yu(l)*dconjg(ckm(l,i)*zu(l+3,m))
-               tmp1 = tmp1 + ckm(l,j)*zu(l,n)
-               do k=1,3
-                  tmp2 = tmp2 + zu(k+3,m)*us(l,k)*dconjg(zu(l,n))
+      if (ic.eq.1) then
+         do m=1,6
+            sig_dd_nhol = sig_dd_nhol + e2/st2*yd(j)*gm2*mu*zd(j,m)
+     $           * dconjg(zd(i,m))*cp0(abs(mu),abs(gm2),sdm(m))
+            do n=1,6
+               tmp  = (0.d0,0.d0)
+               tmp1 = (0.d0,0.d0)
+               tmp2 = (0.d0,0.d0)
+               do l=1,3
+                  tmp  = tmp + yu(l)*dconjg(ckm(l,i)*zu(l+3,m))
+                  tmp1 = tmp1 + ckm(l,j)*zu(l,n)
+                  do k=1,3
+                     tmp2 = tmp2 + zu(k+3,m)*us(l,k)*dconjg(zu(l,n))
+                  end do
                end do
+               sig_dd_nhol = sig_dd_nhol + yd(j)*mu*tmp*tmp1*tmp2
+     $              * cp0(abs(mu),sum(m),sum(n))
             end do
-            sig_dd_nhol = sig_dd_nhol + ic*yd(j)*mu*tmp*tmp1*tmp2
-     $           * cp0(abs(mu),sum(m),sum(n))
          end do
-      end do
+      end if
       sig_dd_nhol = - v2/sq2*sig_dd_nhol/16/pi/pi
       return
       end
@@ -445,7 +504,7 @@ c     propotional to v1 in the decoupling limit
       common/yukawa/yl(3),yu(3),yd(3)
       common/soft/ls(3,3),ks(3,3),ds(3,3),es(3,3),us(3,3),ws(3,3)
       common/alpha_s_susy/g3u,g3d,init_alpha_susy
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       if (init_alpha_susy) call init_alpha_s_susy
       sig_dd_hol = (0.d0,0.d0)
 c     Neutralino+gluino contribution
@@ -457,29 +516,36 @@ c     Neutralino+gluino contribution
                  tmp = tmp + zd(l,m)*dconjg(ds(l,k)*zd(k+3,n))
                end do
             end do
-            sig_dd_hol = sig_dd_hol + tmp*dconjg(zd(i,m))*zd(j+3,n)
-     $           * (- ig*8/3.d0*g3d*g3d*gm1*cp0(gm1,sdm(m),sdm(n))
-     $           + in*e2/ct2/9.d0*gm3*cp0(abs(gm3),sdm(m),sdm(n)))
+            if (in.eq.1) then
+               sig_dd_hol = sig_dd_hol + tmp*dconjg(zd(i,m))*zd(j+3,n)
+     $              * e2/ct2/9.d0*gm3*cp0(abs(gm3),sdm(m),sdm(n))
+            end if
+            if (ig.eq.1) then
+               sig_dd_hol = sig_dd_hol - tmp*dconjg(zd(i,m))*zd(j+3,n)
+     $              * 8/3.d0*g3d*g3d*gm1*cp0(gm1,sdm(m),sdm(n))
+            end if
          end do
       end do
 c     Chargino contribution
-      do m=1,6
-         do n=1,6
-            tmp  = (0.d0,0.d0)
-            tmp1 = (0.d0,0.d0)
-            tmp2 = (0.d0,0.d0)
-            do l=1,3
-               tmp  = tmp + yu(l)*dconjg(ckm(l,i)*zu(l+3,m))
-               tmp1 = tmp1 + ckm(l,j)*zu(l,n)
-               do k=1,3
-                  tmp2 = tmp2 + zu(k+3,m)*ws(l,k)*dconjg(zu(l,n))
+      if (ic.eq.1) then
+         do m=1,6
+            do n=1,6
+               tmp  = (0.d0,0.d0)
+               tmp1 = (0.d0,0.d0)
+               tmp2 = (0.d0,0.d0)
+               do l=1,3
+                  tmp  = tmp + yu(l)*dconjg(ckm(l,i)*zu(l+3,m))
+                  tmp1 = tmp1 + ckm(l,j)*zu(l,n)
+                  do k=1,3
+                     tmp2 = tmp2 + zu(k+3,m)*ws(l,k)*dconjg(zu(l,n))
+                  end do
+                  tmp2 = tmp2 + zu(l+3,m)*dconjg(mu*yu(l)*zu(l,n))
                end do
-               tmp2 = tmp2 + zu(l+3,m)*dconjg(mu*yu(l)*zu(l,n))
+               sig_dd_hol = sig_dd_hol + yd(j)*mu*tmp*tmp1*tmp2
+     $              * cp0(abs(mu),sum(m),sum(n))
             end do
-            sig_dd_hol = sig_dd_hol + ic*yd(j)*mu*tmp*tmp1*tmp2
-     $           * cp0(abs(mu),sum(m),sum(n))
          end do
-      end do
+      end if
       sig_dd_hol = - v1/sq2*sig_dd_hol/16/pi/pi
       return
       end
@@ -499,7 +565,7 @@ c     propotional* to Yukawa_u, in the decoupling limit
       common/vev/v1,v2
       common/soft/ls(3,3),ks(3,3),ds(3,3),es(3,3),us(3,3),ws(3,3)
       common/alpha_s_susy/g3u,g3d,init_alpha_susy
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       if (init_alpha_susy) call init_alpha_s_susy
       sig_uu_ny = (0.d0,0.d0)
 c     Neutralino+gluino contribution
@@ -512,12 +578,17 @@ c     Neutralino+gluino contribution
      $                 * zu(k+3,n)
                end do
             end do
-            sig_uu_ny = sig_uu_ny + tmp*zu(i,m)*dconjg(zu(j+3,n))
-     $           * (12*ig*g3u*g3u*gm1*cp0(gm1,sum(m),sum(n))
-     $           + in*e2/ct2*dconjg(gm3)*cp0(abs(gm3),sum(m),sum(n)))
+            if (in.eq.1) then
+               sig_uu_ny = sig_uu_ny + tmp*zu(i,m)*dconjg(zu(j+3,n))
+     $              * e2/ct2/9*dconjg(gm3)*cp0(abs(gm3),sum(m),sum(n))
+            end if
+            if (ig.eq.1) then
+               sig_uu_ny = sig_uu_ny + tmp*zu(i,m)*dconjg(zu(j+3,n))
+     $              * 4/3.d0*g3u*g3u*gm1*cp0(gm1,sum(m),sum(n))
+            end if
          end do
       end do
-      sig_uu_ny = - sq2/9*sig_uu_ny/16/pi/pi
+      sig_uu_ny = - sq2*sig_uu_ny/16/pi/pi
       return
       end
 
@@ -542,7 +613,7 @@ c     propotional to v2 in the decoupling limit
       common/vev/v1,v2
       common/soft/ls(3,3),ks(3,3),ds(3,3),es(3,3),us(3,3),ws(3,3)
       common/alpha_s_susy/g3u,g3d,init_alpha_susy
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       if (init_alpha_susy) call init_alpha_s_susy
 c     Neutralino+gluino contribution only
       sig_uu_hol = (0.d0,0.d0)
@@ -554,30 +625,36 @@ c     Neutralino+gluino contribution only
                   tmp = tmp + dconjg(us(l,k)*zu(l,m))*zu(k+3,n)
                end do
             end do
-            sig_uu_hol = sig_uu_hol
-     $           + 2/9.d0*tmp*zu(i,m)*dconjg(zu(j+3,n))
-     $           * (12*ig*g3u*g3u*gm1*cp0(gm1,sum(m),sum(n))
-     $           + in*e2/ct2*gm3*cp0(abs(gm3),sum(m),sum(n)))
+            if (in.eq.1) then
+               sig_uu_hol = sig_uu_hol + tmp*zu(i,m)*dconjg(zu(j+3,n))
+     $              * 2/9.d0*e2/ct2*gm3*cp0(abs(gm3),sum(m),sum(n))
+            end if
+            if (ig.eq.1) then
+               sig_uu_hol = sig_uu_hol + tmp*zu(i,m)*dconjg(zu(j+3,n))
+     $              * 8/3.d0*g3u*g3u*gm1*cp0(gm1,sum(m),sum(n))
+            end if
          end do
       end do
+      if (ic.eq.1) then
 c     Chargino contribution
-      do m=1,6
-         do n=1,6
-            tmp  = (0.d0,0.d0)
-            tmp1 = (0.d0,0.d0)
-            tmp2 = (0.d0,0.d0)
-            do k=1,3
-               tmp1 = tmp1 + zd(k,m)*dconjg(ckm(j,k))
-               tmp2 = tmp2 + ckm(i,k)*dconjg(zd(k+3,n))*yd(k)
-               tmp  = tmp  + dconjg(mu*yd(k)*zd(k,m))*zd(k+3,n)
-               do l=1,3
-                  tmp = tmp - zd(k+3,n)*es(l,k)*dconjg(zd(l,m))
+         do m=1,6
+            do n=1,6
+               tmp  = (0.d0,0.d0)
+               tmp1 = (0.d0,0.d0)
+               tmp2 = (0.d0,0.d0)
+               do k=1,3
+                  tmp1 = tmp1 + zd(k,m)*dconjg(ckm(j,k))
+                  tmp2 = tmp2 + ckm(i,k)*dconjg(zd(k+3,n))*yd(k)
+                  tmp  = tmp  + dconjg(mu*yd(k)*zd(k,m))*zd(k+3,n)
+                  do l=1,3
+                     tmp = tmp - zd(k+3,n)*es(l,k)*dconjg(zd(l,m))
+                  end do
                end do
+               sig_uu_hol = sig_uu_hol - mu*yu(j)*tmp1*tmp2*tmp
+     $              * cp0(abs(mu),sdm(m),sdm(n))
             end do
-            sig_uu_hol = sig_uu_hol - ic*mu*yu(j)*tmp1*tmp2*tmp
-     $           * cp0(abs(mu),sdm(m),sdm(n))
          end do
-      end do
+      end if
       sig_uu_hol = - v2/sq2*sig_uu_hol/16/pi/pi
       return
       end
@@ -603,16 +680,19 @@ c     propotional to v2 in the decoupling limit
       common/vev/v1,v2
       common/soft/ls(3,3),ks(3,3),ds(3,3),es(3,3),us(3,3),ws(3,3)
       common/alpha_s_susy/g3u,g3d,init_alpha_susy
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       if (init_alpha_susy) call init_alpha_s_susy
 c     Neutralino+gluino contribution
       sig_uu_nhol = (0.d0,0.d0)
       do m=1,6
-         sig_uu_nhol = sig_uu_nhol - 2*in/3.d0*e2/ct2*gm3*mu*yu(i)
-     $        *zu(i+3,m)*dconjg(zu(j+3,m))*cp0(abs(mu),abs(gm3),sum(m))
-     $        + in*e2/2.d0*zu(i,m)*dconjg(zu(j,m))*mu*yu(j)
-     $        * (gm3/ct2/3*cp0(abs(mu),abs(gm3),sum(m))
-     $        - gm2/st2*cp0(abs(mu),abs(gm2),sum(m)))
+         if (in.eq.1) then
+            sig_uu_nhol = sig_uu_nhol - 2/3.d0*e2/ct2*gm3*mu*yu(i)
+     $           * zu(i+3,m)*dconjg(zu(j+3,m))
+     $           * cp0(abs(mu),abs(gm3),sum(m))
+     $           + e2/2.d0*zu(i,m)*dconjg(zu(j,m))*mu*yu(j)
+     $           * (gm3/ct2/3*cp0(abs(mu),abs(gm3),sum(m))
+     $           - gm2/st2*cp0(abs(mu),abs(gm2),sum(m)))
+         end if
          do n=1,6
             tmp = (0.d0,0.d0)
             do k=1,3
@@ -621,31 +701,37 @@ c     Neutralino+gluino contribution
                   tmp = tmp + dconjg(ws(l,k)*zu(l,m))*zu(k+3,n)
                end do
             end do
-            sig_uu_nhol = sig_uu_nhol
-     $           + 2/9.d0*tmp*zu(i,m)*dconjg(zu(j+3,n))
-     $           * (12*ig*g3u*g3u*gm1*cp0(gm1,sum(m),sum(n))
-     $           + in*e2/ct2*gm3*cp0(abs(gm3),sum(m),sum(n)))
-         end do
+         if (in.eq.1) then
+            sig_uu_nhol = sig_uu_nhol + tmp*zu(i,m)*dconjg(zu(j+3,n))
+     $           * 2/9.d0*e2/ct2*gm3*cp0(abs(gm3),sum(m),sum(n))
+         end if
+         if (ig.eq.1) then
+            sig_uu_nhol = sig_uu_nhol + tmp*zu(i,m)*dconjg(zu(j+3,n))
+     $           * 8/3.d0*g3u*g3u*gm1*cp0(gm1,sum(m),sum(n))
+         end if
       end do
+      end do
+      if (ic.eq.1) then
 c     Chargino contribution
-      do m=1,6
-         sig_uu_nhol = sig_uu_nhol - ic*e2/st2*mu*gm2*zu(i,m)
-     $        * yu(j)*dconjg(zu(j,m))*cp0(abs(mu),abs(gm2),sum(m))
-         do n=1,6
-            tmp  = (0.d0,0.d0)
-            tmp1 = (0.d0,0.d0)
-            tmp2 = (0.d0,0.d0)
-            do k=1,3
-               tmp1 = tmp1 + zd(k,n)*dconjg(ckm(j,k))
-               tmp2 = tmp2 + ckm(i,k)*dconjg(zd(k+3,m))*yd(k)
-               do l=1,3
-                  tmp = tmp + zd(k+3,m)*ds(l,k)*dconjg(zd(l,n))
+         do m=1,6
+            sig_uu_nhol = sig_uu_nhol - ic*e2/st2*mu*gm2*zu(i,m)
+     $           * yu(j)*dconjg(zu(j,m))*cp0(abs(mu),abs(gm2),sum(m))
+            do n=1,6
+               tmp  = (0.d0,0.d0)
+               tmp1 = (0.d0,0.d0)
+               tmp2 = (0.d0,0.d0)
+               do k=1,3
+                  tmp1 = tmp1 + zd(k,n)*dconjg(ckm(j,k))
+                  tmp2 = tmp2 + ckm(i,k)*dconjg(zd(k+3,m))*yd(k)
+                  do l=1,3
+                     tmp = tmp + zd(k+3,m)*ds(l,k)*dconjg(zd(l,n))
+                  end do
                end do
+               sig_uu_nhol = sig_uu_nhol - mu*yu(j)*tmp1*tmp2*tmp
+     $              * cp0(abs(mu),sdm(m),sdm(n))
             end do
-            sig_uu_nhol = sig_uu_nhol - ic*mu*yu(j)*tmp1*tmp2*tmp
-     $           * cp0(abs(mu),sdm(m),sdm(n))
          end do
-      end do
+      end if
       sig_uu_nhol = - v1/sq2*sig_uu_nhol/16/pi/pi
       return
       end
@@ -661,7 +747,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     Left d-quark self-energy (proportional to P_L)                    c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
-      double complex function dsl_sig4(i,j)
+      double complex function dsl_sig0_h(i,j)
 c     Up quark + charged Higgs in loop
       implicit double precision (a-h,o-z)
       double complex b0,ckm
@@ -670,17 +756,17 @@ c     Up quark + charged Higgs in loop
       common/km_mat/ckm(3,3)
       common/yukawa/yl(3),yu(3),yd(3)
       common/fmass/em(3),um(3),dm(3)
-      dsl_sig4 = 0
+      dsl_sig0_h = (0.d0,0.d0)
       do l=1,3
          do k=1,2
-            dsl_sig4 = dsl_sig4 + zh(2,k)*zh(1,k)*um(l)*yu(l)*yd(j)
+            dsl_sig0_h = dsl_sig0_h + zh(2,k)*zh(1,k)*um(l)*yu(l)*yd(j)
      $           * dconjg(ckm(i,l))*ckm(j,l)*b0(0.d0,um(l),cm(k))
          end do
       end do
       return
       end
       
-      double complex function dsl_sig7(i,j)
+      double complex function dsl_sig0_n(i,j)
 c     Neutralino and down squark in loop
       implicit double precision (a-h,o-z)
       double complex b0
@@ -688,17 +774,18 @@ c     Neutralino and down squark in loop
       double complex vl_ddn0,vr_ddn0
       common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
       common/neut/fnm(4),zn(4,4)
-      dsl_sig7 = 0
+      dsl_sig0_n = (0.d0,0.d0)
       do k=1,6
          do l=1,4
-            dsl_sig7 = dsl_sig7 - vl_ddn0(i,k,l)*dconjg(vr_ddn0(j,k,l))
+            dsl_sig0_n = dsl_sig0_n - vl_ddn0(i,k,l)
+     $           * dconjg(vr_ddn0(j,k,l))
      $           * fnm(l)*b0(0.d0,fnm(l),sdm(k))
          end do
       end do
       return
       end
 
-      double complex function dsl_sig8(i,j)
+      double complex function dsl_sig0_c(i,j)
 c     Chargino and up squark in loop
       implicit double precision (a-h,o-z)
       double complex b0
@@ -706,17 +793,18 @@ c     Chargino and up squark in loop
       double complex vl_duc0,vr_duc0
       common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
       common/charg/fcm(2),zpos(2,2),zneg(2,2)
-      dsl_sig8 = 0
+      dsl_sig0_c = (0.d0,0.d0)
       do k=1,6
          do l=1,2
-            dsl_sig8 = dsl_sig8 - vl_duc0(i,k,l)*dconjg(vr_duc0(j,k,l))
+            dsl_sig0_c = dsl_sig0_c - vl_duc0(i,k,l)
+     $           * dconjg(vr_duc0(j,k,l))
      $           * fcm(l)*b0(0.d0,fcm(l),sum(k))
         end do
       end do
       return
       end
 
-      double complex function dsl_sig9(i,j)
+      double complex function dsl_sig0_g(i,j)
 c     Gluino and down squark in loop
       implicit double precision (a-h,o-z)
       double complex b0
@@ -727,10 +815,10 @@ c     Gluino and down squark in loop
       common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
-      dsl_sig9 = 0
+      dsl_sig0_g = (0.d0,0.d0)
       al = 8*g3d*g3d/3.d0
       do  k=1,6
-         dsl_sig9 = dsl_sig9 + al*zd(i,k)*dconjg(zd(j+3,k))*gm1 
+         dsl_sig0_g = dsl_sig0_g + al*zd(i,k)*dconjg(zd(j+3,k))*gm1 
      $        * b0(0.d0,gm1,sdm(k))
       end do
       return
@@ -738,26 +826,27 @@ c     Gluino and down squark in loop
       
       double complex function dsl_sig(i,j)
       implicit double precision (a-h,o-z)
-      double complex dsl_sig4,dsl_sig7,dsl_sig8,dsl_sig9
+c      double complex dsl_sig0_h
+      double complex dsl_sig0_n,dsl_sig0_c,dsl_sig0_g
       logical cdiag,ndiag,tmp
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       common/nc_suppress/eps_d,eps_u,acc
       external init_d_self,init_nc_diag
       dsl_sig = (0.d0,0.d0)
-c      if (ih.eq.1) dsl_sig = dsl_sig + dsl_sig4(i,j) 
-      if (in+ic.gt.0) then
+c      if (ih.eq.1) dsl_sig = dsl_sig + dsl_sig0_h(i,j) 
+      if ((in.eq.1).or.(ic.eq.1)) then
          eps = eps_d
          eps_d = acc
          tmp = cdiag().or.ndiag()
       end if
-      if (in.eq.1) dsl_sig = dsl_sig + dsl_sig7(i,j)
-      if (ic.eq.1) dsl_sig = dsl_sig + dsl_sig8(i,j)
-      if (in+ic.gt.0) then
+      if (in.eq.1) dsl_sig = dsl_sig + dsl_sig0_n(i,j)
+      if (ic.eq.1) dsl_sig = dsl_sig + dsl_sig0_c(i,j)
+      if ((in.eq.1).or.(ic.eq.1)) then
          eps_d = eps
          tmp = cdiag().or.ndiag()
       end if
-      if (ig.eq.1) dsl_sig = dsl_sig + dsl_sig9(i,j) 
+      if (ig.eq.1) dsl_sig = dsl_sig + dsl_sig0_g(i,j) 
       dsl_sig = dsl_sig/16/pi/pi
       return
       end
@@ -766,7 +855,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     Right d-quark self-energy (proportional to P_R)                   c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
-      double complex function dsr_sig4(i,j)
+      double complex function dsr_sig0_h(i,j)
 c     Up quark + charged Higgs in loop
       implicit double precision (a-h,o-z)
       double complex b0,ckm
@@ -775,17 +864,17 @@ c     Up quark + charged Higgs in loop
       common/km_mat/ckm(3,3)
       common/yukawa/yl(3),yu(3),yd(3)
       common/fmass/em(3),um(3),dm(3)
-      dsr_sig4 = 0
+      dsr_sig0_h = (0.d0,0.d0)
       do l=1,3
          do k=1,2
-            dsr_sig4 = dsr_sig4 + zh(2,k)*zh(1,k)*um(l)*yu(l)*yd(i)
+            dsr_sig0_h = dsr_sig0_h + zh(2,k)*zh(1,k)*um(l)*yu(l)*yd(i)
      $           * dconjg(ckm(i,l))*ckm(j,l)*b0(0.d0,um(l),cm(k))
          end do
       end do
       return
       end
 
-      double complex function dsr_sig7(i,j)
+      double complex function dsr_sig0_n(i,j)
 c     Neutralino and down squark in loop
       implicit double precision (a-h,o-z)
       double complex b0
@@ -793,17 +882,18 @@ c     Neutralino and down squark in loop
       double complex vl_ddn0,vr_ddn0
       common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
       common/neut/fnm(4),zn(4,4)
-      dsr_sig7 = 0
+      dsr_sig0_n = (0.d0,0.d0)
       do k=1,6
          do l=1,4
-            dsr_sig7 = dsr_sig7 - vr_ddn0(i,k,l)*dconjg(vl_ddn0(j,k,l))
+            dsr_sig0_n = dsr_sig0_n - vr_ddn0(i,k,l)
+     $           * dconjg(vl_ddn0(j,k,l))
      $           * fnm(l)*b0(0.d0,fnm(l),sdm(k))
         end do
       end do
       return
       end
 
-      double complex function dsr_sig8(i,j)
+      double complex function dsr_sig0_c(i,j)
 c     Chargino and up squark in loop
       implicit double precision (a-h,o-z)
       double complex b0
@@ -811,17 +901,18 @@ c     Chargino and up squark in loop
       double complex vl_duc0,vr_duc0
       common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
       common/charg/fcm(2),zpos(2,2),zneg(2,2)
-      dsr_sig8 = 0
+      dsr_sig0_c = (0.d0,0.d0)
       do k=1,6
          do l=1,2
-            dsr_sig8 = dsr_sig8 - vr_duc0(i,k,l)*dconjg(vl_duc0(j,k,l))
+            dsr_sig0_c = dsr_sig0_c - vr_duc0(i,k,l)
+     $           * dconjg(vl_duc0(j,k,l))
      $           * fcm(l)*b0(0.d0,fcm(l),sum(k))
         end do
       end do
       return
       end
 
-      double complex function dsr_sig9(i,j)
+      double complex function dsr_sig0_g(i,j)
 c     Gluino and down squark in loop
       implicit double precision (a-h,o-z)
       double complex b0
@@ -832,10 +923,10 @@ c     Gluino and down squark in loop
       common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
-      dsr_sig9 = 0
+      dsr_sig0_g = (0.d0,0.d0)
       al = 8*g3d*g3d/3.d0
       do  k=1,6
-         dsr_sig9 = dsr_sig9 + al*zd(i+3,k)*dconjg(zd(j,k))
+         dsr_sig0_g = dsr_sig0_g + al*zd(i+3,k)*dconjg(zd(j,k))
      $        * gm1*b0(0.d0,gm1,sdm(k))
       end do
       return
@@ -843,26 +934,27 @@ c     Gluino and down squark in loop
 
       double complex function dsr_sig(i,j)
       implicit double precision (a-h,o-z)
-      double complex dsr_sig4,dsr_sig7,dsr_sig8,dsr_sig9
+c      double complex dsr_sig0_h
+      double complex dsr_sig0_n,dsr_sig0_c,dsr_sig0_g
       logical cdiag,ndiag,tmp
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       common/nc_suppress/eps_d,eps_u,acc
       external init_d_self,init_nc_diag
       dsr_sig = (0.d0,0.d0)
-c      if (ih.eq.1) dsr_sig = dsr_sig + dsr_sig4(i,j) 
-      if (in+ic.gt.0) then
+c      if (ih.eq.1) dsr_sig = dsr_sig + dsr_sig0_h(i,j) 
+      if ((in.eq.1).or.(ic.eq.1)) then
          eps = eps_d
          eps_d = acc
          tmp = cdiag().or.ndiag()
       end if
-      if (in.eq.1) dsr_sig = dsr_sig + dsr_sig7(i,j)
-      if (ic.eq.1) dsr_sig = dsr_sig + dsr_sig8(i,j)
-      if (in+ic.gt.0) then
+      if (in.eq.1) dsr_sig = dsr_sig + dsr_sig0_n(i,j)
+      if (ic.eq.1) dsr_sig = dsr_sig + dsr_sig0_c(i,j)
+      if ((in.eq.1).or.(ic.eq.1)) then
          eps_d = eps
          tmp = cdiag().or.ndiag()
       end if
-      if (ig.eq.1) dsr_sig = dsr_sig + dsr_sig9(i,j) 
+      if (ig.eq.1) dsr_sig = dsr_sig + dsr_sig0_g(i,j) 
       dsr_sig = dsr_sig/16/pi/pi
       return
       end
@@ -871,7 +963,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     Left u-quark self-energy (proportional to P_L)                    c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
-      double complex function usl_sig4(i,j)
+      double complex function usl_sig0_h(i,j)
 c     Down quark + charged Higgs in loop
       implicit double precision (a-h,o-z)
       double complex b0,ckm
@@ -880,17 +972,17 @@ c     Down quark + charged Higgs in loop
       common/fmass/em(3),um(3),dm(3)
       common/km_mat/ckm(3,3)
       common/yukawa/yl(3),yu(3),yd(3)
-      usl_sig4 = 0
+      usl_sig0_h = (0.d0,0.d0)
       do l=1,3
          do k=1,2
-            usl_sig4 = usl_sig4 + zh(2,k)*zh(1,k)*dm(l)*yd(l)*yu(i)
+            usl_sig0_h = usl_sig0_h + zh(2,k)*zh(1,k)*dm(l)*yd(l)*yu(i)
      $           * ckm(l,i)*dconjg(ckm(l,j))*b0(0.d0,dm(l),cm(k))
          end do
       end do
       return
       end
 
-      double complex function usl_sig7(i,j)
+      double complex function usl_sig0_n(i,j)
 c     Neutralino and down squark in loop
       implicit double precision (a-h,o-z)
       double complex b0
@@ -898,17 +990,18 @@ c     Neutralino and down squark in loop
       double complex vl_uun0,vr_uun0
       common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
       common/neut/fnm(4),zn(4,4)
-      usl_sig7 = 0
+      usl_sig0_n = (0.d0,0.d0)
       do k=1,6
          do l=1,4
-            usl_sig7 = usl_sig7 -  vr_uun0(i,k,l)*dconjg(vl_uun0(j,k,l))
+            usl_sig0_n = usl_sig0_n -  vr_uun0(i,k,l)
+     $           * dconjg(vl_uun0(j,k,l))
      $           * fnm(l)*b0(0.d0,fnm(l),sum(k))
          end do
       end do
       return
       end
 
-      double complex function usl_sig8(i,j)
+      double complex function usl_sig0_c(i,j)
 c     Chargino and down squark in loop
       implicit double precision (a-h,o-z)
       double complex b0
@@ -916,17 +1009,18 @@ c     Chargino and down squark in loop
       double complex vl_udc0,vr_udc0
       common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
       common/charg/fcm(2),zpos(2,2),zneg(2,2)
-      usl_sig8 = 0
+      usl_sig0_c = (0.d0,0.d0)
       do k=1,6
          do l=1,2
-            usl_sig8 = usl_sig8 - vr_udc0(i,k,l)*dconjg(vl_udc0(j,k,l))
+            usl_sig0_c = usl_sig0_c - vr_udc0(i,k,l)
+     $           * dconjg(vl_udc0(j,k,l))
      $           * fcm(l)*b0(0.d0,fcm(l),sdm(k))
          end do
       end do
       return
       end
 
-      double complex function usl_sig9(i,j)
+      double complex function usl_sig0_g(i,j)
 c     gluino and up squark in loop
       implicit double precision (a-h,o-z)
       double complex b0
@@ -938,9 +1032,9 @@ c     gluino and up squark in loop
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
       al = 8/3.d0*g3u*g3u
-      usl_sig9 = 0
+      usl_sig0_g = (0.d0,0.d0)
       do k=1,6
-         usl_sig9 = usl_sig9 + al*zu(j,k)*dconjg(zu(i+3,k))*gm1
+         usl_sig0_g = usl_sig0_g + al*zu(j,k)*dconjg(zu(i+3,k))*gm1
      $        * b0(0.d0,gm1,sum(k))
       end do
       return
@@ -948,26 +1042,27 @@ c     gluino and up squark in loop
 
       double complex function usl_sig(i,j)
       implicit double precision (a-h,o-z)
-      double complex usl_sig4,usl_sig7,usl_sig8,usl_sig9
+c      double complex usl_sig0_h
+      double complex usl_sig0_n,usl_sig0_c,usl_sig0_g
       logical cdiag,ndiag,tmp
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       common/nc_suppress/eps_d,eps_u,acc
       external init_d_self,init_nc_diag
       usl_sig = (0.d0,0.d0)
-c      if (ih.eq.1) usl_sig = usl_sig + usl_sig4(i,j) 
-      if (in+ic.gt.0) then
+c      if (ih.eq.1) usl_sig = usl_sig + usl_sig0_h(i,j) 
+      if ((in.eq.1).or.(ic.eq.1)) then
          eps = eps_u
          eps_u = acc
          tmp = cdiag().or.ndiag()
       end if
-      if (in.eq.1) usl_sig = usl_sig + usl_sig7(i,j)
-      if (ic.eq.1) usl_sig = usl_sig + usl_sig8(i,j)
-      if (in+ic.gt.0) then
+      if (in.eq.1) usl_sig = usl_sig + usl_sig0_n(i,j)
+      if (ic.eq.1) usl_sig = usl_sig + usl_sig0_c(i,j)
+      if ((in.eq.1).or.(ic.eq.1)) then
          eps_u = eps
          tmp = cdiag().or.ndiag()
       end if
-      if (ig.eq.1) usl_sig = usl_sig + usl_sig9(i,j) 
+      if (ig.eq.1) usl_sig = usl_sig + usl_sig0_g(i,j) 
       usl_sig = usl_sig/16/pi/pi
       return
       end
@@ -976,7 +1071,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     Right u-quark self-energy (proportional to P_R)                   c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
-      double complex function usr_sig4(i,j)
+      double complex function usr_sig0_h(i,j)
 c     Down quark + charged Higgs in loop
       implicit double precision (a-h,o-z)
       double complex b0,ckm
@@ -985,17 +1080,17 @@ c     Down quark + charged Higgs in loop
       common/fmass/em(3),um(3),dm(3)
       common/km_mat/ckm(3,3)
       common/yukawa/yl(3),yu(3),yd(3)
-      usr_sig4 = 0
+      usr_sig0_h = (0.d0,0.d0)
       do l=1,3
          do k=1,2
-            usr_sig4 = usr_sig4 + zh(2,k)*zh(1,k)*dm(l)*yd(l)*yu(j)
+            usr_sig0_h = usr_sig0_h + zh(2,k)*zh(1,k)*dm(l)*yd(l)*yu(j)
      $           * ckm(l,i)*dconjg(ckm(l,j))*b0(0.d0,dm(l),cm(k))
          end do
       end do
       return
       end
 
-      double complex function usr_sig7(i,j)
+      double complex function usr_sig0_n(i,j)
 c     Neutralino and down squark in loop
       implicit double precision (a-h,o-z)
       double complex b0
@@ -1003,17 +1098,18 @@ c     Neutralino and down squark in loop
       double complex vl_uun0,vr_uun0
       common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
       common/neut/fnm(4),zn(4,4)
-      usr_sig7 = 0
+      usr_sig0_n = (0.d0,0.d0)
       do k=1,6
          do l=1,4
-            usr_sig7 = usr_sig7 - vl_uun0(i,k,l)*dconjg(vr_uun0(j,k,l))
-     $           *fnm(l)*b0(0.d0,fnm(l),sum(k))
+            usr_sig0_n = usr_sig0_n - vl_uun0(i,k,l)
+     $           * dconjg(vr_uun0(j,k,l))
+     $           * fnm(l)*b0(0.d0,fnm(l),sum(k))
          end do
       end do
       return
       end
 
-      double complex function usr_sig8(i,j)
+      double complex function usr_sig0_c(i,j)
 c     Chargino and down squark in loop
       implicit double precision (a-h,o-z)
       double complex b0
@@ -1021,17 +1117,18 @@ c     Chargino and down squark in loop
       double complex vl_udc0,vr_udc0
       common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
       common/charg/fcm(2),zpos(2,2),zneg(2,2)
-      usr_sig8 = 0
+      usr_sig0_c = (0.d0,0.d0)
       do k=1,6
          do l=1,2
-            usr_sig8 = usr_sig8 - vl_udc0(i,k,l)*dconjg(vr_udc0(j,k,l))
+            usr_sig0_c = usr_sig0_c - vl_udc0(i,k,l)
+     $           * dconjg(vr_udc0(j,k,l))
      $           * fcm(l)*b0(0.d0,fcm(l),sdm(k))
          end do
       end do
       return
       end
 
-      double complex function usr_sig9(i,j)
+      double complex function usr_sig0_g(i,j)
 c     gluino and up squark in loop
       implicit double precision (a-h,o-z)
       double complex b0
@@ -1043,9 +1140,9 @@ c     gluino and up squark in loop
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
       al = 8/3.d0*g3u*g3u
-      usr_sig9 = 0
+      usr_sig0_g = (0.d0,0.d0)
       do k=1,6
-         usr_sig9 = usr_sig9 + al*zu(j+3,k)*dconjg(zu(i,k))*gm1
+         usr_sig0_g = usr_sig0_g + al*zu(j+3,k)*dconjg(zu(i,k))*gm1
      $        * b0(0.d0,gm1,sum(k))
       end do
       return
@@ -1053,26 +1150,27 @@ c     gluino and up squark in loop
 
       double complex function usr_sig(i,j)
       implicit double precision (a-h,o-z)
-      double complex usr_sig4,usr_sig7,usr_sig8,usr_sig9
+c     double complex usr_sig0_h
+      double complex usr_sig0_n,usr_sig0_c,usr_sig0_g
       logical cdiag,ndiag,tmp
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       common/nc_suppress/eps_d,eps_u,acc
       external init_d_self,init_nc_diag
       usr_sig = (0.d0,0.d0)
-c      if (ih.eq.1) usr_sig = usr_sig + usr_sig4(i,j) 
-      if (in+ic.gt.0) then
+c     if (ih.eq.1) usr_sig = usr_sig + usr_sig0_h(i,j) 
+      if ((in.eq.1).or.(ic.eq.1)) then
          eps = eps_u
          eps_u = acc
          tmp = cdiag().or.ndiag()
       end if
-      if (in.eq.1) usr_sig = usr_sig + usr_sig7(i,j)
-      if (ic.eq.1) usr_sig = usr_sig + usr_sig8(i,j)
-      if (in+ic.gt.0) then
+      if (in.eq.1) usr_sig = usr_sig + usr_sig0_n(i,j)
+      if (ic.eq.1) usr_sig = usr_sig + usr_sig0_c(i,j)
+      if ((in.eq.1).or.(ic.eq.1)) then
          eps_u = eps
          tmp = cdiag().or.ndiag()
       end if
-      if (ig.eq.1) usr_sig = usr_sig + usr_sig9(i,j) 
+      if (ig.eq.1) usr_sig = usr_sig + usr_sig0_g(i,j) 
       usr_sig = usr_sig/16/pi/pi
       return
       end

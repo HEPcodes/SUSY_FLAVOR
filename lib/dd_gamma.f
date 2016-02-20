@@ -50,10 +50,10 @@ c     Higgs and Goldstone contributions
       qs = - 1
       do k=1,3
         do l=1,2
-           ai = yh_eff_l(i,k,l) ! zh(2,l)*yu(k)*dconjg(ckm_phys(k,i))
-           bi = yh_eff_r(i,k,l) ! - zh(1,l)*dconjg(yd(i)*ckm_phys(k,i))
-           aj = dconjg(yh_eff_l(j,k,l)) ! zh(2,l)*dconjg(yu(k))*ckm_phys(k,j)
-           bj = dconjg(yh_eff_r(j,k,l)) ! - zh(1,l)*yd(j)*ckm_phys(k,j)
+           ai = dconjg(yh_eff_l(i,k,l)) ! zh(2,l)*yu(k)*dconjg(ckm_phys(k,i))
+           bi = dconjg(yh_eff_r(i,k,l)) ! - zh(1,l)*dconjg(yd(i)*ckm_phys(k,i))
+           aj = yh_eff_l(j,k,l) ! zh(2,l)*dconjg(yu(k))*ckm_phys(k,j)
+           bj = yh_eff_r(j,k,l) ! - zh(1,l)*yd(j)*ckm_phys(k,j)
            call dd_ffs(ai,aj,bi,bj,qf,umu(k),cm(l),cfl,cfr)
            call dd_ssf(ai,aj,bi,bj,qs,umu(k),cm(l),cfl,cfr)
         end do
@@ -133,13 +133,15 @@ c     Full coefficients
       implicit double precision (a-h,o-z)
       double complex cfl(5),cfr(5)
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       do k=1,5
         cfl(k) = (0.d0,0.d0)
         cfr(k) = (0.d0,0.d0)
       end do
-      call dd_gam_w(i,j,cfl,cfr)
-      if (ih.eq.1) call dd_gam_h(i,j,cfl,cfr)
+      if (ih.eq.1) then
+         call dd_gam_w(i,j,cfl,cfr)
+         call dd_gam_h(i,j,cfl,cfr)
+      end if
       if (ic.eq.1) call dd_gam_c(i,j,cfl,cfr)
       if (in.eq.1) call dd_gam_n(i,j,cfl,cfr)
       if (ig.eq.1) call dd_gam_g(i,j,cfl,cfr)

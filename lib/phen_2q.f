@@ -178,16 +178,17 @@ c     complete neutron EDM. Included:
 c       - electric dipole moment of quarks
 c       - chromoelectric dipole moment of quarks
 c       - chromoelectric dipole moment of gluon
-c       - approximate QCD renormalization factors
+c       - approximate QCD coefficients
       implicit double precision (a-h,o-z)
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/edm_qcd/eta_e,eta_c,eta_g,alamx
+      common/edm_qcd/eta_ed,eta_eu,eta_cd,eta_cu,eta_g,alamx
       common/ph_units/hbar,gev_cm,gev_s
       external init_units
       external init_2q
-      edm_n = - (eta_e/3.d0*(4*edm_d(1) - edm_u(1))
-     $     + e/12.d0/pi*eta_c*(4*cdm_d(1) - cdm_u(1))
-     $     + e/4.d0/pi*eta_g*alamx*cdm_g())/e/gev_cm
+      edm_n = eta_ed*edm_d(1) + eta_eu*edm_u(1) 
+     $     + e*(eta_cd*cdm_d(1) + eta_cu*cdm_u(1))
+     $     + e/4.d0/pi*eta_g*alamx*cdm_g()
+      edm_n = edm_n/e/gev_cm
       return
       end
 
@@ -195,10 +196,10 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     Br(B^+ -> tau^+ v) and  Br(B^0 -> D tau v)/Br(B^0 -> Dlv)           c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
-      subroutine b_taunu(br_taunu,dtaunu_rat)
-c     Decays B_u -> tau v and B_u -> D tau v (charged B_u meson)
+      subroutine b_taunu(br_taunu,dtaunu_rat,dstaunu_rat)
+c     Decays B_u -> tau v and B_u -> D (D^*) tau v (charged B_u meson)
       implicit double precision (a-h,o-z)
-      double complex c_np
+      double complex c_l,c_r
       double complex yh_eff_r,yhl_eff_r
       double complex ckm_phys,ckm0,udl,udr,uul,uur
       common/ckm_switch/ckm_phys(3,3),ckm0(3,3),udl(3,3),udr(3,3),
@@ -207,19 +208,27 @@ c     Decays B_u -> tau v and B_u -> D tau v (charged B_u meson)
       common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
       common/meson_data/dmk,amk,epsk,fk,dmd,amd,fd,
      $    amb(2),dmb(2),tau_b(2),fb(2)
+      common/dtau_data/bm,rd,del_rd,rds,del_rds
       common/fmass/em(3),um(3),dm(3)
       common/fermi/g_fermi
       common/ph_units/hbar,gev_cm,gev_s
       external init_4q
-c     B+ mass and width
-      bm = 5.27917d0
-c     common New Physics contribution
-      c_np = - yh_eff_r(3,1,1)*dconjg(yhl_eff_r(3,3,1))/sq2/2/cm(1)
+c     New Physics contributions to D->tau nu
+      c_l = - yh_eff_l(3,1,1)*dconjg(yhl_eff_r(3,3,1))/sq2/2/cm(1)
+     $     /cm(1)/g_fermi/ckm_phys(1,3)
+      c_r = - yh_eff_r(3,1,1)*dconjg(yhl_eff_r(3,3,1))/sq2/2/cm(1)
      $     /cm(1)/g_fermi/ckm_phys(1,3)
       br_taunu = tau_b(1)*gev_s*bm/8/pi*abs(g_fermi*em(3)*fb(1)
      $     * ckm_phys(1,3)*(1 - em(3)*em(3)/bm/bm)
-     $     * (1 + bm*bm/dm(3)/em(3)*c_np))**2
-      dtaunu_rat = 0.28d0*(1 + 1.38d0*dble(c_np) + 0.88d0*abs(c_np)**2)
+     $     * (1 + bm*bm/dm(3)/em(3)*(c_r - c_l)))**2
+c     New Physics contributions to D->tau nu
+      c_l = - yh_eff_l(3,2,1)*dconjg(yhl_eff_r(3,3,1))/sq2/2/cm(1)
+     $     /cm(1)/g_fermi/ckm_phys(2,3)
+      c_r = - yh_eff_r(3,2,1)*dconjg(yhl_eff_r(3,3,1))/sq2/2/cm(1)
+     $     /cm(1)/g_fermi/ckm_phys(2,3)
+      dtaunu_rat = rd*(1 + 1.5d0*dble(c_r + c_l) + abs(c_r + c_l)**2)
+      dstaunu_rat = rds*(1 + 0.12d0*dble(c_r - c_l) 
+     $     + 0.05*abs(c_r - c_l)**2)
       return
       end
 
@@ -227,30 +236,86 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     Br(t->ch(dh))                                                        c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
-      double precision function gam_suu(i,j,k)
+      double precision function gam_suu(i,k)
 c     Decays width u^J -> u^K H^0_i
       implicit double precision (a-h,o-z)
-      double complex form(2)
+      double complex uus(2),uug(2),form(2)
+      double complex zu,zd
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
-      common/fmass/em(3),um(3),dm(3)
-      call suu_vert(i,j,k,form)
-      f1 = (((um(j) - um(k))**2 - rm(i)**2)*((um(j) + um(k))**2 - rm(i)
-     $     **2))**0.5d0
-      f2 = (um(j)**2 + um(k)**2 - rm(i)**2)/2/um(j)
-      gam_suu = f1*(f2*(abs(form(1))**2 + abs(form(2))**2) + 2*um(k)
-     $     *dble(form(1)*dconjg(form(2))))/16/pi/um(j)**2
+      common/hmass_EPA/pm,hm1,hm2,sa,ca,sb,cb
+      common/qmass_pole/um(3),dm(3)
+      common/fmass/emr(3),umr(3),dmr(3)
+      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/debug_4q/ih,ic,in,ig 
+      tm = um(3)                ! top mass pole
+      qm = um(k)                ! lighter quark mass
+      if (i.eq.1) then          ! Higgs mass 
+         hm = hm1
+      else
+         hm = hm2
+      end if
+      if (tm.le.(qm + hm)) then
+         gam_suu = 0.d0
+         return
+      end if
+c     store control variables
+      ih0 = ih
+      ic0 = ic
+      in0 = in
+      ig0 = ig
+c     W+Higgs contribution to h/H-uu vertex (at MA)
+      ic = 0
+      in = 0
+      ig = 0
+      call suu_vert(i,3,k,form)
+c     SUSY contribution to h/H-uu vertex (at MSUSY)
+      ih = 0
+      ic = ic0                  ! ic0...ig0 at initial values
+      in = in0
+      ig = ig0
+      call suu_vert(i,3,k,uus)
+      ih = ih0                  ! restore also ih0
+c     gluon-uu vertex (at MSUSY, only for i=2 - lighter CP-even Higgs)
+      do ii =1,2
+         uug(ii) = (0.d0,0.d0)
+      end do
+      if (i.eq.2) call gluu_vert(3,k,uug)
+c     evaluate SUSY scale as average squark mass scale
+      susy = 0.d0
+      do ii=1,6
+         susy = susy + sum(ii) + sdm(ii)
+      end do
+      susy = susy/12            ! average SUSY scale
+      tmr = umr(3)              ! running mt(mt)
+      r = alfas(susy)/alfas(tmr) 
+      b3 = 7.d0                 ! 11 - 2 N_f/3 with N_f=6
+c     add all formfactors including RGE running (uug = - 2 C_g!)
+      do ii =1,2
+c     full C_h(mt)
+         form(ii) = form(ii) + (uus(ii) + 6/7.d0*e/st/wm*tmr**2*(1 -
+     $        r**(14.d0/3/b3))*uug(ii))*r**(-4/b3) 
+c     full C_g(mt) (-1/2 included here)
+         uug(ii) = - uug(ii)/2*r**(2.d0/3/b3) 
+      end do
+      f1 = (((tm - qm)**2 - hm**2)*((tm + qm)**2 - hm**2))**0.5d0
+      f2 = (tm**2 + qm**2 - hm**2)/2/tm
+      gam_suu_h = f1*(f2*(abs(form(1))**2 + abs(form(2))**2) 
+     $     + 2*qm*dble(form(1)*dconjg(form(2))))/16/pi/tm**2
+      gam_suu_g = e*tm**3/32/pi/st/wm*(1 - (hm/tm)**2)**2
+     $     *dble(dconjg(form(1))*uug(2) + dconjg(form(2))*uug(1))
+      gam_suu = 1.018d0*gam_suu_h + 0.049d0*gam_suu_g
       return
       end
 
-      double precision function br_suu(i,j,k)
+      double precision function br_suu(i,k)
 c     Br(u^J -> u^K H^0_i) normalized to t->bW
       implicit double precision (a-h,o-z)
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/qmass_pole/um(3),dm(3)
       xt = um(3)*um(3)/wm2
       gam_tbw = e2/st2/64/pi*um(3)*(2 + xt)*(1 - 1/xt)**2
-      br_suu = gam_suu(i,j,k)/gam_tbw
+      gam_s   = gam_suu(i,k)
+      br_suu = gam_s/(gam_tbw + gam_s)
       return
       end
 
@@ -262,7 +327,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       implicit double precision (a-h,o-z)
       logical init_eta_2q
 c     Neutron EDM QCD correction factors and chiral symmetry breaking scale
-      common/edm_qcd/eta_en,eta_cn,eta_gn,alamx_n
+      common/edm_qcd/eta_ed,eta_eu,eta_cd,eta_cu,eta_g,alamx
       common/ev_mat_2q/vx(2),sx(2),tx(2),init_eta_2q
       common/kpivv/ak0,del_ak0,akp,del_akp,pc,del_pc,alam
       data init_eta_2q/.true./
@@ -270,6 +335,6 @@ c     Neutron EDM QCD correction factors and chiral symmetry breaking scale
       data del_ak0,del_akp/0.013d-10,0.024d-11/
       data pc,del_pc/0.41d0,0.03d0/
       data alam/0.225d0/
-      data eta_en,eta_cn,eta_gn/1.53d0,3.4d0,3.4d0/
-      data alamx_n/1.18d0/
+      data eta_ed,eta_eu,eta_cd,eta_cu/0.79d0,-0.2d0,0.59d0,0.3d0/
+      data eta_g,alamx/3.4d0,1.18d0/
       end 

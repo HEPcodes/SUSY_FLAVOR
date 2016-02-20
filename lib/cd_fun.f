@@ -280,7 +280,7 @@ c     x(i) = x(i+1) = ... = x(i+n) = (x(1) + ... x(n))/n
       block data init_cd_fun
       implicit double precision (a-h,o-z)
       common/cp_acc/eps
-      data eps/1.d-4/
+      data eps/5.d-3/
       end
 
 

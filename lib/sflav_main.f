@@ -16,7 +16,7 @@ c     store in common blocks for output routine
       implicit double precision (a-h,o-z)
       common/sflav_df0/edmn,edml(3),gminus2(3)
       common/sflav_df1/br_mu_egamma,br_tau_egamma,br_tau_mugamma,
-     $     br_k0,br_kp,br_taunu,dtaunu_ratio,bxgamma,
+     $     br_k0,br_kp,br_taunu,dtaunu_ratio,dstaunu_ratio,bxgamma,
      $     br_bdll(3,3),br_bsll(3,3),br_tuh,br_tch
       common/sflav_df2/eps_k,delta_mk,delta_md,
      $     delta_mbd,dmbd_re,dmbd_im,
@@ -43,20 +43,19 @@ c     Leptonic B decays:
             br_bsll(i,j) = b_ll(3,2,i,j) ! BR(B_s -> l^I+ l^J-)
          end do 
       end do
-c     B_u -> tau decays:
-      call b_taunu(br_taunu,dtaunu_ratio) ! BR(B_u -> tau nu), BR(B_u -> D tau nu)/BR(B_u -> D l nu)
+c     B -> tau decays: BR(B -> tau nu), 
+c     BR(B -> D(D*) tau nu)/BR(B -> D(D*) l nu)
+      call b_taunu(br_taunu,dtaunu_ratio,dstaunu_ratio) 
 c     B->X_s gamma decay:
       delb = 0.99d0             ! Photon energy infrared cutoff
       amiu_b= 4.8d0             ! Renormalization scale miu_b
       bxgamma = bxg_nl(delb,amiu_b) ! BR(B -> X_S gamma)
 
-c     top -> Higgs+quark decays - NOT FULLY IMPLEMENTED YET!!!
-c     br_tuh = br_suu(2,3,1)    ! BR(t -> u h)
-c     br_tch = br_suu(2,3,2)    ! BR(t -> c h)
-c     gam_tuh = gam_suu(2,3,1)  ! Gamma(t -> u h)
-c     gam_tch = gam_suu(2,3,2)  ! Gamma(t -> c h)
-      br_tuh = 0.d0             ! BR(t -> u h)
-      br_tch = 0.d0             ! BR(t -> c h)
+c     top -> Higgs+quark decays
+      br_tuh = br_suu(2,1)      ! BR(t -> u h)
+      br_tch = br_suu(2,2)      ! BR(t -> c h)
+c      gam_tuh = gam_suu(2,1)    ! Gamma(t -> u h)
+c      gam_tch = gam_suu(2,2)    ! Gamma(t -> c h)
 
 c     Delta F = 2 processes
 c     KK mixing:

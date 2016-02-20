@@ -25,13 +25,13 @@ c     cfl(1..5),cfr(1..5): coefficients of H^i_L and H^i_R
       cfl(1) = cfl(1) + qf*aj*bi*fm*cp11(fm,sm)
       cfl(2) = cfl(2) + qf*aj*bi*fm*cp12(fm,sm)
       cfl(3) = cfl(3) + qf*ai*aj*(2*cp11(fm,sm) - 2*cp21(fm,sm)
-     1                - cp23(fm,sm))
+     $                - cp23(fm,sm))
       cfl(4) = cfl(4) - qf*ai*aj*cp23(fm,sm)/2
       cfl(5) = cfl(5) + qf*ai*aj*cp22(fm,sm)
       cfr(1) = cfr(1) + qf*bj*ai*fm*cp11(fm,sm)
       cfr(2) = cfr(2) + qf*bj*ai*fm*cp12(fm,sm)
       cfr(3) = cfr(3) + qf*bi*bj*(2*cp11(fm,sm) - 2*cp21(fm,sm)
-     1                - cp23(fm,sm))
+     $                - cp23(fm,sm))
       cfr(4) = cfr(4) - qf*bi*bj*cp23(fm,sm)/2
       cfr(5) = cfr(5) + qf*bi*bj*cp22(fm,sm)
       return
@@ -50,13 +50,13 @@ c     cfl(1..5),cfr(1..5): coefficients of H^i_L and H^i_R
       cfl(1) = cfl(1) + qs*aj*bi*fm*cp12(sm,fm)/2
       cfl(2) = cfl(2) - qs*aj*bi*fm*cp12(sm,fm)
       cfl(3) = cfl(3) + qs*ai*aj*(cp11(sm,fm) - 2*cp21(sm,fm)
-     1                - cp23(sm,fm))
+     $                - cp23(sm,fm))
       cfl(4) = cfl(4) - qs*ai*aj*cp23(sm,fm)/2
       cfl(5) = cfl(5) - 2*qs*ai*aj*cp23(sm,fm)
       cfr(1) = cfr(1) + qs*bj*ai*fm*cp12(sm,fm)/2
       cfr(2) = cfr(2) - qs*bj*ai*fm*cp12(sm,fm)
       cfr(3) = cfr(3) + qs*bi*bj*(cp11(sm,fm) - 2*cp21(sm,fm)
-     1                - cp23(sm,fm))
+     $                - cp23(sm,fm))
       cfr(4) = cfr(4) - qs*bi*bj*cp23(sm,fm)/2
       cfr(5) = cfr(5) + 2*qs*bi*bj*cp23(sm,fm)
       return
@@ -73,7 +73,7 @@ c     cfl(1..5),cfr(1..5): coefficients of H^i_L and H^i_R
       double complex ai,aj
       double complex cfl(5),cfr(5)
       cfl(3) = cfl(3) + 2*qf*ai*aj*(cp0_1(fm,vm) - 2*cp21(fm,vm)
-     1                - cp23(fm,vm))
+     $                - cp23(fm,vm))
       cfl(4) = cfl(4) + qf*ai*aj*(cp12(fm,vm) - cp23(fm,vm))
       cfl(5) = cfl(5) + 2*qf*ai*aj*cp22(fm,vm)
       return
@@ -91,7 +91,7 @@ c     cfl(1..5),cfr(1..5): coefficients of H^i_L and H^i_R
       double complex ai,aj
       double complex cfl(5),cfr(5)
       cfl(3) = cfl(3) + 2*qv*ai*aj*(cp23(vm,fm) + 2*cp21(vm,fm)
-     1                - 3*cp11(vm,fm))
+     $                - 3*cp11(vm,fm))
       cfl(4) = cfl(4) + qv*ai*aj*(cp23(vm,fm) - 2*cp11(vm,fm))
       cfl(5) = cfl(5) + 4*qv*ai*aj*cp23(vm,fm)
       return

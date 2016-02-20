@@ -20,7 +20,7 @@ c     chargino - up squark contributions
       common/charg/fcm(2),zpos(2,2),zneg(2,2)
       common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      edm_d_c = 0
+      edm_d_c= 0.d0
       do k=1,6
         do l=1,2
           edm_d_c  = edm_d_c 
@@ -39,7 +39,7 @@ c     neutralino-down squark contributions
       common/neut/fnm(4),zn(4,4)
       common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      edm_d_n = 0
+      edm_d_n= 0.d0
       do k=1,6
          do l=1,4
             edm_d_n = edm_d_n + fnm(l)*cp12(sdm(k),fnm(l))
@@ -61,7 +61,7 @@ c     gluino-down squark contributions
       common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
-      edm_d_g = 0
+      edm_d_g= 0.d0
       do k=1,6
         edm_d_g = edm_d_g 
      $      + dimag(zd(i,k)*dconjg(zd(i+3,k)))*cp12(sdm(k),gm1)
@@ -73,7 +73,11 @@ c     gluino-down squark contributions
       double precision function edm_d(i)
 c     Full down quark EDM
       implicit double precision (a-h,o-z)
-      edm_d = edm_d_n(i) + edm_d_c(i) + edm_d_g(i)
+      common/debug_4q/ih,ic,in,ig
+      edm_d = 0.d0
+      if (ic.eq.1) edm_d = edm_d + edm_d_c(i)
+      if (in.eq.1) edm_d = edm_d + edm_d_n(i)
+      if (ig.eq.1) edm_d = edm_d + edm_d_g(i)
       return
       end
 
@@ -88,7 +92,7 @@ c     chargino-down squark contributions
       common/charg/fcm(2),zpos(2,2),zneg(2,2)
       common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      edm_u_c = 0
+      edm_u_c= 0.d0
       do k=1,6
         do l=1,2
           edm_u_c  = edm_u_c 
@@ -107,7 +111,7 @@ c     neutralino-up squark contributions
       common/neut/fnm(4),zn(4,4)
       common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      edm_u_n = 0
+      edm_u_n= 0.d0
       do k=1,6
         do l=1,4
           edm_u_n = edm_u_n + fnm(l)*cp12(sum(k),fnm(l))
@@ -129,7 +133,7 @@ c     gluino-up squark contributions
       common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
-      edm_u_g = 0
+      edm_u_g= 0.d0
       do k=1,6
         edm_u_g = edm_u_g 
      $      + dimag(zu(i,k)*dconjg(zu(i+3,k)))*cp12(sum(k),gm1)
@@ -141,7 +145,11 @@ c     gluino-up squark contributions
       double precision function edm_u(i)
 c     Full up quark EDM
       implicit double precision (a-h,o-z)
-      edm_u = edm_u_n(i) + edm_u_c(i) + edm_u_g(i)
+      common/debug_4q/ih,ic,in,ig
+      edm_u = 0.d0
+      if (ic.eq.1) edm_u = edm_u + edm_u_c(i)
+      if (in.eq.1) edm_u = edm_u + edm_u_n(i)
+      if (ig.eq.1) edm_u = edm_u + edm_u_g(i)
       return
       end
 

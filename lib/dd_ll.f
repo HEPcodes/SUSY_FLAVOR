@@ -109,13 +109,15 @@ c     Full box A^V_LL formfactor
       implicit double precision (a-h,o-z)
       double complex dl_vll_g,dl_vll_h,dl_vll_hg,dl_vll_c,dl_vll_n
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
-      common/susy_sign/isus
-      dl_vll_box = dl_vll_g(i,j,k,l)
-      if (ih.eq.1) dl_vll_box = dl_vll_box + dl_vll_h(i,j,k,l)
-     $     + dl_vll_hg(i,j,k,l)
-      if (ic.eq.1) dl_vll_box = dl_vll_box + isus*dl_vll_c(i,j,k,l)
-      if (in.eq.1) dl_vll_box = dl_vll_box + isus*dl_vll_n(i,j,k,l)
+      common/debug_4q/ih,ic,in,ig
+      dl_vll_box = (0.d0,0.d0)
+      if (ih.eq.1) then
+         dl_vll_box = dl_vll_box + dl_vll_g(i,j,k,l)
+         dl_vll_box = dl_vll_box + dl_vll_hg(i,j,k,l)
+         dl_vll_box = dl_vll_box + dl_vll_h(i,j,k,l) 
+      end if
+      if (ic.eq.1) dl_vll_box = dl_vll_box + dl_vll_c(i,j,k,l)
+      if (in.eq.1) dl_vll_box = dl_vll_box + dl_vll_n(i,j,k,l)
       dl_vll_box = dl_vll_box/16/pi/pi
       return
       end
@@ -146,7 +148,7 @@ c     Double Higgs contribution
             do ll=1,2
                dl_vrr_h = dl_vrr_h + zh(1,kk)*zh(1,ll)*yh_eff_r(i,m,kk)
      $              * dconjg(yh_eff_r(j,m,ll))
-     $              * dp0(cm(kk),cm(ll),umu(m),0.d0)
+     $              * dp1(cm(kk),cm(ll),umu(m),0.d0)
             end do
          end do
       end do
@@ -216,13 +218,15 @@ c     Full box A^V_RR formfactor
       implicit double precision (a-h,o-z)
       double complex dl_vrr_g,dl_vrr_h,dl_vrr_hg,dl_vrr_c,dl_vrr_n
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
-      common/susy_sign/isus
-      dl_vrr_box = dl_vrr_g(i,j,k,l)
-      if (ih.eq.1) dl_vrr_box = dl_vrr_box + dl_vrr_h(i,j,k,l)
-     $        + dl_vrr_hg(i,j,k,l)
-      if (ic.eq.1) dl_vrr_box = dl_vrr_box + isus*dl_vrr_c(i,j,k,l)
-      if (in.eq.1) dl_vrr_box = dl_vrr_box + isus*dl_vrr_n(i,j,k,l)
+      common/debug_4q/ih,ic,in,ig
+      dl_vrr_box = (0.d0,0.d0)
+      if (ih.eq.1) then
+         dl_vrr_box = dl_vrr_box + dl_vrr_g(i,j,k,l)
+         dl_vrr_box = dl_vrr_box + dl_vrr_hg(i,j,k,l)
+         dl_vrr_box = dl_vrr_box + dl_vrr_h(i,j,k,l) 
+      end if
+      if (ic.eq.1) dl_vrr_box = dl_vrr_box + dl_vrr_c(i,j,k,l)
+      if (in.eq.1) dl_vrr_box = dl_vrr_box + dl_vrr_n(i,j,k,l)
       dl_vrr_box = dl_vrr_box/16/pi/pi
       return
       end
@@ -253,7 +257,7 @@ c     Double Higgs contribution
             do ll=1,2
                dl_vlr_h = dl_vlr_h + zh(1,kk)*zh(1,ll)*yh_eff_l(i,m,kk)
      $              * dconjg(yh_eff_l(j,m,ll))
-     $              * dp0(cm(kk),cm(ll),umu(m),0.d0)
+     $              * dp1(cm(kk),cm(ll),umu(m),0.d0)
             end do
          end do
       end do
@@ -323,13 +327,15 @@ c     Full box A^V_LR formfactor
       implicit double precision (a-h,o-z)
       double complex dl_vlr_g,dl_vlr_h,dl_vlr_hg,dl_vlr_c,dl_vlr_n
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
-      common/susy_sign/isus
-      dl_vlr_box = dl_vlr_g(i,j,k,l)
-      if (ih.eq.1) dl_vlr_box = dl_vlr_box + dl_vlr_h(i,j,k,l)
-     $     + dl_vlr_hg(i,j,k,l)
-      if (ic.eq.1) dl_vlr_box = dl_vlr_box + isus*dl_vlr_c(i,j,k,l)
-      if (in.eq.1) dl_vlr_box = dl_vlr_box + isus*dl_vlr_n(i,j,k,l)
+      common/debug_4q/ih,ic,in,ig
+      dl_vlr_box = (0.d0,0.d0)
+      if (ih.eq.1) then
+         dl_vlr_box = dl_vlr_box + dl_vlr_g(i,j,k,l)
+         dl_vlr_box = dl_vlr_box + dl_vlr_hg(i,j,k,l)
+         dl_vlr_box = dl_vlr_box + dl_vlr_h(i,j,k,l) 
+      end if
+      if (ic.eq.1) dl_vlr_box = dl_vlr_box + dl_vlr_c(i,j,k,l)
+      if (in.eq.1) dl_vlr_box = dl_vlr_box + dl_vlr_n(i,j,k,l)
       dl_vlr_box = dl_vlr_box/16/pi/pi
       return
       end
@@ -413,13 +419,15 @@ c     Full box A^V_RL formfactor
       implicit double precision (a-h,o-z)
       double complex dl_vrl_g,dl_vrl_h,dl_vrl_hg,dl_vrl_c,dl_vrl_n
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
-      common/susy_sign/isus
-      dl_vrl_box = dl_vrl_g(i,j,k,l)
-      if (ih.eq.1) dl_vrl_box = dl_vrl_box + dl_vrl_h(i,j,k,l)
-     $     + dl_vrl_hg(i,j,k,l)
-      if (ic.eq.1) dl_vrl_box = dl_vrl_box + isus*dl_vrl_c(i,j,k,l)
-      if (in.eq.1) dl_vrl_box = dl_vrl_box + isus*dl_vrl_n(i,j,k,l)
+      common/debug_4q/ih,ic,in,ig
+      dl_vrl_box = (0.d0,0.d0)
+      if (ih.eq.1) then
+         dl_vrl_box = dl_vrl_box + dl_vrl_g(i,j,k,l)
+         dl_vrl_box = dl_vrl_box + dl_vrl_hg(i,j,k,l)
+         dl_vrl_box = dl_vrl_box + dl_vrl_h(i,j,k,l) 
+      end if
+      if (ic.eq.1) dl_vrl_box = dl_vrl_box + dl_vrl_c(i,j,k,l)
+      if (in.eq.1) dl_vrl_box = dl_vrl_box + dl_vrl_n(i,j,k,l)
       dl_vrl_box = dl_vrl_box/16/pi/pi
       return
       end
@@ -504,13 +512,15 @@ c     Full box A^S_LL formfactor
       implicit double precision (a-h,o-z)
       double complex dl_sll_g,dl_sll_h,dl_sll_hg,dl_sll_c,dl_sll_n
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
-      common/susy_sign/isus
-      dl_sll_box = dl_sll_g(i,j,k,l)
-      if (ih.eq.1) dl_sll_box = dl_sll_box + dl_sll_h(i,j,k,l)
-     $     + dl_sll_hg(i,j,k,l)
-      if (ic.eq.1) dl_sll_box = dl_sll_box + isus*dl_sll_c(i,j,k,l)
-      if (in.eq.1) dl_sll_box = dl_sll_box + isus*dl_sll_n(i,j,k,l)
+      common/debug_4q/ih,ic,in,ig
+      dl_sll_box = (0.d0,0.d0)
+      if (ih.eq.1) then
+         dl_sll_box = dl_sll_box + dl_sll_g(i,j,k,l)
+         dl_sll_box = dl_sll_box + dl_sll_hg(i,j,k,l)
+         dl_sll_box = dl_sll_box + dl_sll_h(i,j,k,l) 
+      end if
+      if (ic.eq.1) dl_sll_box = dl_sll_box + dl_sll_c(i,j,k,l)
+      if (in.eq.1) dl_sll_box = dl_sll_box + dl_sll_n(i,j,k,l)
       dl_sll_box = dl_sll_box/16/pi/pi
       return
       end
@@ -595,13 +605,15 @@ c     Full box A^S_RR formfactor
       implicit double precision (a-h,o-z)
       double complex dl_srr_g,dl_srr_h,dl_srr_hg,dl_srr_c,dl_srr_n
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
-      common/susy_sign/isus
-      dl_srr_box = dl_srr_g(i,j,k,l)
-      if (ih.eq.1) dl_srr_box = dl_srr_box + dl_srr_h(i,j,k,l)
-     $     + dl_srr_hg(i,j,k,l)
-      if (ic.eq.1) dl_srr_box = dl_srr_box + isus*dl_srr_c(i,j,k,l)
-      if (in.eq.1) dl_srr_box = dl_srr_box + isus*dl_srr_n(i,j,k,l)
+      common/debug_4q/ih,ic,in,ig
+      dl_srr_box = (0.d0,0.d0)
+      if (ih.eq.1) then
+         dl_srr_box = dl_srr_box + dl_srr_g(i,j,k,l)
+         dl_srr_box = dl_srr_box + dl_srr_hg(i,j,k,l)
+         dl_srr_box = dl_srr_box + dl_srr_h(i,j,k,l) 
+      end if
+      if (ic.eq.1) dl_srr_box = dl_srr_box + dl_srr_c(i,j,k,l)
+      if (in.eq.1) dl_srr_box = dl_srr_box + dl_srr_n(i,j,k,l)
       dl_srr_box = dl_srr_box/16/pi/pi
       return
       end
@@ -704,13 +716,15 @@ c     Full box A^S_LR formfactor
       implicit double precision (a-h,o-z)
       double complex dl_slr_g,dl_slr_h,dl_slr_hg,dl_slr_c,dl_slr_n
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
-      common/susy_sign/isus
-      dl_slr_box = dl_slr_g(i,j,k,l)
-      if (ih.eq.1) dl_slr_box = dl_slr_box + dl_slr_h(i,j,k,l)
-     $     + dl_slr_hg(i,j,k,l)
-      if (ic.eq.1) dl_slr_box = dl_slr_box + isus*dl_slr_c(i,j,k,l)
-      if (in.eq.1) dl_slr_box = dl_slr_box + isus*dl_slr_n(i,j,k,l)
+      common/debug_4q/ih,ic,in,ig
+      dl_slr_box = (0.d0,0.d0)
+      if (ih.eq.1) then
+         dl_slr_box = dl_slr_box + dl_slr_g(i,j,k,l)
+         dl_slr_box = dl_slr_box + dl_slr_hg(i,j,k,l)
+         dl_slr_box = dl_slr_box + dl_slr_h(i,j,k,l) 
+      end if
+      if (ic.eq.1) dl_slr_box = dl_slr_box + dl_slr_c(i,j,k,l)
+      if (in.eq.1) dl_slr_box = dl_slr_box + dl_slr_n(i,j,k,l)
       dl_slr_box = dl_slr_box/16/pi/pi
       return
       end
@@ -812,13 +826,15 @@ c     Full box A^S_RL formfactor
       implicit double precision (a-h,o-z)
       double complex dl_srl_g,dl_srl_h,dl_srl_hg,dl_srl_c,dl_srl_n
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
-      common/susy_sign/isus
-      dl_srl_box = dl_srl_g(i,j,k,l)
-      if (ih.eq.1) dl_srl_box = dl_srl_box + dl_srl_h(i,j,k,l)
-     $     + dl_srl_hg(i,j,k,l)
-      if (ic.eq.1) dl_srl_box = dl_srl_box + isus*dl_srl_c(i,j,k,l)
-      if (in.eq.1) dl_srl_box = dl_srl_box + isus*dl_srl_n(i,j,k,l)
+      common/debug_4q/ih,ic,in,ig
+      dl_srl_box = (0.d0,0.d0)
+      if (ih.eq.1) then
+         dl_srl_box = dl_srl_box + dl_srl_g(i,j,k,l)
+         dl_srl_box = dl_srl_box + dl_srl_hg(i,j,k,l)
+         dl_srl_box = dl_srl_box + dl_srl_h(i,j,k,l) 
+      end if
+      if (ic.eq.1) dl_srl_box = dl_srl_box + dl_srl_c(i,j,k,l)
+      if (in.eq.1) dl_srl_box = dl_srl_box + dl_srl_n(i,j,k,l)
       dl_srl_box = dl_srl_box/16/pi/pi
       return
       end
@@ -903,13 +919,15 @@ c     Full box A^T_L formfactor
       implicit double precision (a-h,o-z)
       double complex dl_tl_g,dl_tl_h,dl_tl_hg,dl_tl_c,dl_tl_n
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
-      common/susy_sign/isus
-      dl_tl_box = dl_tl_g(i,j,k,l)
-      if (ih.eq.1) dl_tl_box = dl_tl_box + dl_tl_h(i,j,k,l)
-     $     + dl_tl_hg(i,j,k,l)
-      if (ic.eq.1) dl_tl_box = dl_tl_box + isus*dl_tl_c(i,j,k,l)
-      if (in.eq.1) dl_tl_box = dl_tl_box + isus*dl_tl_n(i,j,k,l)
+      common/debug_4q/ih,ic,in,ig
+      dl_tl_box = (0.d0,0.d0)
+      if (ih.eq.1) then
+         dl_tl_box = dl_tl_box + dl_tl_g(i,j,k,l)
+         dl_tl_box = dl_tl_box + dl_tl_hg(i,j,k,l)
+         dl_tl_box = dl_tl_box + dl_tl_h(i,j,k,l) 
+      end if
+      if (ic.eq.1) dl_tl_box = dl_tl_box + dl_tl_c(i,j,k,l)
+      if (in.eq.1) dl_tl_box = dl_tl_box + dl_tl_n(i,j,k,l)
       dl_tl_box = dl_tl_box/16/pi/pi
       return
       end
@@ -994,13 +1012,15 @@ c     Full box A^T_R formfactor
       implicit double precision (a-h,o-z)
       double complex dl_tr_g,dl_tr_h,dl_tr_hg,dl_tr_c,dl_tr_n
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
-      common/susy_sign/isus
-      dl_tr_box = dl_tr_g(i,j,k,l)
-      if (ih.eq.1) dl_tr_box = dl_tr_box + dl_tr_h(i,j,k,l)
-     $     + dl_tr_hg(i,j,k,l)
-      if (ic.eq.1) dl_tr_box = dl_tr_box + isus*dl_tr_c(i,j,k,l)
-      if (in.eq.1) dl_tr_box = dl_tr_box + isus*dl_tr_n(i,j,k,l)
+      common/debug_4q/ih,ic,in,ig
+      dl_tr_box = (0.d0,0.d0)
+      if (ih.eq.1) then
+         dl_tr_box = dl_tr_box + dl_tr_g(i,j,k,l)
+         dl_tr_box = dl_tr_box + dl_tr_hg(i,j,k,l)
+         dl_tr_box = dl_tr_box + dl_tr_h(i,j,k,l) 
+      end if
+      if (ic.eq.1) dl_tr_box = dl_tr_box + dl_tr_c(i,j,k,l)
+      if (in.eq.1) dl_tr_box = dl_tr_box + dl_tr_n(i,j,k,l)
       dl_tr_box = dl_tr_box/16/pi/pi
       return
       end

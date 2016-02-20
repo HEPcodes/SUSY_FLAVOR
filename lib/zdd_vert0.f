@@ -174,9 +174,13 @@ c     Full A^V_L formfactor
       double complex zdd_vl_g,zdd_vl_hg,zdd_vl_h,zdd_vl_c,zdd_vl_n,
      $     zdd_vl_gl
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
-      zdd_vl = zdd_vl_g(i,j)
-      if (ih.eq.1) zdd_vl = zdd_vl + zdd_vl_hg(i,j) + zdd_vl_h(i,j) 
+      common/debug_4q/ih,ic,in,ig
+      zdd_vl = (0.d0,0.d0)
+      if (ih.eq.1) then
+         zdd_vl = zdd_vl + zdd_vl_g(i,j)
+         zdd_vl = zdd_vl + zdd_vl_hg(i,j)
+         zdd_vl = zdd_vl + zdd_vl_h(i,j) 
+      end if
       if (ic.eq.1) zdd_vl = zdd_vl + zdd_vl_c(i,j)
       if (in.eq.1) zdd_vl = zdd_vl + zdd_vl_n(i,j)
       if (ig.eq.1) zdd_vl = zdd_vl + zdd_vl_gl(i,j)
@@ -315,9 +319,13 @@ c     Full A^V_R formfactor
       double complex zdd_vr_g,zdd_vr_hg,zdd_vr_h,zdd_vr_c,zdd_vr_n,
      $     zdd_vr_gl
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
-      zdd_vr = zdd_vr_g(i,j)
-      if (ih.eq.1) zdd_vr = zdd_vr + zdd_vr_hg(i,j) + zdd_vr_h(i,j) 
+      common/debug_4q/ih,ic,in,ig
+      zdd_vr = (0.d0,0.d0)
+      if (ih.eq.1) then
+         zdd_vr = zdd_vr + zdd_vr_g(i,j)
+         zdd_vr = zdd_vr + zdd_vr_hg(i,j)
+         zdd_vr = zdd_vr + zdd_vr_h(i,j) 
+      end if
       if (ic.eq.1) zdd_vr = zdd_vr + zdd_vr_c(i,j)
       if (in.eq.1) zdd_vr = zdd_vr + zdd_vr_n(i,j)
       if (ig.eq.1) zdd_vr = zdd_vr + zdd_vr_gl(i,j)

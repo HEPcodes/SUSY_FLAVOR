@@ -101,7 +101,8 @@ c     Charged Higgs-W-down quark in loop
       common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
       common/km_mat/ckm(3,3)
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      do l=1,2
+      common/mssm_charged_higgs_min_index/mhmin
+      do l=mhmin,2
          do n=1,3
             call fsv_svert(dm(n),cm(l),wm, - dconjg(yd(n))*zh(1,l),
      $           yu(j)*zh(2,l),tmp)
@@ -125,7 +126,8 @@ c     W-charged Higgs-down quark in loop
       common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
       common/km_mat/ckm(3,3)
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      do l=1,2
+      common/mssm_charged_higgs_min_index/mhmin
+      do l=mhmin,2
          do n=1,3
             call fvs_svert(dm(n),wm,cm(l),dconjg(yu(k))*zh(2,l),
      $           - yd(n)*zh(1,l),tmp)
@@ -151,9 +153,10 @@ c     Down-quark-down-quark-charged Higgs in loop
       common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
       common/km_mat/ckm(3,3)
       common/vev/v1,v2
+      common/mssm_charged_higgs_min_index/mhmin
       do l=1,3
          cv = - dm(l)*zr(1,i)/v1*ckm(l,j)*dconjg(ckm(l,k))
-         do n=1,2
+         do n=mhmin,2
             call sff_svert(cm(n),dm(l),dm(l),co,co, 
      $           - dconjg(yd(l))*zh(1,n),yu(j)*zh(2,n), 
      $           dconjg(yu(k))*zh(2,n), - yd(l)*zh(1,n),tmp)
@@ -175,8 +178,9 @@ c     Charged Higgs-charged Higgs-down quark in loop
       common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
       common/km_mat/ckm(3,3)
       common/yukawa/yl(3),yu(3),yd(3)
-      do l=1,2
-         do m=1,2
+      common/mssm_charged_higgs_min_index/mhmin
+      do l=mhmin,2
+         do m=mhmin,2
             cv = v_hhs(l,m,i)
             do n=1,3
                call fss_svert(dm(n),cm(l),cm(m), 
@@ -316,12 +320,12 @@ c     Full triangle Suu formfactors for on-shell momenta
       implicit double precision (a-h,o-z)
       double complex form(2)
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       if (j.eq.k) stop 'Flavor diagonal Suu vertex not implemented!'
       do l=1,2
          form(l) = (0.d0,0.d0)
       end do
-      if (ih.ne.0) then
+      if (ih.eq.1) then
          call suu_vert_wwd(i,j,k,form)
          call suu_vert_ddw(i,j,k,form)
          call suu_vert_hwd(i,j,k,form)
@@ -329,15 +333,15 @@ c     Full triangle Suu formfactors for on-shell momenta
          call suu_vert_hhd(i,j,k,form)
          call suu_vert_ddh(i,j,k,form)
       end if
-      if (ic.ne.0) then
+      if (ic.eq.1) then
          call suu_vert_ccd(i,j,k,form)
          call suu_vert_ddc(i,j,k,form)
       end if
-      if (in.ne.0) then
+      if (in.eq.1) then
          call suu_vert_nnu(i,j,k,form)
          call suu_vert_uun(i,j,k,form)
       end if
-      if (ig.ne.0) call suu_vert_uug(i,j,k,form)
+      if (ig.eq.1) call suu_vert_uug(i,j,k,form)
       do l=1,2
          form(l) = form(l)/16/pi/pi
       end do
@@ -351,7 +355,7 @@ c     Full Suu vertex (triangle + self energy) for on-shell momenta
       double complex uvl_self,uvr_self,usl_self,usr_self
       double complex uslj,usrj,uslk,usrk,uvlj,uvrj,uvlk,uvrk
       logical sqdiag,sldiag
-      common/qmass_pole/um(3),dm(3)
+      common/qmass_pole/ump(3),dmp(3)
       common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
       common/vev/v1,v2
       common/sff_args/sm,fm1,fm2
@@ -360,10 +364,10 @@ c     Full Suu vertex (triangle + self energy) for on-shell momenta
       call set_yukawa(0)
       if(sqdiag().or.sldiag()) 
      $     stop 'suu_vert: problem with sfermion diagonalization?'
-      call set_2hdm(al,be,am,hm1,hm2,hmc,2) ! sets 1-loop EPA neutral Higgs parameters
+      call set_2hdm(al,be,am,hm1,hm2,hmc,2) ! sets 2-loop neutral Higgs parameters
       sm = rm(i)                ! external scalar mass
-      fm1 = um(j)               ! incoming external fermion mass
-      fm2 = um(k)               ! outgoing external fermion mass
+      fm1 = ump(j)              ! incoming external fermion mass
+      fm2 = ump(k)              ! outgoing external fermion mass
       call suu_triangle(i,j,k,form)
       fact = - zr(2,i)/v2/(fm1**2 - fm2**2)
       uslj = usl_self(fm1**2,j,k)
@@ -380,7 +384,7 @@ c     Full Suu vertex (triangle + self energy) for on-shell momenta
       form(2) = form(2) + fact*((fm2*uslk + fm1*usrk + fm2*(fm2*uvlk +
      $     fm1*uvrk))*fm1 - (fm1*uslj + fm2*usrj + fm1*(fm2*uvlj + fm1
      $     *uvrj))*fm2)
-      call set_2hdm(al,be,am,hm1,hm2,hmc,0) ! restores tree-level neutral Higgs parameters
+      call set_2hdm(al,be,am,hm1,hm2,hmc,1) ! restores tree-level neutral Higgs parameters
       call set_ckm(1)
       call set_yukawa(1)
       if(sqdiag().or.sldiag()) 

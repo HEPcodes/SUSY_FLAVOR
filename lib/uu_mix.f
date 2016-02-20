@@ -165,15 +165,21 @@ c     Full A^V_LL formfactor
       double complex uu_vll_sm,uu_vll_hg,uu_vll_c,uu_vll_n,
      $    uu_vll_ng,uu_vll_g
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
-      uu_vll = - (ih*uu_vll_hg(i,j) + ic*uu_vll_c(i,j) 
-     $    + in*uu_vll_n(i,j) + ing*uu_vll_ng(i,j) 
-     $    + ig*uu_vll_g(i,j))/16/pi/pi
-c      SM contribution should be treated separately from the point of 
-c      view of QCD evolution factors. We add it here temporarily,
-c      improve that later?
-c      Perhaps the same should be done for Higgs contribution uu_vll_hg?
-      uu_vll = uu_vll - ih*uu_vll_sm(i,j)/16.d0/pi/pi
+      common/debug_4q/ih,ic,in,ig
+      uu_vll = (0.d0,0.d0)
+      if (ih.eq.1) then 
+c     SM contribution should be treated separately from the point of 
+c     view of QCD evolution factors. We add it here temporarily,
+c     improve that later?
+c     Perhaps the same should be done for Higgs contribution uu_vll_hg?
+         uu_vll = uu_vll + uu_vll_sm(i,j)
+         uu_vll = uu_vll + uu_vll_hg(i,j)
+      end if 
+      if (in.eq.1) uu_vll = uu_vll + uu_vll_n(i,j) 
+      if (ic.eq.1) uu_vll = uu_vll + uu_vll_c(i,j) 
+      if (ig.eq.1) uu_vll = uu_vll + uu_vll_g(i,j) 
+      if ((ig.eq.1).and.(in.eq.1)) uu_vll = uu_vll + uu_vll_ng(i,j) 
+      uu_vll = - uu_vll/16/pi/pi
       return
       end
 
@@ -307,10 +313,14 @@ c      Full A^V_RR formfactor
       implicit double precision (a-h,o-z)
       double complex uu_vrr_hg,uu_vrr_c,uu_vrr_n,uu_vrr_ng,uu_vrr_g
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
-      uu_vrr = - (ih*uu_vrr_hg(i,j) + ic*uu_vrr_c(i,j) 
-     $    + in*uu_vrr_n(i,j) + ing*uu_vrr_ng(i,j) 
-     $    + ig*uu_vrr_g(i,j))/16/pi/pi
+      common/debug_4q/ih,ic,in,ig
+      uu_vrr = (0.d0,0.d0)
+      if (ih.eq.1) uu_vrr = uu_vrr + uu_vrr_hg(i,j)
+      if (in.eq.1) uu_vrr = uu_vrr + uu_vrr_n(i,j) 
+      if (ic.eq.1) uu_vrr = uu_vrr + uu_vrr_c(i,j) 
+      if (ig.eq.1) uu_vrr = uu_vrr + uu_vrr_g(i,j) 
+      if ((ig.eq.1).and.(in.eq.1)) uu_vrr = uu_vrr + uu_vrr_ng(i,j) 
+      uu_vrr = - uu_vrr/16/pi/pi
       return
       end
       
@@ -449,10 +459,14 @@ c     Full A^V_LR formfactor
       implicit double precision (a-h,o-z)
       double complex uu_vlr_hg,uu_vlr_c,uu_vlr_n,uu_vlr_ng,uu_vlr_g
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
-      uu_vlr = - (ih*uu_vlr_hg(i,j) + ic*uu_vlr_c(i,j) 
-     $    + in*uu_vlr_n(i,j) + ing*uu_vlr_ng(i,j) 
-     $    + ig*uu_vlr_g(i,j))/16/pi/pi
+      common/debug_4q/ih,ic,in,ig
+      uu_vlr = (0.d0,0.d0)
+      if (ih.eq.1) uu_vlr = uu_vlr + uu_vlr_hg(i,j)
+      if (in.eq.1) uu_vlr = uu_vlr + uu_vlr_n(i,j) 
+      if (ic.eq.1) uu_vlr = uu_vlr + uu_vlr_c(i,j) 
+      if (ig.eq.1) uu_vlr = uu_vlr + uu_vlr_g(i,j) 
+      if ((ig.eq.1).and.(in.eq.1)) uu_vlr = uu_vlr + uu_vlr_ng(i,j) 
+      uu_vlr = - uu_vlr/16/pi/pi
       return
       end
 
@@ -585,10 +599,14 @@ c     Full A^S_LL formfactor
       implicit double precision (a-h,o-z)
       double complex uu_sll_hg,uu_sll_c,uu_sll_n,uu_sll_ng,uu_sll_g
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
-      uu_sll = - (ih*uu_sll_hg(i,j) + ic*uu_sll_c(i,j) 
-     $    + in*uu_sll_n(i,j) + ing*uu_sll_ng(i,j) 
-     $    + ig*uu_sll_g(i,j))/16/pi/pi
+      common/debug_4q/ih,ic,in,ig
+      uu_sll = (0.d0,0.d0)
+      if (ih.eq.1) uu_sll = uu_sll + uu_sll_hg(i,j)
+      if (in.eq.1) uu_sll = uu_sll + uu_sll_n(i,j) 
+      if (ic.eq.1) uu_sll = uu_sll + uu_sll_c(i,j) 
+      if (ig.eq.1) uu_sll = uu_sll + uu_sll_g(i,j) 
+      if ((ig.eq.1).and.(in.eq.1)) uu_sll = uu_sll + uu_sll_ng(i,j) 
+      uu_sll = - uu_sll/16/pi/pi
       return
       end
 
@@ -721,10 +739,14 @@ c     Full A^S_RR formfactor
       implicit double precision (a-h,o-z)
       double complex uu_srr_hg,uu_srr_c,uu_srr_n,uu_srr_ng,uu_srr_g
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
-      uu_srr = - (ih*uu_srr_hg(i,j) + ic*uu_srr_c(i,j) 
-     $    + in*uu_srr_n(i,j) + ing*uu_srr_ng(i,j) 
-     $    + ig*uu_srr_g(i,j))/16/pi/pi
+      common/debug_4q/ih,ic,in,ig
+      uu_srr = (0.d0,0.d0)
+      if (ih.eq.1) uu_srr = uu_srr + uu_srr_hg(i,j)
+      if (in.eq.1) uu_srr = uu_srr + uu_srr_n(i,j) 
+      if (ic.eq.1) uu_srr = uu_srr + uu_srr_c(i,j) 
+      if (ig.eq.1) uu_srr = uu_srr + uu_srr_g(i,j) 
+      if ((ig.eq.1).and.(in.eq.1)) uu_srr = uu_srr + uu_srr_ng(i,j) 
+      uu_srr = - uu_srr/16/pi/pi
       return
       end
 
@@ -868,10 +890,14 @@ c     Full A^S_LR formfactor
       implicit double precision (a-h,o-z)
       double complex uu_slr_hg,uu_slr_c,uu_slr_n,uu_slr_ng,uu_slr_g
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
-      uu_slr = - (ih*uu_slr_hg(i,j) + ic*uu_slr_c(i,j) 
-     $    + in*uu_slr_n(i,j) + ing*uu_slr_ng(i,j) 
-     $    + ig*uu_slr_g(i,j))/16/pi/pi
+      common/debug_4q/ih,ic,in,ig
+      uu_slr = (0.d0,0.d0)
+      if (ih.eq.1) uu_slr = uu_slr + uu_slr_hg(i,j)
+      if (in.eq.1) uu_slr = uu_slr + uu_slr_n(i,j) 
+      if (ic.eq.1) uu_slr = uu_slr + uu_slr_c(i,j) 
+      if (ig.eq.1) uu_slr = uu_slr + uu_slr_g(i,j) 
+      if ((ig.eq.1).and.(in.eq.1)) uu_slr = uu_slr + uu_slr_ng(i,j) 
+      uu_slr = - uu_slr/16/pi/pi
       return
       end
 
@@ -978,9 +1004,13 @@ c     Full A^T_L formfactor
       implicit double precision (a-h,o-z)
       double complex uu_tl_c,uu_tl_n,uu_tl_ng,uu_tl_g
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
-      uu_tl = - (ic*uu_tl_c(i,j) + in*uu_tl_n(i,j)
-     $    + ing*uu_tl_ng(i,j) + ig*uu_tl_g(i,j))/16/pi/pi
+      common/debug_4q/ih,ic,in,ig
+      uu_tl = (0.d0,0.d0)
+      if (in.eq.1) uu_tl = uu_tl + uu_tl_n(i,j) 
+      if (ic.eq.1) uu_tl = uu_tl + uu_tl_c(i,j) 
+      if (ig.eq.1) uu_tl = uu_tl + uu_tl_g(i,j) 
+      if ((ig.eq.1).and.(in.eq.1)) uu_tl = uu_tl + uu_tl_ng(i,j) 
+      uu_tl = - uu_tl/16/pi/pi
       return
       end
 
@@ -1087,9 +1117,13 @@ c     Full A^T_R formfactor
       implicit double precision (a-h,o-z)
       double complex uu_tr_c,uu_tr_n,uu_tr_ng,uu_tr_g
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
-      uu_tr = - (ic*uu_tr_c(i,j) + in*uu_tr_n(i,j)
-     $    + ing*uu_tr_ng(i,j) + ig*uu_tr_g(i,j))/16/pi/pi
+      common/debug_4q/ih,ic,in,ig
+      uu_tr = (0.d0,0.d0)
+      if (in.eq.1) uu_tr = uu_tr + uu_tr_n(i,j) 
+      if (ic.eq.1) uu_tr = uu_tr + uu_tr_c(i,j) 
+      if (ig.eq.1) uu_tr = uu_tr + uu_tr_g(i,j) 
+      if ((ig.eq.1).and.(in.eq.1)) uu_tr = uu_tr + uu_tr_ng(i,j) 
+      uu_tr = - uu_tr/16/pi/pi
       return
       end
 

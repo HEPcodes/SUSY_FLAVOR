@@ -77,7 +77,7 @@ c     Initialize "default" set of parameters
       common/soft/ls(3,3),ks(3,3),ds(3,3),es(3,3),us(3,3),ws(3,3)
       common/msoft/lms(3,3),rms(3,3),ums(3,3),dms(3,3),qms(3,3)
       common/sflav_data/control_data(3),sm_data(31),ckm_data(4),
-     $     extpar_data(49),extim_data(49),hadron_data(56),tb_min(6)
+     $     extpar_data(49),extim_data(49),hadron_data(65),tb_min(6)
 c     defaults for control variables
       control_data(1) = 1       ! sfermion input parameters in SLHA2 conventions
       control_data(2) = 2       ! fermion soft terms given as absolute values
@@ -87,17 +87,17 @@ c     SM default data
       sm_data(3) = 0.1172d0     ! alpha_s(M_Z)
       sm_data(4) = 91.1876d0    ! M_Z (pole)
 c     Fermion mass initialization, input: MSbar running quark masses
-      sm_data(5) = 4.17d0       ! mb(mb) SM MSbar
+      sm_data(5) = 4.18d0       ! mb(mb) SM MSbar
       sm_data(6) = 173.5d0      ! mtop(pole)
-      sm_data(7) = 1.777d0      ! mtau(pole)
-      sm_data(11) = 5.11d-4     ! me(pole)
-      sm_data(13) = 0.105659d0  ! mmu(pole)
-      sm_data(21) = 7.d-03      ! md(2 GeV) MSbar
-      sm_data(22) = 4.d-03      ! mu(2 GeV) MSbar
-      sm_data(23) = 9.4d-02     ! ms(2 GeV) MSbar
+      sm_data(7) = 1.77684d0    ! mtau(pole)
+      sm_data(11) = 5.109989d-4 ! me(pole)
+      sm_data(13) = 0.105658d0  ! mmu(pole)
+      sm_data(21) = 4.7d-03     ! md(2 GeV) MSbar
+      sm_data(22) = 2.1d-03     ! mu(2 GeV) MSbar
+      sm_data(23) = 9.34d-02    ! ms(2 GeV) MSbar
       sm_data(24) = 1.279d0     ! mc(mc) MSbar
       sm_data(30) = 80.398d0    ! MW (pole), not a standard SLHA2 entry !!!
-      sm_data(31) = 0.232d0     ! s_W^2 (MSbar), not a standard SLHA2 entry !!!
+      sm_data(31) = 0.23116d0   ! s_W^2 (MSbar), not a standard SLHA2 entry !!!
 c     CKM data
       ckm_data(1) = 0.2258d0    ! lambda
       ckm_data(2) = 0.808d0     ! A
@@ -126,14 +126,14 @@ c     clear MINPAR/EXTPAR and soft terms data
             ws(i,j) = (0.d0,0.d0) ! non-holomorphic A terms set to zero
          end do
       end do
-      hadron_data(1) = 0.1598d0 ! f_K
+      hadron_data(1) = 0.1561d0 ! f_K
       hadron_data(2) = 0.2d0    ! f_D
       hadron_data(3) = 0.193d0  ! f_B_d
       hadron_data(4) = 0.232d0  ! f_B_s
-      hadron_data(5) = 0.75d0   ! B_K for SM contribution to KKbar
-      hadron_data(6) = 1.44d0   ! eta_cc in KK mixing (SM)
-      hadron_data(7) = 0.47d0   ! eta_cc in KK mixing (SM)
-      hadron_data(8) = 0.57d0   ! eta_cc in KK mixing (SM)
+      hadron_data(5) = 0.724d0  ! B_K for SM contribution to KKbar
+      hadron_data(6) = 1.87d0   ! eta_cc in KK mixing (SM)
+      hadron_data(7) = 0.496d0  ! eta_ct in KK mixing (SM)
+      hadron_data(8) = 0.577d0  ! eta_tt in KK mixing (SM)
       hadron_data(9) = 2.d0     ! scale for B_K (non-SM)    
       hadron_data(10) = 0.61d0  ! B_K for VLL (non-SM)
       hadron_data(11) = 0.76d0  ! B_K for SLL1
@@ -145,7 +145,7 @@ c     clear MINPAR/EXTPAR and soft terms data
       do i=1,5
          hadron_data(16+i) = 1.d0 ! B_D for VLL, SLL(2), LR(2) 
       end do 
-      hadron_data(22) = 1.18d0  ! B_Bd for SM contribution 
+      hadron_data(22) = 1.22d0 ! B_Bd for SM contribution 
       hadron_data(23) = 4.6d0   ! scale for B_B (non-SM, both Bd and Bs)
       hadron_data(24) = 0.87d0  ! B_Bd for VLL (non-SM)
       hadron_data(25) = 0.8d0   ! B_Bd for SLL1
@@ -160,33 +160,42 @@ c     clear MINPAR/EXTPAR and soft terms data
       hadron_data(34) = 1.71d0  ! B_Bs for LR1 
       hadron_data(35) = 1.16d0  ! B_Bs for LR2 
       hadron_data(36) = 1.519d-12 ! Bd lifetime (experimental)
-      hadron_data(37) = 1.466d-12 ! Bs lifetime (experimental)
-      hadron_data(38) = 5.27958d0 ! Bd mass (experimental)
-      hadron_data(39) = 5.36677d0 ! Bs mass (experimental)
+      hadron_data(37) = 1.512d-12 ! Bs lifetime (experimental)
+      hadron_data(38) = 5.2792d0 ! Bd mass (experimental)
+      hadron_data(39) = 5.3668d0 ! Bs mass (experimental)
       hadron_data(40) = 3.337d-13 ! Delta Bd (experimental)
       hadron_data(41) = 1.17d-11 ! Delta Bs (experimental)
       hadron_data(42) = 0.497614d0 ! K0 mass (experimental)
       hadron_data(43) = 3.483d-15 ! Delta mK (experimental)
-      hadron_data(44) = 2.229d-3 ! eps_K (experimental)
+      hadron_data(44) = 2.228d-3 ! eps_K (experimental)
       hadron_data(45) = 1.8645d0 ! D0 mass (experimental)
       hadron_data(46) = 1.56d-14 ! Delta mD (experimental)
-      hadron_data(47) = 2.231d-10 ! parameter kappa in K^0->pi^0vv calculations
-      hadron_data(48) = 5.173d-11 ! parameter kappa in K^+->pi^+vv calculations
+      hadron_data(47) = 2.231d-10 ! parameter kappa0 in K^0->pi^0vv calculations
+      hadron_data(48) = 5.173d-11 ! parameter kappa+ in K^+->pi^+vv calculations
       hadron_data(49) = 0.41d0  ! parameter P_c in K->pivv calculations
-      hadron_data(50) = 0.013d-10 ! error of ak0
-      hadron_data(51) = 0.024d-11 ! error of akp
-      hadron_data(52) = 0.03d0  ! error of pc 
-      hadron_data(53) = 1.53d0  ! neutron EDM QCD correction factors
-      hadron_data(54) = 3.4d0   ! neutron EDM QCD correction factors
-      hadron_data(55) = 3.4d0   ! neutron EDM QCD correction factors
-      hadron_data(56) = 1.18d0  ! neutron EDM chiral symmetry breaking scale
+      hadron_data(50) = 0.013d-10 ! error of kappa0
+      hadron_data(51) = 0.024d-11 ! error of kappa+
+      hadron_data(52) = 0.03d0  ! error of P_c 
+      hadron_data(53) = 0.79d0  ! neutron EDM_d QCD coefficient
+      hadron_data(54) = -.2d0   ! neutron EDM_u QCD coefficient
+      hadron_data(55) = 0.59d0  ! neutron CDM_d QCD coefficient
+      hadron_data(56) = 0.3d0   ! neutron CDM_u QCD coefficient
+      hadron_data(57) = 3.4d0   ! neutron CDM_g QCD coefficient
+      hadron_data(58) = 1.18d0  ! neutron EDM chiral symmetry breaking scale
+      hadron_data(59) = 1.5d0   ! pole c quark mass (in B-->X_s gamma and t->cH)
+      hadron_data(60) = 0.1872d0 ! Br(tau->evv)
+      hadron_data(61) = 5.27917d0 ! M_B_u
+      hadron_data(62) = 0.297d0 ! Br(B->D tau nu)/Br(B->D l nu) in SM
+      hadron_data(63) = 0.017d0 ! error of Br(B->D tau nu)/Br(B->D l nu) in SM
+      hadron_data(64) = 0.252d0 ! Br(B->D* tau nu)/Br(B->D* l nu) in SM
+      hadron_data(65) = 0.003d0 ! error of Br(B->D* tau nu)/Br(B->D* l nu) in SM
       return
       end
 
-      subroutine sprog_input
-c     Set default SM/hadronic parameters
+      subroutine sflav_sm
+c     set default SM/hadronic parameters
       implicit double precision (a-h,o-z)
-      common/edm_qcd/eta_en,eta_cn,eta_gn,alamx_n
+      common/edm_qcd/eta_ed,eta_eu,eta_cd,eta_cu,eta_g,alamx
       common/kpivv/ak0,del_ak0,akp,del_akp,pc,del_pc,alam_k
       common/sm_4q/eta_cc,eta_ct,eta_tt,eta_b,bk_sm,bd_sm,bb_sm(2)
       common/meson_data/dmk,amk,epsk,fk,dmd,amd,fd,
@@ -194,19 +203,22 @@ c     Set default SM/hadronic parameters
       common/bx_4q/bk(5),bd(5),bb(2,5),amu_k,amu_d,amu_b
       common/fmass_high/umu(3),uml(3),amuu(3),dmu(3),dml(3),amud(3)
       common/fmass/em(3),um(3),dm(3)
+      common/qmass_pole/ump(3),dmp(3)
+      common/tau_gam/br_tau_evv
+      common/dtau_data/dmbp,rd,del_rd,rds,del_rds
       common/sflav_data/control_data(3),sm_data(31),ckm_data(4),
-     $     extpar_data(49),extim_data(49),hadron_data(56),tb_min(6)
+     $     extpar_data(49),extim_data(49),hadron_data(65),tb_min(6)
+      external init_phys,init_4q,init_const,init_control,init_units
 c     set default SM variables, clear SUSY parameters
       call sflav_defaults
       alpha_z = 1/sm_data(1)    ! 1/alpha_em(M_Z)
-      alpha_s = sm_data(3)      ! alpha_s(MZ)
       zm0 = sm_data(4)          ! M_Z
-c     Fermion mass initialization, input: MSbar running quark masses
-      bottom = sm_data(5)       ! mb(mb)
-      bot_scale = bottom
-      top_pole = sm_data(6)     ! mt(pole)
-      top = 0.94d0*top_pole     ! mt(mt_pole) - running mt at mt(pole)
-      top_scale = top
+      wm0 = sm_data(30)         ! M_W
+      st2_new = sm_data(31)     ! s_W^2 (here MSbar value)
+      call vpar_update(zm0,wm0,alpha_z,st2_new)
+c     QCD parameters and fermion mass initialization
+c     input: MSbar running quark masses
+      alpha_s = sm_data(3)      ! alpha_s(MZ)
       em(3) = sm_data(7)        ! m_tau (pole)
       em(1) = sm_data(11)       ! m_e (pole)
       em(2) = sm_data(13)       ! m_mu (pole)
@@ -214,13 +226,13 @@ c     Fermion mass initialization, input: MSbar running quark masses
       uml(1) = sm_data(22)      ! mu(2 GeV)
       dml(2) = sm_data(23)      ! ms(2 GeV)
       uml(2) = sm_data(24)      ! mc(mc)
-      wm0 = sm_data(30)         ! M_W (not standard SLHA2!)
-      st2 = sm_data(31)         ! sin^2(theta_W) in MSbar (not standard SLHA2!)
-c     Electroweak and strong parameter initialization
-      call vpar_update(zm0,wm0,alpha_z,st2) ! sets electroweak parameters
-      call lam_fit(alpha_s)     ! fits Lambda_QCD at 3 loop level
-      call lam_fit_NLO(alpha_s) ! fits Lambda_QCD at NLO level
-      call init_fermion_sector(top,top_scale,bottom,bot_scale)
+      amuu(2) = uml(2)          ! charm mass assumed to be given as mc(mc) 
+      bottom = sm_data(5)       ! mb(mb)
+      bot_scale = bottom
+      top_pole = sm_data(6)     ! mt(pole)
+      top = 0.94d0*top_pole     ! mt(mt_pole) - running mt at mt(pole)
+      top_scale = top
+      call init_fermion_sector(alpha_s,top,top_scale,bottom,bot_scale)
 c     read the CKM data
       alam = ckm_data(1)        ! lambda
       apar = ckm_data(2)        ! A
@@ -266,16 +278,25 @@ c     read the hadronic data
       epsk = hadron_data(44)    ! eps_K (experimental)
       amd = hadron_data(45)     ! D0 mass (experimental)
       dmd = hadron_data(46)     ! Delta mD (experimental)
-      ak0 = hadron_data(47)     ! parameter kappa in K^0->pi^0vv calculations
-      akp = hadron_data(48)     ! parameter kappa in K^+->pi^+vv calculations
+      ak0 = hadron_data(47)     ! parameter kappa0 in K^0->pi^0vv calculations
+      akp = hadron_data(48)     ! parameter kappa+ in K^+->pi^+vv calculations
       pc = hadron_data(49)      ! parameter P_c in K->pivv calculations
-      del_ak0 = hadron_data(50) ! error of ak0
-      del_akp = hadron_data(51) ! error of akp
-      del_pc = hadron_data(52)  ! error of pc 
-      eta_en = hadron_data(53)  ! neutron EDM QCD correction factors
-      eta_cn = hadron_data(54)  ! neutron EDM QCD correction factors
-      eta_gn = hadron_data(55)  ! neutron EDM QCD correction factors
-      alamx_n = hadron_data(56) ! neutron EDM chiral symmetry breaking scale
+      del_ak0 = hadron_data(50) ! error of kappa0
+      del_akp = hadron_data(51) ! error of kappa+
+      del_pc = hadron_data(52)  ! error of P_c 
+      eta_ed = hadron_data(53)  ! neutron EDM_d QCD coefficient
+      eta_eu = hadron_data(54)  ! neutron EDM_u QCD coefficient
+      eta_cd = hadron_data(55)  ! neutron CDM_d QCD coefficient
+      eta_cu = hadron_data(56)  ! neutron CDM_u QCD coefficient
+      eta_g = hadron_data(57)   ! neutron CDM_g QCD coefficient
+      alamx = hadron_data(58)   ! neutron EDM chiral symmetry breaking scale
+      ump(2) = hadron_data(59)  ! pole c quark mass (in B->X_s gamma and t->cH)
+      br_tau_evv = hadron_data(60) ! Br(tau->evv)
+      dmbp = hadron_data(61)    ! M_B_u
+      rd = hadron_data(62)      ! Br(B->D tau nu)/Br(B->D l nu) in SM
+      del_rd = hadron_data(63)  ! error of Br(B->D tau nu)/Br(B->D l nu) in SM
+      rds = hadron_data(64)     ! Br(B->D* tau nu)/Br(B->D* l nu) in SM
+      del_rds = hadron_data(65) ! error of Br(B->D* tau nu)/Br(B->D* l nu) in SM
       return
       end
 
@@ -289,19 +310,22 @@ c     Input read from file susy_flavor.in
       double complex lms,rms,ums,dms,qms
       double complex cz,co,ci
       common/num/cz,co,ci,zero,one
-      common/edm_qcd/eta_en,eta_cn,eta_gn,alamx_n
+      common/edm_qcd/eta_ed,eta_eu,eta_cd,eta_cu,eta_g,alamx
       common/kpivv/ak0,del_ak0,akp,del_akp,pc,del_pc,alam_k
       common/sm_4q/eta_cc,eta_ct,eta_tt,eta_b,bk_sm,bd_sm,bb_sm(2)
       common/meson_data/dmk,amk,epsk,fk,dmd,amd,fd,
      $    amb(2),dmb(2),tau_b(2),fb(2)
+      common/dtau_data/dmbp,rd,del_rd,rds,del_rds
       common/bx_4q/bk(5),bd(5),bb(2,5),amu_k,amu_d,amu_b
       common/fmass_high/umu(3),uml(3),amuu(3),dmu(3),dml(3),amud(3)
       common/fmass/em(3),um(3),dm(3)
+      common/qmass_pole/ump(3),dmp(3)
+      common/tau_gam/br_tau_evv
       common/soft/ls(3,3),ks(3,3),ds(3,3),es(3,3),us(3,3),ws(3,3)
       common/msoft/lms(3,3),rms(3,3),ums(3,3),dms(3,3),qms(3,3)
       common/sf_cont/eps,indx(3,3),iconv
       common/sflav_data/control_data(3),sm_data(31),ckm_data(4),
-     $     extpar_data(49),extim_data(49),hadron_data(56),tb_min(6)
+     $     extpar_data(49),extim_data(49),hadron_data(65),tb_min(6)
 c     reset error code
       ierr = 0
 c     set default SM variables, clear SUSY parameters
@@ -359,13 +383,12 @@ c     Fermion mass initialization, input: MSbar running quark masses
       uml(1) = sm_data(22)      ! mu(2 GeV)
       dml(2) = sm_data(23)      ! ms(2 GeV)
       uml(2) = sm_data(24)      ! mc(mc)
+      amuu(2) = uml(2)          ! charm mass assumed to be given as mc(mc) 
       wm0 = sm_data(30)         ! M_W (not standard SLHA2!)
       st2 = sm_data(31)         ! sin^2(theta_W) in MSbar (not standard SLHA2!)
 c     Electroweak and strong parameter initialization
       call vpar_update(zm0,wm0,alpha_z,st2) ! sets electroweak parameters
-      call lam_fit(alpha_s)     ! fits Lambda_QCD at 3 loop level
-      call lam_fit_NLO(alpha_s) ! fits Lambda_QCD at NLO level
-      call init_fermion_sector(top,top_scale,bottom,bot_scale)
+      call init_fermion_sector(alpha_s,top,top_scale,bottom,bot_scale)
 c     find V_CKM input block, read the CKM data
       block = 'VCKMIN            '
       ibl = 4
@@ -562,8 +585,50 @@ c     find sfermion soft input blocks (all are optional), read the sfermion data
             if (read_mat_el(ifl,ds,1)) goto 32 ! down-squark LR mixing A_D, imaginary part
          end do
       end if
+ 32   block = 'TEINH             '
+      ibl = 9
+      if (find_block(ifl,block)) then
+         do i=1,ibl
+            if (read_mat_el(ifl,ks,0)) goto 33 ! slepton LR mixing A_L', real part
+         end do
+      end if
+ 33   block = 'IMTEINH           '
+      ibl = 9
+      if (find_block(ifl,block)) then
+         do i=1,ibl
+            if (read_mat_el(ifl,ds,1)) goto 34 ! slepton LR mixing A_L', imaginary part
+         end do
+      end if
+ 34   block = 'TDINH             '
+      ibl = 9
+      if (find_block(ifl,block)) then
+         do i=1,ibl
+            if (read_mat_el(ifl,es,0)) goto 35 ! down-squark LR mixing A_D', real part
+         end do
+      end if
+ 35   block = 'IMTDINH           '
+      ibl = 9
+      if (find_block(ifl,block)) then
+         do i=1,ibl
+            if (read_mat_el(ifl,es,1)) goto 36 ! down-squark LR mixing A_D', imaginary part
+         end do
+      end if
+ 36   block = 'TUINH             '
+      ibl = 9
+      if (find_block(ifl,block)) then
+         do i=1,ibl
+            if (read_mat_el(ifl,ws,0)) goto 37 ! up-squark LR mixing A_U', real part
+         end do
+      end if
+ 37   block = 'IMTUINH           '
+      ibl = 9
+      if (find_block(ifl,block)) then
+         do i=1,ibl
+            if (read_mat_el(ifl,ws,1)) goto 38 ! up-squark LR mixing A_U', imaginary part
+         end do
+      end if
 c     remove instabilities by adding tiny mass splitting
- 32   do i=1,3
+ 38   do i=1,3
          lms(i,i) = (1 + eps*i)*lms(i,i)
          rms(i,i) = (1 - eps*i)*rms(i,i)
          qms(i,i) = (1 + eps*i)*dble(qms(i,i))
@@ -599,6 +664,9 @@ c     expand LR mixing from dimensionless to dimensionful
                ls(k,l) = ls(k,l)*abs(lms(k,k)*rms(l,l))**0.25d0
                ds(k,l) = ds(k,l)*abs(qms(k,k)*dms(l,l))**0.25d0
                us(k,l) = us(k,l)*abs(qms(k,k)*ums(l,l))**0.25d0
+               ks(k,l) = ks(k,l)*abs(lms(k,k)*rms(l,l))**0.25d0
+               es(k,l) = es(k,l)*abs(qms(k,k)*dms(l,l))**0.25d0
+               ws(k,l) = ws(k,l)*abs(qms(k,k)*ums(l,l))**0.25d0
             end do
          end do
       end if
@@ -622,13 +690,13 @@ c     reset status of physical Higgs mass after parameter changes
       call reset_phys_data
 c     find optional hadronic data input block, read the data
       block = 'SFLAV_HADRON      '
-      ibl = 56
+      ibl = 65
       if (find_block(ifl,block)) then
          do i=1,ibl
-            if (read_var(ifl,hadron_data,ibl)) goto 33
+            if (read_var(ifl,hadron_data,ibl)) goto 39
          end do
       end if
- 33   fk = hadron_data(1)       ! f_K
+ 39   fk = hadron_data(1)       ! f_K
       fd = hadron_data(2)       ! f_D
       fb(1) = hadron_data(3)    ! f_B_d
       fb(2) = hadron_data(4)    ! f_B_s
@@ -666,26 +734,30 @@ c     find optional hadronic data input block, read the data
       epsk = hadron_data(44)    ! eps_K (experimental)
       amd = hadron_data(45)     ! D0 mass (experimental)
       dmd = hadron_data(46)     ! Delta mD (experimental)
-      ak0 = hadron_data(47)     ! parameter kappa in K^0->pi^0vv calculations
-      akp = hadron_data(48)     ! parameter kappa in K^+->pi^+vv calculations
+      ak0 = hadron_data(47)     ! parameter kappa0 in K^0->pi^0vv calculations
+      akp = hadron_data(48)     ! parameter kappa+ in K^+->pi^+vv calculations
       pc = hadron_data(49)      ! parameter P_c in K->pivv calculations
-      del_ak0 = hadron_data(50) ! error of ak0
-      del_akp = hadron_data(51) ! error of akp
-      del_pc = hadron_data(52)  ! error of pc 
-      eta_en = hadron_data(53)  ! neutron EDM QCD correction factors
-      eta_cn = hadron_data(54)  ! neutron EDM QCD correction factors
-      eta_gn = hadron_data(55)  ! neutron EDM QCD correction factors
-      alamx_n = hadron_data(56) ! neutron EDM chiral symmetry breaking scale
-c     Neutral CP-even Higgs masses in the simple 1-loop Effective
-c     Potential Approximation (EPA). Only real mu, A_t, A_b allowed
-c     store dimensionless |A_t|, |A_b| for EPA Higgs mass calculation
-      yts = abs(us(3,3)/(qms(3,3)*ums(3,3))**0.25d0)
-      ybs = abs(ds(3,3)/(qms(3,3)*dms(3,3))**0.25d0)
-      stbl = sqrt(abs(qms(3,3)))
-      str = sqrt(abs(ums(3,3)))
-      sbr = sqrt(abs(dms(3,3)))
-      call fcorr_EPA(tanbe,pm,top,abs(amue),stbl,sbr,str,ybs,yts,ierr)
-      if (ierr.ne.0) write(*,*) 'negative 1-loop CP-even Higgs mass^2?'
+      del_ak0 = hadron_data(50) ! error of kappa0
+      del_akp = hadron_data(51) ! error of kappa+
+      del_pc = hadron_data(52)  ! error of P_c 
+      eta_ed = hadron_data(53)  ! neutron EDM_d QCD coefficient
+      eta_eu = hadron_data(54)  ! neutron EDM_u QCD coefficient
+      eta_cd = hadron_data(55)  ! neutron CDM_d QCD coefficient
+      eta_cu = hadron_data(56)  ! neutron CDM_u QCD coefficient
+      eta_g = hadron_data(57)   ! neutron CDM_g QCD coefficient
+      alamx = hadron_data(58)   ! neutron EDM chiral symmetry breaking scale
+      ump(2) = hadron_data(59)  ! pole c quark mass (in B->X_s gamma and t->cH)
+      br_tau_evv = hadron_data(60) ! Br(tau->evv)
+      dmbp = hadron_data(61)    ! M_B_u
+      rd = hadron_data(62)      ! Br(B->D tau nu)/Br(B->D l nu) in SM
+      del_rd = hadron_data(63)  ! error of Br(B->D tau nu)/Br(B->D l nu) in SM
+      rds = hadron_data(64)     ! Br(B->D* tau nu)/Br(B->D* l nu) in SM
+      del_rds = hadron_data(65) ! error of Br(B->D* tau nu)/Br(B->D* l nu) in SM
+
+c     Neutral CP-even Higgs masses with the approximate 2-loop formulae 
+c     (hep-ph/9903404, hep-ph/9307201)
+      call mhcorr_app2(ierr)
+      if (ierr.ne.0) write(*,*) 'error in 2-loop CP-even Higgs mass^2?'
       close(ifl)
       return
       end
@@ -707,7 +779,7 @@ c     writes SUSY_FLAVOR results to susy_flavor.out
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/sflav_df0/edmn,edml(3),gminus2(3)
       common/sflav_df1/br_mu_egamma,br_tau_egamma,br_tau_mugamma,
-     $     br_k0,br_kp,br_taunu,dtaunu_ratio,bxgamma,
+     $     br_k0,br_kp,br_taunu,dtaunu_ratio,dstaunu_ratio,bxgamma,
      $     br_bdll(3,3),br_bsll(3,3),br_tuh,br_tch
       common/sflav_df2/eps_k,delta_mk,delta_md,
      $     delta_mbd,dmbd_re,dmbd_im,
@@ -718,7 +790,7 @@ c     writes SUSY_FLAVOR results to susy_flavor.out
 
       write(ifl,*)'#'
       write(ifl,*)'#         ***************************'
-      write(ifl,*)'#         * SUSY_FLAVOR 2.10 output *'
+      write(ifl,*)'#         * SUSY_FLAVOR 2.50 output *'
       write(ifl,*)'#         ***************************'
       write(ifl,*)'#'
 
@@ -731,8 +803,8 @@ c     writes SUSY_FLAVOR results to susy_flavor.out
       write(ifl,*)'BLOCK SFLAV_MASS        # Mass Spectrum'
       write(ifl,*)'#     code          mass          # particle'
       write(ifl,100) 24, wm, 'W+'
-      write(ifl,100) 25, hm2, 'h (simple 1-loop EPA approximation only)' 
-      write(ifl,100) 35, hm1, 'H (simple 1-loop EPA approximation only)'
+      write(ifl,100) 25, hm2, 'h (simple 2-loop approximation only)' 
+      write(ifl,100) 35, hm1, 'H (simple 2-loop approximation only)'
       write(ifl,100) 36, ppm(1), 'A'
       write(ifl,100) 37, cm(1), 'H+'
       write(ifl,100) 41, em(1), 'e (pole)'
@@ -816,24 +888,26 @@ c     estimate chiral corrections size
       write(ifl,100) 3, br_tau_mugamma, 'Br(tau-> mu gamma)'
       write(ifl,100) 4, br_k0, 'Br(K0 -> pi0 nu nu)'
       write(ifl,100) 5, br_kp, 'Br(K+ -> pi+ nu nu)'
-      write(ifl,100) 6, br_taunu, 'BR(B_u -> tau nu)'
+      write(ifl,100) 6, br_taunu, 'BR(B -> tau nu)'
       write(ifl,100) 7, dtaunu_ratio, 
-     $     'BR(B_u -> D tau nu)/BR(B_u -> D l nu)'
-      write(ifl,100) 8, bxgamma, 'BR(B -> X_s gamma)'
-      write(ifl,100) 9, br_tuh, 'BR(t -> u h) (not yet implemented)'
-      write(ifl,100) 10, br_tch, 'BR(t -> c h) (not yet implemented)'
-      write(ifl,100) 11, br_bdll(1,1), 'BR(B_d -> e e)'
-      write(ifl,100) 12, br_bdll(2,2), 'BR(B_d -> mu mu)'
-      write(ifl,100) 13, br_bdll(3,3), 'BR(B_d -> tau tau)'
-      write(ifl,100) 14, 2*br_bdll(2,1), 'BR(B_d -> mu e)'
-      write(ifl,100) 15, 2*br_bdll(3,1), 'BR(B_d -> tau e)'
-      write(ifl,100) 16, 2*br_bdll(3,2), 'BR(B_d -> tau mu)'
-      write(ifl,100) 17, br_bsll(1,1), 'BR(B_s -> e e)'
-      write(ifl,100) 18, br_bsll(2,2), 'BR(B_s -> mu mu)'
-      write(ifl,100) 19, br_bsll(3,3), 'BR(B_s -> tau tau)'
-      write(ifl,100) 20, 2*br_bsll(2,1), 'BR(B_s -> mu e)'
-      write(ifl,100) 21, 2*br_bsll(3,1), 'BR(B_s -> tau e)'
-      write(ifl,100) 22, 2*br_bsll(3,2), 'BR(B_s -> tau mu)'
+     $     'BR(B -> D tau nu)/BR(B -> D l nu)'
+      write(ifl,100) 8, dstaunu_ratio, 
+     $     'BR(B -> D* tau nu)/BR(B -> D* l nu)'
+      write(ifl,100) 9, bxgamma, 'BR(B -> X_s gamma)'
+      write(ifl,100) 10, br_tuh, 'BR(t -> u h)'
+      write(ifl,100) 11, br_tch, 'BR(t -> c h)'
+      write(ifl,100) 12, br_bdll(1,1), 'BR(B_d -> e e)'
+      write(ifl,100) 13, br_bdll(2,2), 'BR(B_d -> mu mu)'
+      write(ifl,100) 14, br_bdll(3,3), 'BR(B_d -> tau tau)'
+      write(ifl,100) 15, 2*br_bdll(2,1), 'BR(B_d -> mu e)'
+      write(ifl,100) 16, 2*br_bdll(3,1), 'BR(B_d -> tau e)'
+      write(ifl,100) 17, 2*br_bdll(3,2), 'BR(B_d -> tau mu)'
+      write(ifl,100) 18, br_bsll(1,1), 'BR(B_s -> e e)'
+      write(ifl,100) 19, br_bsll(2,2), 'BR(B_s -> mu mu)'
+      write(ifl,100) 20, br_bsll(3,3), 'BR(B_s -> tau tau)'
+      write(ifl,100) 21, 2*br_bsll(2,1), 'BR(B_s -> mu e)'
+      write(ifl,100) 22, 2*br_bsll(3,1), 'BR(B_s -> tau e)'
+      write(ifl,100) 23, 2*br_bsll(3,2), 'BR(B_s -> tau mu)'
 
       write(ifl,*)'BLOCK SFLAV_DELTA_F2     # Delta F = 2 processes'
       write(ifl,100) 1, eps_k, 'epsilon_K'
@@ -846,11 +920,12 @@ c     estimate chiral corrections size
       write(ifl,100) 8, dmbs_re, 'Re(H_eff_Bs)'
       write(ifl,100) 9, dmbs_im, 'Im(H_eff_Bs)'
 
+      close(ifl)
+
  100  format(2x,i7,5x,1pe16.9,4x,'#',1x,a)
  101  format(3x,i2,3x,i2,22x,'#',1x,a)
  102  format(3x,i2,2x,i2,5x,1pe16.9,4x,'#',1x,a)
  
-
       return
       end
 
@@ -858,7 +933,7 @@ c     estimate chiral corrections size
 c     print real part of complex matrix
       double complex a(n,n)
       do i=1,n
-         write(ifl,'(100(1pe12.5,1x))')(dble(a(i,j)),j=1,n)
+         write(ifl,'(100(1pe10.3,1x))')(dble(a(i,j)),j=1,n)
       end do
       write(ifl,*)
       return
@@ -868,7 +943,7 @@ c     print real part of complex matrix
 c     print imaginary part of complex matrix
       double complex a(n,n)
       do i=1,n
-         write(ifl,'(100(1pe12.5,1x))')(dimag(a(i,j)),j=1,n)
+         write(ifl,'(100(1pe10.3,1x))')(dimag(a(i,j)),j=1,n)
       end do
       write(ifl,*)
       return

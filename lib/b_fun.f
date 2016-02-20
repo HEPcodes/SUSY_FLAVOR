@@ -7,6 +7,8 @@ c     Revised: 28: 3:1994(J.R.)
 c     Next order of F expansion around s=0 added
 c     Revised:  8: 6:2013(J.R.)
 c     New common /cmem/ added to comply with changes in c_fun.f
+c     Revised:  25: 2:2014(J.R.)
+c     Additional order of s/m^2 added in f expansion
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     This file contains two-point standard loop integrals         c
@@ -61,7 +63,7 @@ c     F function - equal masses
       common/spence/ber(9),pi,pi6,eps
       x = 4*a1*a1/s
       if (abs(1/x).le.eps) then
-        feq = 2/x/3.d0*(1 + 0.4d0/x)
+        feq = 2/x/3.d0*(1 + 2/5.d0/x + 8/35.d0/x/x)
         return
       end if
       if (abs(x).le.eps) then
@@ -92,7 +94,7 @@ c     F function - one mass zero
       common/spence/ber(9),pi,pi6,eps
       x = a1*a1/s
       if (abs(1/x).le.eps) then
-        f0 = (1 + 3*x)/6/x/x
+        f0 = (1 + 1/3.d0/x + 1/6.d0/x/x)/2/x
         return
       end if
       if (abs(x).le.eps) then
@@ -121,10 +123,13 @@ c     F function - non equal masses
       sum = s1 + s2
       dif = s1 - s2
       if (abs(s/dif).le.eps) then
-        f1 = sum - 4*s1*s2/dif*log(a1/a2)
-        f2 = 3*sum*sum - 2*dif*dif - 12*s1*s2*sum/dif*log(a1/a2)
-        fneq = s/dif/dif/2*(f1 + s*f2/3/dif/dif)
-        return
+         x = s/dif/dif
+         f1 = sum - 4*s1*s2/dif*log(a1/a2)
+         f2 = 3*sum*sum - 2*dif*dif - 12*s1*s2*sum/dif*log(a1/a2)
+         f3 = sum*(5*sum*sum - 13/3.d0*dif*dif) 
+     $        - (dif**4 - 6*(dif*sum)**2 + 5*sum**4)/dif*log(a1/a2)
+         fneq = x/2*(f1 + x*f2/3 + x*x*f3/4)
+         return
       end if
       fneq = 1 + (dif/s - sum/dif)*log(a2/a1)
       if (abs(dif/s).le.eps) then

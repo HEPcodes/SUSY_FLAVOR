@@ -14,6 +14,14 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       program susy_flavor_header
       implicit double precision (a-h,o-z)
 
+c     choose MSSM sectors to include
+      ih = 1                    ! Higgs + gauge diagrams included
+      ic = 1                    ! chargino diagrams included
+      in = 1                    ! neutralino diagrams included
+      ig = 1                    ! gluino diagrams included
+      
+      call set_active_sector(ih,ic,in,ig) ! set control variables
+
       call sflav_input(ilev,ierr) ! read parameters from susy_flavor.in
       if (ierr.ne.0) write(*,*) 'Error in parameter initialization!' 
 

@@ -36,7 +36,9 @@ c     Full A^V_LL SM formfactor
       common/fmass_high/umu(3),uml(3),amuu(3),dmu(3),dml(3),amud(3)
       common/ckm_switch/ckm_phys(3,3),ckm0(3,3),udl(3,3),udr(3,3),
      $     uul(3,3),uur(3,3)
+      common/debug_4q/ih,ic,in,ig
       dd_vll_sm = (0.d0,0.d0)
+      if (ih.ne.1) return
       do m=1,3
          do n=1,3
             dd_vll_sm = dd_vll_sm + e2*e2/4/st2/st2
@@ -182,12 +184,12 @@ c     Full A^V_LL formfactor
 c      double complex dd_vll_sm
       double complex dd_vll_hg,dd_vll_c,dd_vll_n,dd_vll_ng,dd_vll_g
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       dd_vll = (0.d0,0.d0)
       if (ih.eq.1)  dd_vll = dd_vll + dd_vll_hg(i,j) 
       if (ic.eq.1)  dd_vll = dd_vll + dd_vll_c(i,j) 
       if (in.eq.1)  dd_vll = dd_vll + dd_vll_n(i,j) 
-      if (ing.eq.1) dd_vll = dd_vll + dd_vll_ng(i,j) 
+      if ((in.eq.1).and.(ig.eq.1)) dd_vll = dd_vll + dd_vll_ng(i,j) 
       if (ig.eq.1)  dd_vll = dd_vll + dd_vll_g(i,j) 
       dd_vll = - dd_vll/16/pi/pi
 c     SM contribution has to be treated separately from the point of 
@@ -329,12 +331,12 @@ c      Full A^V_RR formfactor
       implicit double precision (a-h,o-z)
       double complex dd_vrr_hg,dd_vrr_c,dd_vrr_n,dd_vrr_ng,dd_vrr_g
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       dd_vrr = (0.d0,0.d0)
       if (ih.eq.1)  dd_vrr = dd_vrr + dd_vrr_hg(i,j) 
       if (ic.eq.1)  dd_vrr = dd_vrr + dd_vrr_c(i,j) 
       if (in.eq.1)  dd_vrr = dd_vrr + dd_vrr_n(i,j) 
-      if (ing.eq.1) dd_vrr = dd_vrr + dd_vrr_ng(i,j) 
+      if ((in.eq.1).and.(ig.eq.1)) dd_vrr = dd_vrr + dd_vrr_ng(i,j) 
       if (ig.eq.1)  dd_vrr = dd_vrr + dd_vrr_g(i,j) 
       dd_vrr = - dd_vrr/16/pi/pi
       return
@@ -486,12 +488,12 @@ c     Full A^V_LR formfactor
       implicit double precision (a-h,o-z)
       double complex dd_vlr_hg,dd_vlr_c,dd_vlr_n,dd_vlr_ng,dd_vlr_g
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       dd_vlr = (0.d0,0.d0)
       if (ih.eq.1)  dd_vlr = dd_vlr + dd_vlr_hg(i,j) 
       if (ic.eq.1)  dd_vlr = dd_vlr + dd_vlr_c(i,j) 
       if (in.eq.1)  dd_vlr = dd_vlr + dd_vlr_n(i,j) 
-      if (ing.eq.1) dd_vlr = dd_vlr + dd_vlr_ng(i,j) 
+      if ((in.eq.1).and.(ig.eq.1)) dd_vlr = dd_vlr + dd_vlr_ng(i,j) 
       if (ig.eq.1)  dd_vlr = dd_vlr + dd_vlr_g(i,j) 
       dd_vlr = - dd_vlr/16/pi/pi
       return
@@ -629,12 +631,12 @@ c     Full A^S_LL formfactor
       implicit double precision (a-h,o-z)
       double complex dd_sll_hg,dd_sll_c,dd_sll_n,dd_sll_ng,dd_sll_g
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       dd_sll = (0.d0,0.d0)
       if (ih.eq.1)  dd_sll = dd_sll + dd_sll_hg(i,j) 
       if (ic.eq.1)  dd_sll = dd_sll + dd_sll_c(i,j) 
       if (in.eq.1)  dd_sll = dd_sll + dd_sll_n(i,j) 
-      if (ing.eq.1) dd_sll = dd_sll + dd_sll_ng(i,j) 
+      if ((in.eq.1).and.(ig.eq.1)) dd_sll = dd_sll + dd_sll_ng(i,j) 
       if (ig.eq.1)  dd_sll = dd_sll + dd_sll_g(i,j) 
       dd_sll = - dd_sll/16/pi/pi
       return
@@ -772,12 +774,12 @@ c     Full A^S_RR formfactor
       implicit double precision (a-h,o-z)
       double complex dd_srr_hg,dd_srr_c,dd_srr_n,dd_srr_ng,dd_srr_g
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       dd_srr = (0.d0,0.d0)
       if (ih.eq.1)  dd_srr = dd_srr + dd_srr_hg(i,j) 
       if (ic.eq.1)  dd_srr = dd_srr + dd_srr_c(i,j) 
       if (in.eq.1)  dd_srr = dd_srr + dd_srr_n(i,j) 
-      if (ing.eq.1) dd_srr = dd_srr + dd_srr_ng(i,j) 
+      if ((in.eq.1).and.(ig.eq.1)) dd_srr = dd_srr + dd_srr_ng(i,j) 
       if (ig.eq.1)  dd_srr = dd_srr + dd_srr_g(i,j) 
       dd_srr = - dd_srr/16/pi/pi
       return
@@ -935,12 +937,12 @@ c     Full A^S_LR formfactor
       implicit double precision (a-h,o-z)
       double complex dd_slr_hg,dd_slr_c,dd_slr_n,dd_slr_ng,dd_slr_g
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       dd_slr = (0.d0,0.d0)
       if (ih.eq.1)  dd_slr = dd_slr + dd_slr_hg(i,j) 
       if (ic.eq.1)  dd_slr = dd_slr + dd_slr_c(i,j) 
       if (in.eq.1)  dd_slr = dd_slr + dd_slr_n(i,j) 
-      if (ing.eq.1) dd_slr = dd_slr + dd_slr_ng(i,j) 
+      if ((in.eq.1).and.(ig.eq.1)) dd_slr = dd_slr + dd_slr_ng(i,j) 
       if (ig.eq.1)  dd_slr = dd_slr + dd_slr_g(i,j) 
       dd_slr = - dd_slr/16/pi/pi
       return
@@ -1054,11 +1056,11 @@ c     Full A^T_L formfactor
       implicit double precision (a-h,o-z)
       double complex dd_tl_c,dd_tl_n,dd_tl_ng,dd_tl_g
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       dd_tl = (0.d0,0.d0)
       if (ic.eq.1)  dd_tl = dd_tl + dd_tl_c(i,j) 
       if (in.eq.1)  dd_tl = dd_tl + dd_tl_n(i,j) 
-      if (ing.eq.1) dd_tl = dd_tl + dd_tl_ng(i,j) 
+      if ((in.eq.1).and.(ig.eq.1)) dd_tl = dd_tl + dd_tl_ng(i,j) 
       if (ig.eq.1)  dd_tl = dd_tl + dd_tl_g(i,j) 
       dd_tl = - dd_tl/16/pi/pi
       return
@@ -1172,11 +1174,11 @@ c     Full A^T_R formfactor
       implicit double precision (a-h,o-z)
       double complex dd_tr_c,dd_tr_n,dd_tr_ng,dd_tr_g
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       dd_tr = (0.d0,0.d0)
       if (ic.eq.1)  dd_tr = dd_tr + dd_tr_c(i,j) 
       if (in.eq.1)  dd_tr = dd_tr + dd_tr_n(i,j) 
-      if (ing.eq.1) dd_tr = dd_tr + dd_tr_ng(i,j) 
+      if ((in.eq.1).and.(ig.eq.1)) dd_tr = dd_tr + dd_tr_ng(i,j) 
       if (ig.eq.1)  dd_tr = dd_tr + dd_tr_g(i,j) 
       dd_tr = - dd_tr/16/pi/pi
       return

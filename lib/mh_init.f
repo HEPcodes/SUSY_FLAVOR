@@ -21,7 +21,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     running s,b masses at m_t scale
       implicit double precision (a-h,o-z)
       common/fmass_high/umu(3),uml(3),amuu(3),dmu(3),dml(3),amud(3)
-      umu(3) = uml(3) + 1.d-3
+      umu(3) = uml(3) + 1.d-5
       do i=1,3
          dmu(i) = qmass_nlo(dml(i),amud(i),umu(3))
       end do
@@ -31,11 +31,12 @@ c     running s,b masses at m_t scale
       return
       end
 
-      subroutine init_fermion_sector(tm,tscale,bm,bscale)
+      subroutine init_fermion_sector(alpha_s,tm,tscale,bm,bscale)
       implicit double precision (a-h,o-z)
       logical higgs, fermion
       common/fmass/em(3),um(3),dm(3)
       common/fmass_high/umu(3),uml(3),amuu(3),dmu(3),dml(3),amud(3)
+      common/qmass_pole/ump(3),dmp(3)
       common/required_init/higgs,fermion
       external init_phys,init_control
 c     Initialization of the running fermion masses. Masses of the light
@@ -48,12 +49,18 @@ c     common/fmass/
       uml(3) = tm               ! top mass at tscale
       amud(3) = bscale
       dml(3) = bm               ! bottom mass at bscale
-      amuu(2) = uml(2)          ! charm mass assumed to be given as mc(mc) 
-      call init_run_qmass
-      do i=1,3
-         dm(i) = dmu(i)
-         um(i) = umu(i)
+      do iter=1,3
+         call lam_fit(alpha_s)  ! fits Lambda_QCD at 3 loop level
+         call lam_fit_nlo(alpha_s) ! fits Lambda_QCD at NLO level
+         call init_run_qmass
+         do i=1,3
+            dm(i) = dmu(i)
+            um(i) = umu(i)
+         end do
+         call qstep_update      ! update ordered msbar quark mass array
       end do
+      ump(3) = qm_pole_nlo(uml(3)) ! NLO pole top mass
+      dmp(3) = qm_pole_nlo(dml(3)) ! NLO pole bottom mass
 c     if Higgs sector is initialized, calculate also Yukawa couplings
       if (higgs) call init_tree_yukawa
       fermion = .true.
@@ -171,6 +178,11 @@ c     expand slepton LR mass insertions
 c     if slepton input data in SLHA format, rewrite them to
 c     hep-ph/9511250 convention
       if (iconv.eq.1) call sl_slha_to_jr
+
+c      call cr_mat_print(ls,3,6)
+c      call ci_mat_print(ls,3,6)
+c      stop
+
 c     call diagonalization routine
       ierr = intlog(sldiag())
       return
@@ -225,9 +237,11 @@ c     expand squark LR mass insertions
             ws(i,j) = sumi_lrp(i,j)*abs(qms(i,i)*ums(j,j))**0.25d0
          end do
       end do
+
 c     if squark input data in SLHA format, rewrite them to
 c     hep-ph/9511250 convention
       if (iconv.eq.1) call sq_slha_to_jr
+
 c     call diagonalization routine
       ierr = intlog(sqdiag())
       return
@@ -420,18 +434,32 @@ c     equal to zero - significantly speeds up calculations
       return
       end
 
-      subroutine par_content(jh,jc,jn,jng,jg)
-c     Integers ih,ic,in,ing,ig switches on/off contributions of
-c     (respectively) gauge/Higgs bosons, charginos, neutralinos, mixed
-c     neutralino-gluinos and gluinos to the Green's functions.  ix=0(1)
-c     switches proper contribution off(on)
-      common/debug_4q/ih,ic,in,ing,ig
+      subroutine set_active_sector(jh,jc,jn,jg)
+c     Integers ih,ic,in,ig switches on/off contributions of
+c     (respectively) gauge+Higgs bosons, charginos, neutralinos and
+c     gluinos to the Green's functions.  
+      common/debug_4q/ih,ic,in,ig
       external init_control
-      ih = jh
-      ig = jg
-      ic = jc
-      in = jn
-      ing = jng
+      if ((jh.eq.0).or.(jh.eq.1)) then 
+         ih = jh
+      else
+         stop 'incorrect IH in set_active_sector'
+      end if
+      if ((jc.eq.0).or.(jc.eq.1)) then 
+         ic = jc
+      else 
+         stop 'incorrect IC in set_active_sector'
+      end if
+      if ((jn.eq.0).or.(jn.eq.1)) then 
+         in = jn
+      else 
+         stop 'incorrect IN in set_active_sector'
+      end if
+      if ((jg.eq.0).or.(jg.eq.1)) then 
+         ig = jg
+      else 
+         stop 'incorrect IG in set_active_sector'
+      end if
       return
       end
 
@@ -500,6 +528,7 @@ c     Physical quantities initialization
       common/fmass/em(3),um(3),dm(3)
       common/qmass_pole/ump(3),dmp(3)
       common/fmass_high/umu(3),uml(3),amuu(3),dmu(3),dml(3),amud(3)
+      common/tau_gam/br_tau_evv
       common/crdat/pbarn,ae,ve
       common/fvert/qf(4),vf(4),af(4),nc(4)
       common/nc_exp/z_inv,z_vis,z_width,cr_peak
@@ -521,22 +550,22 @@ c     uml contains u-quark masses at scales amuu, similarly for d-quarks
 c     umu, dmu are quark masses at mt=umu(3),
 c     to be calculated in init_run_qmass
 c     Light fermion masses at mu = 2GeV used by Ciuchini et al.
-      data umu,uml,amuu/4.d-3,1.3d0,163.5d0,
-     $     4.d-3,1.279d0,163.5d0,
-     $     2.d0,1.279d0,163.5d0/
-      data dmu,dml,amud/7.d-3,0.094d0,4.17d0,
-     $     7.d-3,0.094d0,4.17d0,
-     $     2.d0,2.d0,4.17d0/
-      data em/5.1099891d-4,1.05658d-1,1.777d0/
-      data um/4d-3,1.279d0,163.5d0/
-      data dm/7d-3,0.094d0,4.17d0/
-      data ump/4d-3,1.279d0,173.2d0/
-      data dmp/7d-3,0.110d0,4.17d0/
+      data umu,uml,amuu/2.1d-3,1.279d0,163.1d0,
+     $                  2.1d-3,1.279d0,163.1d0,
+     $                  2.d0,   1.279d0,163.1d0/
+      data dmu,dml,amud/4.7d-3,9.34d-2,4.19d0,
+     $                  4.7d-3,9.34d-2,4.19d0,
+     $                  2.d0,  2.d0,   4.19d0/
+      data em/5.109989d-4,1.05658d-1,1.77684d0/
+      data um/2.1d-3,1.279d0,163.1d0/
+      data dm/4.73d-3,9.34d-2,4.18d0/
+      data ump/4d-3,1.5d0,173.5d0/
+      data dmp/7d-3,0.110d0,4.77d0/
       data vkm1,vkm2,vkm3,phi/0.222d0,0.975d0,0.044d0,0.d0/
       data ckm/(1.d0,0.d0),(0.d0,0.d0),(0.d0,0.d0),
      $         (0.d0,0.d0),(1.d0,0.d0),(0.d0,0.d0),
      $         (0.d0,0.d0),(0.d0,0.d0),(1.d0,0.d0)/
-      data zm,zm2,wm,wm2/9.11884D+01,8.315251D+03,8.033D+01,6.4963D+03/
+      data zm,zm2,wm,wm2/9.11876D+01,8.315251D+03,8.0398D+01,6.4963D+03/
       data st2,ct2/2.18433072D-01,7.81566928D-01/
       data st,ct/4.67368240D-01,8.84062740D-01/
       data sct,sct2/4.13182847D-01,1.70720065D-01/
@@ -544,13 +573,67 @@ c     Light fermion masses at mu = 2GeV used by Ciuchini et al.
       data alpha/7.2973525205D-03/
       data sq2,pi/1.414213562373095d0,3.1415926536d0/
       data hm,vev/100.d0,248.663d0/
+      data br_tau_evv/0.1782d0/
       data lms/9*(0.d0,0.d0)/,rms/9*(0.d0,0.d0)/
       data dms/9*(0.d0,0.d0)/,ums/9*(0.d0,0.d0)/,qms/9*(0.d0,0.d0)/
       data ls/9*(0.d0,0.d0)/,ks/9*(0.d0,0.d0)/
       data ds/9*(0.d0,0.d0)/,es/9*(0.d0,0.d0)/
       data us/9*(0.d0,0.d0)/,ws/9*(0.d0,0.d0)/
-      data gm1,gm2,gm3/250.d0,(200.d0,0.d0),(100.d0,0.d0)/
+      data gm1,gm2,gm3/600.d0,(200.d0,0.d0),(100.d0,0.d0)/
       end
+
+      block data init_4q
+      implicit double precision (a-h,o-z)
+      logical init_eta,init_alpha_susy,eff_yuk,init_eff_yuk
+      common/alpha_s_susy/g3u,g3d,init_alpha_susy
+      common/sm_4q/eta_cc,eta_ct,eta_tt,eta_b,bk_sm,bd_sm,bb_sm(2)
+      common/ev_mat_4q/vxx(4),sxx(4,2,2),sxy(4,2,2),init_eta
+      common/meson_data/dmk,amk,epsk,fk,dmd,amd,fd,
+     $    amb(2),dmb(2),tau_b(2),fb(2)
+      common/dtau_data/dmbp,rd,del_rd,rds,del_rds
+      common/bx_4q/bk(5),bd(5),bb(2,5),amu_k,amu_d,amu_b
+      common/eff_yuk_4q/eps_d(3),eff_yuk,init_eff_yuk
+      common/diag_type/ihpeng,izpeng,ifpeng,ibox
+c     include Higgs penguins
+      data ihpeng,izpeng,ifpeng,ibox/4*1/
+c     inclusion of eps,eps' terms in 4q box calculations
+      data eff_yuk,init_eff_yuk/.false.,.true./
+      data eps_d/3*0.d0/
+c     K mesons
+      data dmk,amk,fk,epsk/3.483d-15,0.497614d0,0.156d0,2.228d-3/
+c     B_K ordering: VLL, SLL(2), LR(2)
+      data bk/0.61d0,0.76d0,0.51d0,0.96d0,1.30d0/
+      data bk_sm/0.724d0/
+c     D mesons
+      data dmd,amd,fd/1.56d-14,1.8645d0,0.2d0/
+      data bd/5*1.d0/
+      data bd_sm/1.d0/
+c     B_d,B_s mesons
+      data amb/5.2792d0,5.3668d0/
+      data dmb/3.337d-13,1.17d-11/
+      data tau_b/1.519d-12,1.516d-12/
+      data fb/0.192d0,0.228d0/
+      data bb/2*0.87d0,2*0.8d0,2*0.71d0,2*1.71d0,2*1.16d0/
+      data bb_sm/1.305d0,1.345d0/
+c     Scales for B_X calculations
+      data amu_k,amu_d,amu_b/2.d0,2.d0,4.6d0/
+c     Debug/status variablesq
+      data init_eta/.true./
+      data init_alpha_susy/.true./
+c     For SM-like formfactor (vector-LL) in kaon and (partially) BB
+c     mixing much more refined calculation of QCD factors exist.
+c     Lets replace our simplified formulae by the exact numerical values,
+c     taken from arXiv: 0909.1333 [hep-ph]
+c     KK mixing:
+      data eta_cc,eta_ct,eta_tt/1.87d0,0.496d0,0.5765d0/
+c     BB mixing:
+      data eta_b/0.55d0/
+c     B_u meson and  Br(B->D(D^*) tau nu)/Br(B->D(D^*) l nu) in SM
+      data dmbp/5.27917d0/      ! M_B_u
+      data rd,del_rd/0.297d0,0.017d0/ 
+      data rds,del_rds/0.252d0,0.003d0/
+      end
+
 
       block data init_const
 c     common numerical constants initialization
@@ -581,18 +664,20 @@ c     control variables initialization
       common/bswitch/bstat
       common/hm_stat/hstat
       common/dimreg/idflag
-      common/debug_4q/ih,ic,in,ing,ig
+      common/debug_4q/ih,ic,in,ig
       common/sf_cont/eps,indx(3,3),iconv
+      common/mssm_charged_higgs_min_index/mhmin
 c     status of Higgs and fermion sector initialization
       data higgs,fermion/2*.false./
       data idflag/1/
-      data ih,ig,ic,in,ing/5*1/
+      data ih,ig,ic,in/4*1/
       data vstat,fstat,hstat,bstat/2*.true.,2*.false./
       data eps/1.d-5/
       data indx/0,1,3,
      $          1,0,2,
      $          3,2,0/
       data iconv/2/
+      data mhmin/1/
       end
 
       block data init_units
