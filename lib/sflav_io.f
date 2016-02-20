@@ -310,6 +310,7 @@ c     Input read from file susy_flavor.in
       double complex lms,rms,ums,dms,qms
       double complex cz,co,ci
       double complex yl,yu,yd
+      dimension tmp_data(100)
       common/yukawa/yl(3),yu(3),yd(3)
       common/num/cz,co,ci,zero,one
       common/edm_qcd/eta_ed,eta_eu,eta_cd,eta_cu,eta_g,alamx
@@ -404,6 +405,101 @@ c     find V_CKM input block, read the CKM data
       rhobar = ckm_data(3)      ! rho bar
       etabar = ckm_data(4)      ! eta bar
       call ckm_wolf(alam,apar,rhobar,etabar)
+
+c     Next section added for compatibility with some SUSY generators
+c     output (even if formally hmix, msoft, au, ad, ae are *output*
+c     blocks at scale Q
+
+c     Block hmix, Higgs sector parameters
+      block = 'hmix              '
+      ibl = 4
+      if (find_block(ifl,block)) then
+         do i=1,ibl
+            if (read_var(ifl,tmp_data,ibl)) goto 200
+         end do
+      end if
+ 200  extpar_data(23) = tmp_data(1) ! tan(beta)
+      extpar_data(25) = tmp_data(2) ! mu
+      extpar_data(26) = sqrt(tmp_data(4)) ! M_A
+      amue  = extpar_data(23)   ! mu (complex)
+      tanbe = extpar_data(25)   ! tan(beta)
+      pm    = extpar_data(26)   ! M_A pole
+c     Block msoft, soft SUSY masses
+      block = 'msoft             '
+      ibl = 49
+      if (find_block(ifl,block)) then
+         do i=1,ibl
+            if (read_var(ifl,tmp_data,ibl)) goto 201
+         end do
+      end if
+ 201  extpar_data(1) = tmp_data(1) ! M1 (bino mass, complex)
+      extpar_data(2) = tmp_data(2) ! M2 (wino mass, complex)
+      extpar_data(3) = tmp_data(3) ! M3 (gluino mass)
+      do i=1,3
+         extpar_data(30+i) = tmp_data(30+i) ! M_eL, M_muL, M_tauL 
+         extpar_data(33+i) = tmp_data(33+i) ! M_eR, M_muR, M_tauR 
+         extpar_data(40+i) = tmp_data(40+i) ! M_q1L, M_q2L, M_q3L
+         extpar_data(43+i) = tmp_data(43+i) ! M_uR, M_cR, M_tR
+         extpar_data(46+i) = tmp_data(46+i) ! M_dR, M_sR, M_bR
+      end do
+      amgg  = extpar_data(1)    ! M1 (bino mass, complex)
+      amg   = extpar_data(2)    ! M2 (wino mass, complex)
+      amglu = extpar_data(3)    ! M3 (gluino mass)
+      us(3,3)  = extpar_data(11) ! A_t
+      ds(3,3)  = extpar_data(12) ! A_b
+      ls(3,3)  = extpar_data(13) ! A_tau
+      do i=1,3
+         lms(i,i) = extpar_data(30+i)**2 ! M_eL, M_muL, M_tauL 
+         rms(i,i) = extpar_data(33+i)**2 ! M_eR, M_muR, M_tauR 
+         qms(i,i) = extpar_data(40+i)**2 ! M_q1L, M_q2L, M_q3L
+         ums(i,i) = extpar_data(43+i)**2 ! M_uR, M_cR, M_tR
+         dms(i,i) = extpar_data(46+i)**2 ! M_dR, M_sR, M_bR
+      end do
+c     Block au, soft up-squark mixing
+      block = 'au                '
+      ibl = 3
+      if (find_block(ifl,block)) then
+         do i=1,ibl
+            if (read_var(ifl,tmp_data,ibl)) goto 202
+         end do
+      end if
+ 202  extpar_data(11) = tmp_data(3) ! A_t
+      extpar_data(14) = tmp_data(1) ! A_u
+      extpar_data(17) = tmp_data(2) ! A_c
+      us(3,3) = extpar_data(11) ! A_t
+      us(1,1) = extpar_data(14) ! A_u 
+      us(2,2) = extpar_data(17) ! A_c 
+c     Block ad, soft down-squark mixing
+      block = 'ad                '
+      ibl = 3
+      if (find_block(ifl,block)) then
+         do i=1,ibl
+            if (read_var(ifl,tmp_data,ibl)) goto 203
+         end do
+      end if
+ 203  extpar_data(12) = tmp_data(3) ! A_b
+      extpar_data(15) = tmp_data(1) ! A_d
+      extpar_data(18) = tmp_data(2) ! A_s
+      ds(3,3) = extpar_data(12) ! A_b
+      ds(1,1) = extpar_data(15) ! A_d 
+      ds(2,2) = extpar_data(18) ! A_s 
+c     Block ae, soft slepton mixing
+      block = 'ae                '
+      ibl = 3
+      if (find_block(ifl,block)) then
+         do i=1,ibl
+            if (read_var(ifl,tmp_data,ibl)) goto 204
+         end do
+      end if
+ 204  extpar_data(13) = tmp_data(3) ! A_tau
+      extpar_data(16) = tmp_data(1) ! A_e
+      extpar_data(19) = tmp_data(2) ! A_mu
+      ls(3,3) = extpar_data(13) ! A_tau
+      ls(1,1) = extpar_data(16) ! A_e
+      ls(2,2) = extpar_data(19) ! A_mu 
+c     end of SUSY generators compatibility code
+
+
 c     find MINPAR input block, read tan(beta) if defined (other entries
 c     of MINPAR ignored)
       block = 'MINPAR            '
@@ -473,7 +569,10 @@ c     Higgs sector
       if (ierr.ne.0) write(*,*) 'negative tree level Higgs mass^2?'
 c     SUSY fermion sector
       call init_ino_sector(amgg,amg,amglu,amue,tanbe,ierr)
-      if (ierr.ne.0) write(*,*) '-ino mass below M_Z/2?'
+      if (ierr.ne.0) then
+         write(*,*) 'WARNING: neutralino or chargino mass below M_Z/2?'
+         ierr = - ierr
+      end if
 c     rescale A terms by Yukawa couplings to conform to SLHA2 convention
       do i=1,3
          us(i,i) = us(i,i)*yu(i)
@@ -761,11 +860,10 @@ c     find optional hadronic data input block, read the data
       del_rd = hadron_data(63)  ! error of Br(B->D tau nu)/Br(B->D l nu) in SM
       rds = hadron_data(64)     ! Br(B->D* tau nu)/Br(B->D* l nu) in SM
       del_rds = hadron_data(65) ! error of Br(B->D* tau nu)/Br(B->D* l nu) in SM
-
 c     Neutral CP-even Higgs masses with the approximate 2-loop formulae 
 c     (hep-ph/9903404, hep-ph/9307201)
       call mhcorr_app2(ierr)
-      if (ierr.ne.0) write(*,*) 'error in 2-loop CP-even Higgs mass^2?'
+      if (ierr.gt.0) write(*,*) 'Error in 2-loop CP-even Higgs mass^2?'
       close(ifl)
       return
       end

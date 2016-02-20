@@ -72,13 +72,16 @@ c     gluino-up squark contributions
       double precision function cdm_d(i)
 c     Full down quark CDM
       implicit double precision (a-h,o-z)
+      logical init_alpha_susy
+      common/alpha_s_susy/g3u,g3d,init_alpha_susy
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/debug_4q/ih,ic,in,ig
+      if (init_alpha_susy) call init_alpha_s_susy
       cdm_d = 0.d0
       if (ic.eq.1) cdm_d = cdm_d + cdm_d_c(i)
       if (in.eq.1) cdm_d = cdm_d + cdm_d_n(i)
       if (ig.eq.1) cdm_d = cdm_d + cdm_d_g(i)
-      cdm_d = sqrt(alfas(zm)/pi)*cdm_d
+      cdm_d = g3d/2.d0/pi*cdm_d
       return
       end
 
@@ -145,13 +148,16 @@ c     gluino-up squark contributions
       double precision function cdm_u(i)
 c     Full up quark CDM
       implicit double precision (a-h,o-z)
+      logical init_alpha_susy
+      common/alpha_s_susy/g3u,g3d,init_alpha_susy
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/debug_4q/ih,ic,in,ig
+      if (init_alpha_susy) call init_alpha_s_susy
       cdm_u = 0.d0
       if (ic.eq.1) cdm_u = cdm_u + cdm_u_c(i)
       if (in.eq.1) cdm_u = cdm_u + cdm_u_n(i)
       if (ig.eq.1) cdm_u = cdm_u + cdm_u_g(i)
-      cdm_u = sqrt(alfas(zm)/pi)*cdm_u
+      cdm_u = g3u/2.d0/pi*cdm_u
       return
       end
 

@@ -736,8 +736,8 @@ c     2-loop Yt corrections
       else
          dsf = 2 - (stm2 + stm1)/(stm2 - stm1)*log(stm2/stm1)
       end if
-      sin2t = abs(su_mat(3,6)**2/(su_mat(3,6)**2 + (su_mat(3,3) -
-     $     su_mat(6,6))**2/4))  ! sin^2(2 theta_t)
+      sin2t = abs(su_mat(3,6))**2/(abs(su_mat(3,6))**2 + (su_mat(3,3) -
+     $     su_mat(6,6))**2/4)  ! sin^2(2 theta_t)
       dst = (stm2 - stm1)/4/um(3)**2*sin2t
       xxt = dst*dst*dsf + 2*dst*log(stm2/stm1)
       tl = log(stm1*stm2/um(3)**4)/2
