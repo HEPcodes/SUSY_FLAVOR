@@ -109,27 +109,33 @@ c     second index j,i=1 or 2 defines B meson, B_d or B_s respectively
       common/dl_wil_coeff/dls_vll,dls_vrr,dls_vlr,dls_vrl,
      $     dls_sll,dls_srr,dls_slr,dls_srl,dls_tl,dls_tr
       common/ph_units/hbar,gev_cm,gev_s
+      common/fmass_high/umu(3),uml(3),amuu(3),dmu(3),dml(3),amud(3)
+      common/bx_4q/bk(5),bd(5),bb(2,5),amu_k,amu_d,amu_b
       external init_4q,init_2q,init_units
       if (max(i,j).ne.3) stop 'No b quark index in b_ll?'
+      if (min(i,j).eq.3) stop '(b-bar b) decay not implemented!'
       call dl_wil_run(i,j,k,l)
 c     form factors
       ii = min(i,j)      
       amb2 = amb(ii)*amb(ii)
+      if (ii.eq.1) fb2 = 0.19d0**2
+      if (ii.eq.2) fb2 = 0.227d0**2
+      rm = amb2/(qmass_nlo(dml(ii),amud(ii),amu_b)
+     $     + qmass_nlo(dml(3),amud(3),amu_b))
       del = em(k) - em(l)
       sum = em(k) + em(l)
       fv = dls_vrr - dls_vll + dls_vrl - dls_vlr 
       fa = dls_vll + dls_vrr - dls_vlr - dls_vrl
-      fs = amb2/(dm(3) + dm(ii))*(dls_sll - dls_srr + dls_slr - dls_srl)
-      fp = amb2/(dm(3) + dm(ii))*(dls_slr + dls_srl - dls_sll - dls_srr)
+      fs = rm*(dls_sll - dls_srr + dls_slr - dls_srl)
+      fp = rm*(dls_slr + dls_srl - dls_sll - dls_srr)
 c     matrix element
       b_ll = (amb2 - sum*sum)*abs(fs)**2 + (amb2 - del*del)*abs(fp)**2
      $     + sum*sum*(amb2 - del*del)*abs(fa)**2
      $     + 2*sum*(amb2 - del*del)*dble(fp*dconjg(fa))
-
       if (k.ne.l) b_ll = b_ll + del*del*(amb2 - sum*sum)*abs(fv)**2
      $     - 2*del*(amb2 - sum*sum)*dble(fs*dconjg(fv))
 c     branching ratio itself
-      b_ll = b_ll*fb(ii)*fb(ii)*tau_b(ii)/128/pi/amb(ii)/hbar
+      b_ll = b_ll*fb2*tau_b(ii)/128/pi/amb(ii)/hbar
      $     * sqrt(1 - sum*sum/amb2)*sqrt(1 - del*del/amb2)
       return
       end

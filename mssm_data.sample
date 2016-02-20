@@ -2,7 +2,7 @@
 ******* MSSM Lagrangian parameters *******
 
 QED coupling 1/alpha_em(M_Z) =  1.2793E+02
-Weinberg angle s_W^2 =  2.2265E-01
+Weinberg angle s_W^2 =  2.3200E-01
 Z boson mass =  9.1188E+01
 W boson mass =  8.0398E+01
 QCD coupling alpha_s(M_Z) =  1.1720E-01
@@ -99,18 +99,18 @@ Down-squark LR mixing matrix, imaginary part:
 
 ** Fermion masses **
 Charged lepton masses                 5.110E-04  1.057E-01  1.777E+00
-Running u quark masses at m_t scale  2.220E-03  6.440E-01  1.632E+02
+Running u quark masses at m_t scale  2.220E-03  6.082E-01  1.632E+02
 Running d quark masses at m_t scale  3.885E-03  5.216E-02  2.737E+00
 
 ** Higgs masses **
 Tree level (H,h,A,H+):           2.000E+02  9.110E+01  2.000E+02  2.156E+02
-1-loop, EPA approximation (H,h): 1.993E+02  1.146E+02
+1-loop, EPA approximation (H,h): 1.994E+02  1.137E+02
 
 ** Tree level SUSY masses **
 Sneutrino masses    2.895E+02  2.930E+02  2.964E+02
-Slepton masses      2.539E+02  2.993E+02  3.031E+02  3.034E+02  3.079E+02  3.460E+02
-U squark masses     2.207E+02  4.466E+02  4.486E+02  4.494E+02  4.971E+02  4.973E+02
-D squark masses     2.642E+02  4.291E+02  5.035E+02  5.038E+02  5.506E+02  5.506E+02
-Chargino masses     2.722E+02  3.890E+02
-Neutralino masses   1.986E+02  2.757E+02  3.235E+02  3.893E+02
+Slepton masses      2.539E+02  2.993E+02  3.032E+02  3.034E+02  3.078E+02  3.460E+02
+U squark masses     2.196E+02  4.469E+02  4.486E+02  4.496E+02  4.971E+02  4.974E+02
+D squark masses     2.642E+02  4.291E+02  5.035E+02  5.037E+02  5.506E+02  5.506E+02
+Chargino masses     2.724E+02  3.886E+02
+Neutralino masses   1.983E+02  2.762E+02  3.236E+02  3.890E+02
 Gluino mass         6.000E+02

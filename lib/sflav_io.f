@@ -23,14 +23,26 @@ c     read the ifl file until the first character in line is blank space
  100  stop 'Incomplete or corrupted SUSY_FLAVOR.SLHA input file'
       end
 
+      logical function find_block(ifl,name,len)
+      implicit double precision (a-h,o-z)
+      character*14 name,line
+      find_block=.false.
+      rewind(ifl)
+ 10   read(ifl,'(a14)',END=100)line
+      if (line(7:6+len).ne.name(1:len)) goto 10
+      find_block = .true. 
+      call skip_comments(ifl)
+ 100  return
+      end
+
       subroutine sflav_input(ilev)
 c     Input read from file susy_flavor.in
       implicit double precision (a-h,o-z)
       double complex amg,amgg,amue
       double complex ls,ks,ds,es,us,ws
       double complex lms,rms,ums,dms,qms
-      character*14 line
-      logical sldiag,sqdiag
+      character*14 line,block
+      logical sldiag,sqdiag,find_block
       dimension tmpi(3,3),tmpr(3,3)
       common/fmass_high/umu(3),uml(3),amuu(3),dmu(3),dml(3),amud(3)
       common/fmass/em(3),um(3),dm(3)
@@ -41,103 +53,104 @@ c     open input file
       ifl = 1
       open(ifl,file='susy_flavor.in',status='old')
 c     Find non-standard Block SOFTINP, check the status of soft parameters
- 21   read(ifl,'(a14)',END=101)line
-      if (line(7:13).ne.'SOFTINP') goto 21
-      call skip_comments(ifl)
-      read(ifl,*)k,iconv        ! soft parameters convention
-c     iconv = 1:
-c          sfermion input parameters in SLHA2 conventions
-c     iconv = 2:
-c          sfermion input parameters in conventions of hep-ph/9511250
-      if ((iconv.ne.1).and.(iconv.ne.2)) stop
-     $     'susy_flavor.in: incorrect iconv value'
-      read(ifl,*)k,input_type   ! dimension of soft parameters 
-c     input_type = 1:
-c          sfermion off-diagonal terms given as mass insertions
-c          LR diagonal terms given as dimensionless parameters
-c     input_type = 2:
-c          fermion soft terms given as absolute values
+      block = 'SOFTINP'
+      if (find_block(ifl,block,7)) then
+         read(ifl,*)k,iconv     ! soft parameters convention
+c     iconv = 1: sfermion input parameters in SLHA2 conventions
+c     iconv = 2: sfermion input parameters in conventions of hep-ph/9511250
+         if ((iconv.ne.1).and.(iconv.ne.2)) stop
+     $        'susy_flavor.in: incorrect iconv value'
+         read(ifl,*)k,input_type ! dimension of soft parameters 
+c     input_type = 1: sfermion off-diagonal terms given as mass insertions
+c                     LR diagonal terms given as dimensionless parameters
+c     input_type = 2: fermion soft terms given as absolute values
 c     for more information read comments in susy_flavor.in file
-      if ((input_type.ne.1).and.(input_type.ne.2)) stop
-     $     'susy_flavor.in: incorrect input_type value'
-      read(ifl,*)k,ilev         ! chiral resummation level
+         if ((input_type.ne.1).and.(input_type.ne.2)) stop
+     $        'susy_flavor.in: incorrect input_type value'
+         read(ifl,*)k,ilev      ! chiral resummation level
 c     ilev = 0: no resummation
 c     ilev = 1: analytical resummation in the decoupling limit
 c     ilev = 2: iterative numerical resummation (default)
-      if ((ilev.ne.0).and.(ilev.ne.1).and.(ilev.ne.2)) stop
-     $     'susy_flavor.in: incorrect ilev value'
-      goto 102
-c     SOFTINP block absent, set default values
- 101  iconv = 1                 ! SLHA2 conventions
-      input_type = 2            ! dimensionful sfermion parameters
-      ilev = 2                  ! chiral resummation level
+         if ((ilev.ne.0).and.(ilev.ne.1).and.(ilev.ne.2)) stop
+     $        'susy_flavor.in: incorrect ilev value'
+      else                      ! SOFTINP block absent, set default values
+         iconv = 1              ! SLHA2 conventions
+         input_type = 2         ! dimensionful sfermion parameters
+         ilev = 2               ! chiral resummation level
+      end if
 c     find SM input block, read the SM data
- 102  rewind(ifl)
- 10   read(ifl,'(a14)',END=100)line
-      if (line(7:14).ne.'SMINPUTS') goto 10
-      call skip_comments(ifl)
-      read(ifl,*)k,alpha_z      ! 1/alpha_em(M_Z)
-      alpha_z = 1/alpha_z
-      read(ifl,*)k,alpha_s      ! alpha_s(MZ)  
-      read(ifl,*)k,zm0          ! M_Z
+      block = 'SMINPUTS'
+      if (find_block(ifl,block,8)) then
+         read(ifl,*)k,alpha_z   ! 1/alpha_em(M_Z)
+         alpha_z = 1/alpha_z
+         read(ifl,*)k,alpha_s   ! alpha_s(MZ)  
+         read(ifl,*)k,zm0       ! M_Z
 c     Fermion mass initialization, input: MSbar running quark masses
-      read(ifl,*)k,bottom       ! mb(mb)
-      bot_scale = bottom
-      read(ifl,*)k,top          ! mt(mt)
-      top_scale = top
-      read(ifl,*)k,em(3)        ! m_tau (pole)
-      read(ifl,*)k,em(1)        ! m_e (pole)
-      read(ifl,*)k,em(2)        ! m_mu (pole)
-      read(ifl,*)k,dml(1)       ! md(2 GeV)
-      read(ifl,*)k,uml(1)       ! mu(2 GeV)
-      read(ifl,*)k,dml(2)       ! ms(2 GeV)
-      read(ifl,*)k,uml(2)       ! mc(mc)
-      read(ifl,'(a1)',END=100)line
-      if (line(1:1).ne.' ') then
-         wm0 = 80.398d0
-      else 
-         backspace(ifl)
-         read(ifl,*)k,wm0       ! M_W (not standard SLHA2!)
+         read(ifl,*)k,bottom    ! mb(mb)
+         bot_scale = bottom
+         read(ifl,*)k,top       ! mt(mt)
+         top_scale = top
+         read(ifl,*)k,em(3)     ! m_tau (pole)
+         read(ifl,*)k,em(1)     ! m_e (pole)
+         read(ifl,*)k,em(2)     ! m_mu (pole)
+         read(ifl,*)k,dml(1)    ! md(2 GeV)
+         read(ifl,*)k,uml(1)    ! mu(2 GeV)
+         read(ifl,*)k,dml(2)    ! ms(2 GeV)
+         read(ifl,*)k,uml(2)    ! mc(mc)
+         read(ifl,'(a1)',END=100)line
+         if (line(1:1).ne.' ') then
+            wm0 = 80.398d0
+         else 
+            backspace(ifl)
+            read(ifl,*)k,wm0    ! M_W (not standard SLHA2!)
+         end if
+      else
+         goto 100
       end if
 c     Electroweak and strong parameter initialization
       call vpar_update(zm0,wm0,alpha_z) ! sets electroweak parameters
-      CALL lam_fit(alpha_s)     ! fits Lambda_QCD at 3 loop level 
-      CALL lam_fit_NLO(alpha_s) ! fits Lambda_QCD at NLO level
+      call lam_fit(alpha_s)     ! fits Lambda_QCD at 3 loop level 
+      call lam_fit_NLO(alpha_s) ! fits Lambda_QCD at NLO level
       call init_fermion_sector(top,top_scale,bottom,bot_scale)
 c     find V_CKM input block, read the CKM data
-      rewind(ifl)
- 11   read(ifl,'(a14)',END=100)line
-      if (line(7:12).ne.'VCKMIN') goto 11
-      call skip_comments(ifl)
-      read(ifl,*)k,alam         ! lambda
-      read(ifl,*)k,apar         ! A
-      read(ifl,*)k,rhobar       ! rho bar
-      read(ifl,*)k,etabar       ! eta bar
+      block = 'VCKMIN'
+      if (find_block(ifl,block,6)) then
+         read(ifl,*)k,alam      ! lambda
+         read(ifl,*)k,apar      ! A
+         read(ifl,*)k,rhobar    ! rho bar
+         read(ifl,*)k,etabar    ! eta bar
+      else
+         goto 100
+      end if
       call ckm_wolf(alam,apar,rhobar,etabar)
 c     find EXTPAR input block, read the real Higgs and gaugino data
-      rewind(ifl)
- 12   read(ifl,'(a14)',END=100)line
-      if (line(7:12).ne.'EXTPAR') goto 12
-      call skip_comments(ifl)
-      read(ifl,*)k,qscale       ! input scale, has to be -1 (EW scale)
-      if (abs(qscale+1).gt.1.d-6) 
-     $     stop 'susy_flavor.in: input has to be defined at EW scale!'
-      read(ifl,*)k,x1           ! M1 (bino mass, complex)
-      read(ifl,*)k,x2           ! M2 (wino mass, complex)
-      read(ifl,*)k,amglu        ! M3 (gluino mass)
-      read(ifl,*)k,x3           ! mu (complex)
-      read(ifl,*)k,tanbe        ! tan(beta)
-      read(ifl,*)k,pm           ! M_A
+      block = 'EXTPAR'
+      if (find_block(ifl,block,6)) then
+         read(ifl,*)k,qscale    ! input scale, has to be -1 (EW scale)
+         if (abs(qscale+1).gt.1.d-6) stop
+     $        'susy_flavor.in: input has to be defined at EW scale!'
+         read(ifl,*)k,x1        ! M1 (bino mass, complex)
+         read(ifl,*)k,x2        ! M2 (wino mass, complex)
+         read(ifl,*)k,amglu     ! M3 (gluino mass)
+         read(ifl,*)k,x3        ! mu (complex)
+         read(ifl,*)k,tanbe     ! tan(beta)
+         read(ifl,*)k,pm        ! M_A
+      else
+         goto 100
+      end if
 c     find IMEXTPAR input block, read the imaginary Higgs and gaugino data
-      rewind(ifl)
- 121  read(ifl,'(a14)',END=100)line
-      if (line(7:14).ne.'IMEXTPAR') goto 121
-      call skip_comments(ifl)
-      read(ifl,*)k,y1           ! M1 (bino mass, complex)
+      block = 'IMEXTPAR'
+      if (find_block(ifl,block,8)) then
+         read(ifl,*)k,y1        ! M1 (bino mass, complex)
+         read(ifl,*)k,y2        ! M2 (wino mass, complex)
+         read(ifl,*)k,y3        ! mu (complex)
+      else
+         y1 = 0.d0
+         y2 = 0.d0
+         y3 = 0.d0
+      end if
       amgg = dcmplx(x1,y1)
-      read(ifl,*)k,y2           ! M2 (wino mass, complex)
-      amg = dcmplx(x2,y2)
-      read(ifl,*)k,y3           ! mu (complex)
+      amg  = dcmplx(x2,y2)
       amue = dcmplx(x3,y3)
 c     Higgs sector
       call init_higgs_sector(pm,tanbe,amue,ierr)
@@ -148,34 +161,38 @@ c     SUSY fermion sector
       
 c     find slepton soft input blocks, read the slepton data
 c     left and right slepton mass
-      rewind(ifl)
- 13   read(ifl,'(a14)',END=100)line
-      if (line(7:12).ne.'MSL2IN') goto 13
-      do i=1,6
-         read(ifl,*)k,l,tmpr(k,l) ! left slepton mass M_SL^2, real part
-         if (k.eq.l) lms(k,l) = dcmplx(tmpr(k,l),0.d0)
-      end do
-      rewind(ifl)
- 131  read(ifl,'(a14)',END=100)line
-      if (line(7:14).ne.'IMMSL2IN') goto 131
-      do i=1,3
-         read(ifl,*)k,l,tmpi(k,l) ! left slepton mass M_SL^2, imaginary part
-         lms(k,l) = dcmplx(tmpr(k,l),tmpi(k,l))
-      end do
-      rewind(ifl)
- 14   read(ifl,'(a14)',END=100)line
-      if (line(7:12).ne.'MSE2IN') goto 14
-      do i=1,6
-         read(ifl,*)k,l,tmpr(k,l) ! right slepton mass M_ER^2, real part
-         if (k.eq.l) rms(k,l) = dcmplx(tmpr(k,l),0.d0)
-      end do
-      rewind(ifl)
- 141  read(ifl,'(a14)',END=100)line
-      if (line(7:14).ne.'IMMSE2IN') goto 141
-      do i=1,3
-         read(ifl,*)k,l,tmpi(k,l) ! right slepton mass M_ER^2, imaginary part
-         rms(k,l) = dcmplx(tmpr(k,l),tmpi(k,l))
-      end do
+      block = 'MSL2IN'
+      if (find_block(ifl,block,6)) then
+         do i=1,6
+            read(ifl,*)k,l,tmpr(k,l) ! left slepton mass M_SL^2, real part
+            lms(k,l) = dcmplx(tmpr(k,l),0.d0)
+         end do
+      else 
+         goto 100
+      end if
+      block = 'IMMSL2IN'        ! optional!
+      if (find_block(ifl,block,8)) then
+         do i=1,3
+            read(ifl,*)k,l,tmpi(k,l) ! left slepton mass M_SL^2, imaginary part
+            lms(k,l) = dcmplx(tmpr(k,l),tmpi(k,l))
+         end do
+      end if
+      block = 'MSE2IN'
+      if (find_block(ifl,block,6)) then
+         do i=1,6
+            read(ifl,*)k,l,tmpr(k,l) ! right slepton mass M_ER^2, real part
+            rms(k,l) = dcmplx(tmpr(k,l),0.d0)
+         end do
+      else 
+         goto 100
+      end if
+      block = 'IMMSE2IN'        ! optional!
+      if (find_block(ifl,block,8)) then
+         do i=1,3
+            read(ifl,*)k,l,tmpi(k,l) ! right slepton mass M_ER^2, imaginary part
+            rms(k,l) = dcmplx(tmpr(k,l),tmpi(k,l))
+         end do
+      end if
 c     remove instabilities by adding tiny mass splitting
       do i=1,3
          lms(i,i) = (1 + eps*i)*lms(i,i)
@@ -198,20 +215,23 @@ c     initialize h.c. LL and RR entries
          end do
       end do
 c     slepton LR mixing
-      rewind(ifl)
- 15   read(ifl,'(a14)',END=100)line
-      if (line(7:10).ne.'TEIN') goto 15
-      do i=1,9
-         read(ifl,*)k,l,tmpr(k,l) ! slepton LR mixing A_L, real part
-      end do
-      rewind(ifl)
- 151  read(ifl,'(a14)',END=100)line
-      if (line(7:12).ne.'IMTEIN') goto 151
-      do i=1,9
-         read(ifl,*)k,l,tmpi(k,l) ! slepton LR mixing A_L, imaginary part
-         ls(k,l) = dcmplx(tmpr(k,l),tmpi(k,l))
-         ks(k,l) = (0.d0,0.d0)  ! non-holomorphic terms set to zero
-      end do
+      block = 'TEIN'
+      if (find_block(ifl,block,4)) then
+         do i=1,9
+            read(ifl,*)k,l,tmpr(k,l) ! slepton LR mixing A_L, real part
+            ls(k,l) = dcmplx(tmpr(k,l),0.d0)
+            ks(k,l) = (0.d0,0.d0) ! non-holomorphic terms set to zero
+         end do
+      else 
+         goto 100
+      end if
+      block = 'IMTEIN'
+      if (find_block(ifl,block,6)) then
+         do i=1,9
+            read(ifl,*)k,l,tmpi(k,l) ! slepton LR mixing A_L, imaginary part
+            ls(k,l) = dcmplx(tmpr(k,l),tmpi(k,l))
+         end do
+      end if
 c     expand LR mixing from dimensionless to dimensionful
       if (input_type.eq.1) then
          do k=1,3
@@ -228,48 +248,54 @@ c     slepton diagonalization routine
 
 c     find squark soft input blocks, read the squark data
 c     left and right squark mass
-      rewind(ifl)
- 16   read(ifl,'(a14)',END=100)line
-      if (line(7:12).ne.'MSQ2IN') goto 16
-      do i=1,6
-         read(ifl,*)k,l,tmpr(k,l) ! Left squark mass M_QL^2, real part
-         if (k.eq.l) qms(k,l) = dcmplx(tmpr(k,l),0.d0)
-      end do
-      rewind(ifl)
- 161  read(ifl,'(a14)',END=100)line
-      if (line(7:14).ne.'IMMSQ2IN') goto 161
-      do i=1,3
-         read(ifl,*)k,l,tmpi(k,l) ! Left squark mass M_QL^2, imaginary part
-         qms(k,l) = dcmplx(tmpr(k,l),tmpi(k,l))
-      end do
-      rewind(ifl)
- 17   read(ifl,'(a14)',END=100)line
-      if (line(7:12).ne.'MSU2IN') goto 17
-      do i=1,6
-         read(ifl,*)k,l,tmpr(k,l) ! right up-squark mass M_UR^2, real part
-         if (k.eq.l) ums(k,l) = dcmplx(tmpr(k,l),0.d0)
-       end do
-      rewind(ifl)
- 171  read(ifl,'(a14)',END=100)line
-      if (line(7:14).ne.'IMMSU2IN') goto 171
-      do i=1,3
-         read(ifl,*)k,l,tmpi(k,l) ! right up-squark mass M_UR^2, imaginary part
-         ums(k,l) = dcmplx(tmpr(k,l),tmpi(k,l))
-       end do
-      rewind(ifl)
- 18   read(ifl,'(a14)',END=100)line
-      if (line(7:12).ne.'MSD2IN') goto 18
-      do i=1,6
-         read(ifl,*)k,l,tmpr(k,l) ! right down-squark mass M_DR^2, real part 
-         if (k.eq.l) dms(k,l) = dcmplx(tmpr(k,l),0.d0)
-      end do
-      rewind(ifl)
- 181  read(ifl,'(a14)',END=100)line
-      if (line(7:14).ne.'IMMSD2IN') goto 181
-      do i=1,3
-         read(ifl,*)k,l,tmpi(k,l) ! right down-squark mass M_DR^2, imaginary part
-         dms(k,l) = dcmplx(tmpr(k,l),tmpi(k,l))
-      end do
+      block = 'MSQ2IN'
+      if (find_block(ifl,block,6)) then
+         do i=1,6
+            read(ifl,*)k,l,tmpr(k,l) ! left squark mass M_QL^2, real part
+            qms(k,l) = dcmplx(tmpr(k,l),0.d0)
+         end do
+      else 
+         goto 100
+      end if
+      block = 'IMMSQ2IN'        ! optional!
+      if (find_block(ifl,block,8)) then
+         do i=1,3
+            read(ifl,*)k,l,tmpi(k,l) ! left squark mass M_QL^2, imaginary part
+            qms(k,l) = dcmplx(tmpr(k,l),tmpi(k,l))
+         end do
+      end if
+      block = 'MSU2IN'
+      if (find_block(ifl,block,6)) then
+         do i=1,6
+            read(ifl,*)k,l,tmpr(k,l) ! right squark mass M_UR^2, real part
+            ums(k,l) = dcmplx(tmpr(k,l),0.d0)
+         end do
+      else 
+         goto 100
+      end if
+      block = 'IMMSU2IN'        ! optional!
+      if (find_block(ifl,block,8)) then
+         do i=1,3
+            read(ifl,*)k,l,tmpi(k,l) ! right squark mass M_UR^2, imaginary part
+            ums(k,l) = dcmplx(tmpr(k,l),tmpi(k,l))
+         end do
+      end if
+      block = 'MSD2IN'
+      if (find_block(ifl,block,6)) then
+         do i=1,6
+            read(ifl,*)k,l,tmpr(k,l) ! right squark mass M_DR^2, real part
+            dms(k,l) = dcmplx(tmpr(k,l),0.d0)
+         end do
+      else 
+         goto 100
+      end if
+      block = 'IMMSD2IN'        ! optional!
+      if (find_block(ifl,block,8)) then
+         do i=1,3
+            read(ifl,*)k,l,tmpi(k,l) ! right squark mass M_DR^2, imaginary part
+            dms(k,l) = dcmplx(tmpr(k,l),tmpi(k,l))
+         end do
+      end if
 c     remove instabilities by adding tiny mass splitting
       do i=1,3
          qms(i,i) = (1 + eps*i)*dble(qms(i,i))
@@ -295,34 +321,40 @@ c     initialize h.c. of LL and RR entries
          end do
       end do
 c     squark LR mixing
-      rewind(ifl)
- 19   read(ifl,'(a14)',END=100)line
-      if (line(7:10).ne.'TUIN') goto 19
-      do i=1,9
-         read(ifl,*)k,l,tmpr(k,l) ! up-squark LR mixing A_U, real part
-       end do
-      rewind(ifl)
- 191  read(ifl,'(a14)',END=100)line
-      if (line(7:12).ne.'IMTUIN') goto 191
-      do i=1,9
-         read(ifl,*)k,l,tmpi(k,l) ! up-squark LR mixing A_U, imaginary part
-         us(k,l) = dcmplx(tmpr(k,l),tmpi(k,l))
-         ws(k,l) = (0.d0,0.d0)
-      end do
-      rewind(ifl)
- 20   read(ifl,'(a14)',END=100)line
-      if (line(7:10).ne.'TDIN') goto 20
-      do i=1,9
-         read(ifl,*)k,l,tmpr(k,l) ! down-squark LR mixing A_D, real part
-      end do
-      rewind(ifl)
- 201  read(ifl,'(a14)',END=100)line
-      if (line(7:12).ne.'IMTDIN') goto 201
-      do i=1,9
-         read(ifl,*)k,l,tmpi(k,l) ! down-squark LR mixing A_D, imaginary part
-         ds(k,l) = dcmplx(tmpr(k,l),tmpi(k,l))
-         es(k,l) = (0.d0,0.d0)
-      end do
+      block = 'TUIN'
+      if (find_block(ifl,block,4)) then
+         do i=1,9
+            read(ifl,*)k,l,tmpr(k,l) ! up-squark LR mixing A_U, real part
+            us(k,l) = dcmplx(tmpr(k,l),0.d0)
+            ws(k,l) = (0.d0,0.d0) ! non-holomorphic terms set to zero
+         end do
+      else 
+         goto 100
+      end if
+      block = 'IMTUIN'
+      if (find_block(ifl,block,6)) then
+         do i=1,9
+            read(ifl,*)k,l,tmpi(k,l) ! up-squark LR mixing A_U, imaginary part
+            us(k,l) = dcmplx(tmpr(k,l),tmpi(k,l))
+         end do
+      end if
+      block = 'TDIN'
+      if (find_block(ifl,block,4)) then
+         do i=1,9
+            read(ifl,*)k,l,tmpr(k,l) ! down-squark LR mixing A_D, real part
+            ds(k,l) = dcmplx(tmpr(k,l),0.d0)
+            es(k,l) = (0.d0,0.d0) ! non-holomorphic terms set to zero
+         end do
+      else 
+         goto 100
+      end if
+      block = 'IMTDIN'
+      if (find_block(ifl,block,6)) then
+         do i=1,9
+            read(ifl,*)k,l,tmpi(k,l) ! down-squark LR mixing A_D, imaginary part
+            ds(k,l) = dcmplx(tmpr(k,l),tmpi(k,l))
+         end do
+      end if
 c     store dimensionless |A_t|, |A_b| for EPA Higgs mass calculation
       if (input_type.eq.1) then 
          yts = abs(us(3,3))
@@ -358,7 +390,7 @@ c     Potential Approximation (EPA). Only real mu, A_t, A_b allowed
       close(ifl)
       return
 c     incorrect input file?
- 100  stop 'Incomplete or corrupted SUSY_FLAVOR.SLHA input file'
+ 100  stop 'Incomplete or corrupt susy_flavor.in input file'
       end
 
       subroutine print_MSSM_par(ifl)

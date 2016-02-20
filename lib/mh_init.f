@@ -269,9 +269,12 @@ c     Consistent calculation of data related to M_Z, M_W
       e = sqrt(e2)
       zm = zm_new
       wm = wm_new
-      ct = wm/zm
-      ct2 = ct*ct
-      st2 = 1 - ct2
+      st2 = 0.232d0
+      ct2 = 1 - st2
+      ct = sqrt(ct2)       
+c      ct = wm/zm
+c      ct2 = ct*ct
+c      st2 = 1 - ct2
       st = sqrt(st2)
       sct = st*ct
       sct2 = sct*sct
@@ -523,7 +526,7 @@ c     Light fermion masses at mu = 2GeV used by Ciuchini et al.
      $     7.d-3,0.094d0,4.17d0,
      $     2.d0,2.d0,4.17d0/
       data em/5.1099891d-4,1.05658d-1,1.777d0/
-      data um/4d-3,1.3d0,165.d0/
+      data um/4d-3,1.279d0,163.5d0/
       data dm/7d-3,0.094d0,4.17d0/
       data vkm1,vkm2,vkm3,phi/0.222d0,0.975d0,0.044d0,0.d0/
       data ckm/(1.d0,0.d0),(0.d0,0.d0),(0.d0,0.d0),

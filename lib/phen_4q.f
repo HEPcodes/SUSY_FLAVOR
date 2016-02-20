@@ -537,25 +537,25 @@ c     include Higgs penguins
 c     inclusion of eps,eps' terms in 4q box calculations
       data eff_yuk,init_eff_yuk/.false.,.true./
       data eps_d/3*0.d0/
-c      K mesons
-      data dmk,amk,fk,epsk/3.49d-15,0.497672d0,0.1598d0,2.229d-3/
-c      B_K ordering: VLL, SLL(2), LR(2)
+c     K mesons
+      data dmk,amk,fk,epsk/3.483d-15,0.497614d0,0.1598d0,2.229d-3/
+c     B_K ordering: VLL, SLL(2), LR(2)
       data bk/0.61d0,0.76d0,0.51d0,0.96d0,1.30d0/
-      data bk_sm/0.724d0/
-c      D mesons
-      data dmd,amd,fd/4.61d-14,1.8645d0,0.165d0/
+      data bk_sm/0.75d0/
+c     D mesons
+      data dmd,amd,fd/1.56d-14,1.8645d0,0.2d0/
       data bd/5*1.d0/
       data bd_sm/1.d0/
-c      B_d,B_s mesons
-      data amb/5.2795d0,5.3663d0/
+c     B_d,B_s mesons
+      data amb/5.27958d0,5.36677d0/
       data dmb/3.337d-13,1.17d-11/
-      data tau_b/1.525d-12,1.472d-12/
-      data fb/0.2d0,0.245d0/
+      data tau_b/1.519d-12,1.466d-12/
+      data fb/0.196d0,0.238d0/
       data bb/2*0.87d0,2*0.8d0,2*0.71d0,2*1.71d0,2*1.16d0/
-      data bb_sm/1.22d0,1.22d0/
+      data bb_sm/1.18d0,1.22d0/
 c     Scales for B_X calculations
       data amu_k,amu_d,amu_b/2.d0,2.d0,4.6d0/
-c      Debug/status variables
+c     Debug/status variables
       data init_eta/.true./
       data init_alpha_susy/.true./
       data ih,ic,in,ing,ig/5*1/
