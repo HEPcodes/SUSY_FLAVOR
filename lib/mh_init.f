@@ -178,11 +178,6 @@ c     expand slepton LR mass insertions
 c     if slepton input data in SLHA format, rewrite them to
 c     hep-ph/9511250 convention
       if (iconv.eq.1) call sl_slha_to_jr
-
-c      call cr_mat_print(ls,3,6)
-c      call ci_mat_print(ls,3,6)
-c      stop
-
 c     call diagonalization routine
       ierr = intlog(sldiag())
       return

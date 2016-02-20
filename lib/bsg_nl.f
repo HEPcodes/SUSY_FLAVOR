@@ -259,7 +259,7 @@ c     Coefficient c7^(0) at MW scale
       end do
       call dd_gam(3,2,cfl,cfr)
       c7_bsg_l = - 8*pi*pi/sq2/g_ferm/dm(3)/ckm_phys(3,2)
-     $     /dconjg(ckm_phys(3,3))*(cfl(1) - cfl(4)*dm(3) + cfr(4)*dm(2))
+     $     /dconjg(ckm_phys(3,3))*(cfl(1) - cfl(4)*dm(3) - cfr(4)*dm(2))
       return
       end
 
@@ -279,7 +279,7 @@ c     Coefficient c8^(0) at MW scale
       end do
       call dd_gluon(3,2,cfl,cfr)
       c8_bsg_l = - 8*pi*pi/sq2/g_ferm/dm(3)/ckm_phys(3,2)
-     $     /dconjg(ckm_phys(3,3))*(cfl(1) - cfl(4)*dm(3) + cfr(4)*dm(2))
+     $     /dconjg(ckm_phys(3,3))*(cfl(1) - cfl(4)*dm(3) - cfr(4)*dm(2))
       return
       end
 
@@ -299,7 +299,7 @@ c     Coefficient c7^(0) at MW scale
       end do
       call dd_gam(3,2,cfl,cfr)
       c7_bsg_r = - 8*pi*pi/sq2/g_ferm/dm(3)/ckm_phys(3,2)
-     $     /dconjg(ckm_phys(3,3))*(cfr(1) - cfr(4)*dm(3) + cfl(4)*dm(2))
+     $     /dconjg(ckm_phys(3,3))*(cfr(1) - cfr(4)*dm(3) - cfl(4)*dm(2))
       return
       end
 
@@ -319,7 +319,7 @@ c     Coefficient c8^(0) at MW scale
       end do
       call dd_gluon(3,2,cfl,cfr)
       c8_bsg_r = - 8*pi*pi/sq2/g_ferm/dm(3)/ckm_phys(3,2)
-     $     /dconjg(ckm_phys(3,3))*(cfr(1) - cfr(4)*dm(3) + cfl(4)*dm(2))
+     $     /dconjg(ckm_phys(3,3))*(cfr(1) - cfr(4)*dm(3) - cfl(4)*dm(2))
       return
       end
 

@@ -93,13 +93,6 @@ c     Slepton masses and mixing angles
           sl_mat(j+3,i)     = dconjg(sl_mat(i,j+3))
         end do
       end do
-
-c      call cr_mat_print(sv_mat,3,6)
-c      call ci_mat_print(sv_mat,3,6)
-c      call cr_mat_print(sl_mat,6,6)
-c      call ci_mat_print(sl_mat,6,6)
-c      stop
-
       do i=1,6
         do j=1,6
           msl(i,j)  = dble(sl_mat(i,j))
@@ -206,11 +199,6 @@ c      U-squark mass matrix initialization
           su_mat(j+3,i)     = dconjg(su_mat(i,j+3))
         end do
       end do
-
-c      call cr_mat_print(sd_mat,6,6)
-c      call ci_mat_print(sd_mat,6,6)
-c      stop
-
       do i=1,6
         do j=1,6
           msd(i,j)  = dble(sd_mat(i,j))

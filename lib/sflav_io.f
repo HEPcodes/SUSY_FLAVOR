@@ -309,6 +309,8 @@ c     Input read from file susy_flavor.in
       double complex ls,ks,ds,es,us,ws
       double complex lms,rms,ums,dms,qms
       double complex cz,co,ci
+      double complex yl,yu,yd
+      common/yukawa/yl(3),yu(3),yd(3)
       common/num/cz,co,ci,zero,one
       common/edm_qcd/eta_ed,eta_eu,eta_cd,eta_cu,eta_g,alamx
       common/kpivv/ak0,del_ak0,akp,del_akp,pc,del_pc,alam_k
@@ -472,6 +474,12 @@ c     Higgs sector
 c     SUSY fermion sector
       call init_ino_sector(amgg,amg,amglu,amue,tanbe,ierr)
       if (ierr.ne.0) write(*,*) '-ino mass below M_Z/2?'
+c     rescale A terms by Yukawa couplings to conform to SLHA2 convention
+      do i=1,3
+         us(i,i) = us(i,i)*yu(i)
+         ds(i,i) = ds(i,i)*yd(i)
+         ls(i,i) = ls(i,i)*yl(i)
+      end do
 c     find sfermion soft input blocks (all are optional), read the sfermion data
       block = 'MSL2IN            '
       ibl = 6
@@ -596,7 +604,7 @@ c     find sfermion soft input blocks (all are optional), read the sfermion data
       ibl = 9
       if (find_block(ifl,block)) then
          do i=1,ibl
-            if (read_mat_el(ifl,ds,1)) goto 34 ! slepton LR mixing A_L', imaginary part
+            if (read_mat_el(ifl,ks,1)) goto 34 ! slepton LR mixing A_L', imaginary part
          end do
       end if
  34   block = 'TDINH             '
@@ -790,7 +798,7 @@ c     writes SUSY_FLAVOR results to susy_flavor.out
 
       write(ifl,*)'#'
       write(ifl,*)'#         ***************************'
-      write(ifl,*)'#         * SUSY_FLAVOR 2.50 output *'
+      write(ifl,*)'#         * SUSY_FLAVOR 2.52 output *'
       write(ifl,*)'#         ***************************'
       write(ifl,*)'#'
 

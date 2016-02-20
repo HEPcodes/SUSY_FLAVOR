@@ -24,8 +24,8 @@ c     fermion masses
          return
       end if
       call ll_gam(i,j,cfl,cfr)
-      cl = cfl(1) + em(i)*cfl(4) - em(j)*cfr(4)
-      cr = cfr(1) - em(j)*cfl(4) + em(i)*cfr(4)
+      cl = cfl(1) - em(i)*cfl(4) - em(j)*cfr(4)
+      cr = cfr(1) - em(j)*cfl(4) - em(i)*cfr(4)
       gam_llg = e2*em(j)**3/4/pi*(abs(cl)**2 + abs(cr)**2)
       return
       end
@@ -45,8 +45,8 @@ c     BR(l^J->l^I) decay
          return
       end if
       call ll_gam(i,j,cfl,cfr)
-      cl = cfl(1) + em(i)*cfl(4) - em(j)*cfr(4)
-      cr = cfr(1) - em(j)*cfl(4) + em(i)*cfr(4)
+      cl = cfl(1) - em(i)*cfl(4) - em(j)*cfr(4)
+      cr = cfr(1) - em(j)*cfl(4) - em(i)*cfr(4)
 c
 c      write(*,*)i,j
 c      write(*,*)32*pi*pi*st2/em(j)/e2*cl ! c7l
@@ -65,7 +65,7 @@ c     magnetic moment anomaly of lepton, a=(g-2)/2
       common/fmass/em(3),um(3),dm(3)
       call ll_gam(i,i,cfl,cfr)
       g_minus_2_anomaly = - 4*em(i)*dble(cfl(1) 
-     $     + em(i)*(cfl(4) - cfr(4)))
+     $     - em(i)*(cfl(4) + cfr(4)))
       return
       end
 

@@ -1,6 +1,6 @@
  #
  #         ***************************
- #         * SUSY_FLAVOR 2.50 output *
+ #         * SUSY_FLAVOR 2.52 output *
  #         ***************************
  #
  BLOCK SFLAV_CONTROL
@@ -76,19 +76,19 @@
         2     -3.083776497E-23    # EDM_mu
         3     -5.176903910E-22    # EDM_tau
         4      2.774724592E-25    # neutron EDM
-        5      9.398319525E-15    # (g-2)_e/2, SUSY contribution
-        6      4.843853089E-10    # (g-2)_mu/2, SUSY contribution
-        7      1.458383883E-07    # (g-2)_tau/2, SUSY contribution
+        5      9.960738284E-15    # (g-2)_e/2, SUSY contribution
+        6      5.084295006E-10    # (g-2)_mu/2, SUSY contribution
+        7      1.525545885E-07    # (g-2)_tau/2, SUSY contribution
  BLOCK SFLAV_DELTA_F1     # Delta F = 1 processes
-        1      2.343751393E-08    # Br(mu-> e gamma)
-        2      3.014685213E-20    # Br(tau-> e gamma)
-        3      3.472210147E-09    # Br(tau-> mu gamma)
+        1      2.343752488E-08    # Br(mu-> e gamma)
+        2      3.014534296E-20    # Br(tau-> e gamma)
+        3      3.472209764E-09    # Br(tau-> mu gamma)
         4      2.797221645E-11    # Br(K0 -> pi0 nu nu)
         5      7.705241425E-11    # Br(K+ -> pi+ nu nu)
         6      8.768756802E-05    # BR(B -> tau nu)
         7      2.962480267E-01    # BR(B -> D tau nu)/BR(B -> D l nu)
         8      2.519503536E-01    # BR(B -> D* tau nu)/BR(B -> D* l nu)
-        9      6.933463024E-04    # BR(B -> X_s gamma)
+        9      6.941567711E-04    # BR(B -> X_s gamma)
        10      6.246693508E-12    # BR(t -> u h)
        11      1.945258389E-10    # BR(t -> c h)
        12      2.686076008E-15    # BR(B_d -> e e)

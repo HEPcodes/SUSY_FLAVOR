@@ -233,7 +233,7 @@ c     New Physics contributions to D->tau nu
       end
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-c     Br(t->ch(dh))                                                        c
+c     Br(t->ch(uh))                                                        c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       double precision function gam_suu(i,k)
