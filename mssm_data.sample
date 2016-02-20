@@ -1,0 +1,116 @@
+
+******* MSSM Lagrangian parameters *******
+
+QED coupling 1/alpha_em(M_Z) =  1.2793E+02
+Weinberg angle s_W^2 =  2.2265E-01
+Z boson mass =  9.1188E+01
+W boson mass =  8.0398E+01
+QCD coupling alpha_s(M_Z) =  1.1720E-01
+
+Higgs mixing parameter mu (complex)   =  2.0000E+02  1.0000E+02
+Higgs soft mixing parameter m_{12}^2  = -3.9604E+03
+Higgs soft masses m_{H_1}^2,m_{H_2}^2 = -6.3208E+03 -5.3679E+04
+
+U(1)  gaugino mass (complex) = 9.5472E+01  0.0000E+00
+SU(2) gaugino mass (complex) = 2.0000E+02  0.0000E+00
+SU(3) gaugino mass (real)    = 6.0000E+02
+
+Left slepton mass matrix, real part:
+ 9.00009E+04  0.00000E+00  0.00000E+00
+ 0.00000E+00  9.00018E+04  1.80004E+03
+ 0.00000E+00  1.80004E+03  9.00027E+04
+
+Left slepton mass matrix, imaginary part:
+ 0.00000E+00  0.00000E+00  0.00000E+00
+-0.00000E+00  0.00000E+00  9.00022E+02
+-0.00000E+00 -9.00022E+02  0.00000E+00
+
+Right slepton mass matrix, real part:
+ 8.99991E+04  0.00000E+00  0.00000E+00
+ 0.00000E+00  8.99982E+04  0.00000E+00
+ 0.00000E+00  0.00000E+00  8.99973E+04
+
+Right slepton mass matrix, imaginary part:
+ 0.00000E+00  0.00000E+00  0.00000E+00
+-0.00000E+00  0.00000E+00  0.00000E+00
+-0.00000E+00 -0.00000E+00  0.00000E+00
+
+Slepton LR mixing matrix, real part:
+-9.00010E-03  0.00000E+00  0.00000E+00
+ 0.00000E+00 -1.86094E+00  0.00000E+00
+ 0.00000E+00  0.00000E+00 -3.12978E+01
+
+Slepton LR mixing matrix, imaginary part:
+-0.00000E+00  0.00000E+00  0.00000E+00
+ 0.00000E+00 -0.00000E+00  0.00000E+00
+ 0.00000E+00  0.00000E+00 -0.00000E+00
+
+Left squark mass matrix, real part:
+ 2.50003E+05  0.00000E+00  0.00000E+00
+ 0.00000E+00  2.50005E+05  4.00010E+03
+ 0.00000E+00  4.00010E+03  1.60005E+05
+
+Left squark mass matrix, imaginary part:
+ 0.00000E+00  0.00000E+00  0.00000E+00
+-0.00000E+00  0.00000E+00 -2.00005E+03
+-0.00000E+00  2.00005E+03  0.00000E+00
+
+Right up-squark mass matrix, real part:
+ 2.02498E+05  0.00000E+00  0.00000E+00
+ 0.00000E+00  2.02496E+05  0.00000E+00
+ 0.00000E+00  0.00000E+00  3.99988E+04
+
+Right up-squark mass matrix, imaginary part:
+ 0.00000E+00  0.00000E+00  0.00000E+00
+-0.00000E+00  0.00000E+00  0.00000E+00
+-0.00000E+00 -0.00000E+00  0.00000E+00
+
+Right down-squark mass matrix, real part:
+ 3.02497E+05  0.00000E+00  0.00000E+00
+ 0.00000E+00  3.02494E+05  0.00000E+00
+ 0.00000E+00  0.00000E+00  8.99973E+04
+
+Right down-squark mass matrix, imaginary part:
+ 0.00000E+00  0.00000E+00  0.00000E+00
+-0.00000E+00  0.00000E+00  0.00000E+00
+-0.00000E+00 -0.00000E+00  0.00000E+00
+
+Up-squark LR mixing matrix, real part:
+ 6.18168E-03  0.00000E+00  0.00000E+00
+ 0.00000E+00  1.79332E+00  0.00000E+00
+ 0.00000E+00  0.00000E+00  2.71002E+02
+
+Up-squark LR mixing matrix, imaginary part:
+ 0.00000E+00  0.00000E+00  0.00000E+00
+ 0.00000E+00  0.00000E+00  0.00000E+00
+ 0.00000E+00  0.00000E+00  0.00000E+00
+
+Down-squark LR mixing matrix, real part:
+-1.19597E-01  0.00000E+00  0.00000E+00
+ 0.00000E+00 -1.87938E+00  0.00000E+00
+ 0.00000E+00  0.00000E+00 -5.56628E+01
+
+Down-squark LR mixing matrix, imaginary part:
+-0.00000E+00  0.00000E+00  0.00000E+00
+ 0.00000E+00 -0.00000E+00  0.00000E+00
+ 0.00000E+00  0.00000E+00 -0.00000E+00
+
+******* Particle masses in GeV: *******
+
+** Fermion masses **
+Charged lepton masses                 5.110E-04  1.057E-01  1.777E+00
+Running u quark masses at m_t scale  2.220E-03  6.440E-01  1.632E+02
+Running d quark masses at m_t scale  3.885E-03  6.104E-02  2.737E+00
+
+** Higgs masses **
+Tree level (H,h,A,H+):           2.010E+02  8.893E+01  2.000E+02  2.156E+02
+1-loop, EPA approximation (H,h): 2.005E+02  1.137E+02
+
+** Tree level SUSY masses **
+Sneutrino masses    2.897E+02  2.931E+02  2.965E+02
+Slepton masses      2.953E+02  3.028E+02  3.030E+02  3.037E+02  3.038E+02  3.114E+02
+U squark masses     2.178E+02  4.486E+02  4.487E+02  4.489E+02  4.971E+02  4.974E+02
+D squark masses     2.999E+02  4.049E+02  5.035E+02  5.037E+02  5.505E+02  5.505E+02
+Chargino masses     1.552E+02  2.808E+02
+Neutralino masses   8.865E+01  1.584E+02  2.322E+02  2.808E+02
+Gluino mass         6.000E+02

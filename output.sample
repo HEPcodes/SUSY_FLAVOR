@@ -1,0 +1,35 @@
+************************************************
+MSSM Lagrangian parameters and tree level masses
+written on file mssm_data.txt
+************************************************
+
+Physical observables:
+
+Electric dipole moments:
+Electron EDM =  4.7256E-25
+Muon EDM     =  9.7726E-23
+Tau EDM      =  1.6425E-21
+Neutron EDM  =  5.9331E-24
+
+Neutrino K decays:
+BR(K_L^0 -> pi^0 vv) =  2.8741E-11
+BR(K^+   -> pi^+ vv) =  7.8746E-11
+
+Leptonic B decays:
+BR(B_d -> mu^+ mu^-) =  1.2009E-10
+BR(B_s -> mu^+ mu^-) =  5.0332E-09
+
+B-> X_s photon decay:
+BR(B -> X_S gamma) =  2.5756E-04
+
+KK mixing:
+eps_K =  2.3366E-03
+Delta m_K =  2.4362E-15
+
+DD mixing:
+Delta m_D =  1.6656E-17
+
+BB mixing:
+Delta m_B_d =  3.6999E-13
+Delta m_B_s =  1.3242E-11
+
