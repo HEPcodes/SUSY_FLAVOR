@@ -17,22 +17,6 @@ c     Compare with the paper: J.Rosiek@Phys.Rev.D41(1990)p.3464;       c
 c     erratum, hep-ph/9511250                                          c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
  
-      subroutine init_tree_yukawa()
-c     Initialization of Yukawa coupling
-      implicit double precision (a-h,o-z)
-      double complex yl,yu,yd
-      common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/fmass/em(3),um(3),dm(3)
-      common/yukawa/yl(3),yu(3),yd(3)
-      common/vev/v1,v2
-      do i=1,3
-         yu(i) = sq2*um(i)/v2
-         yd(i) = - sq2*dm(i)/v1
-         yl(i) = - sq2*em(i)/v1
-      end do
-      return
-      end
-
 cccccccccccccccccccccccccccccccccc
 c     SUSY vertices              c
 cccccccccccccccccccccccccccccccccc
@@ -121,8 +105,8 @@ c     Up quark-up squark-neutralino left vertex
       common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
       common/neut/fnm(4),zn(4,4)
       common/yukawa/yl(3),yu(3),yd(3)
-      vl_uun0 =  e/sct/sq2*dconjg(zu(i,j))*(zn(1,k)*st/3 + zn(2,k)*ct)
-     $     + dconjg(yu(i)*zu(i+3,j))*zn(4,k)
+      vl_uun0 = - e/sct/sq2*dconjg(zu(i,j))*(zn(1,k)*st/3 + zn(2,k)*ct)
+     $     - dconjg(yu(i)*zu(i+3,j))*zn(4,k)
       return
       end
 
@@ -135,8 +119,8 @@ c     Up quark-up squark-neutralino right vertex
       common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
       common/neut/fnm(4),zn(4,4)
       common/yukawa/yl(3),yu(3),yd(3)
-      vr_uun0 = -2*sq2*e/3.d0/ct*dconjg(zu(i+3,j)*zn(1,k))
-     $     + yu(i)*dconjg(zu(i,j)*zn(4,k))
+      vr_uun0 = 2*sq2*e/3.d0/ct*dconjg(zu(i+3,j)*zn(1,k))
+     $     - yu(i)*dconjg(zu(i,j)*zn(4,k))
       return
       end
  
@@ -218,8 +202,8 @@ c     Up quark-down squark-chargino left vertex
       common/km_mat/ckm(3,3)
       vl_udc0 = (0.d0,0.d0)
       do l=1,3
-         vl_udc0 = vl_udc0 + (e/st*zd(l,j)*zneg(1,k) 
-     $        + dconjg(yd(l))*zd(l+3,j)*zneg(2,k))*ckm(l,i)
+         vl_udc0 = vl_udc0 - (e/st*zd(l,j)*zneg(1,k) 
+     $        - dconjg(yd(l))*zd(l+3,j)*zneg(2,k))*ckm(l,i)
       end do
       return
       end
@@ -236,7 +220,7 @@ c     Up quark-down squark-chargino right vertex
       common/km_mat/ckm(3,3)
       vr_udc0 = (0.d0,0.d0)
       do l=1,3
-         vr_udc0 = vr_udc0 - yu(i)*zd(l,j)*dconjg(zpos(2,k))*ckm(l,i)
+         vr_udc0 = vr_udc0 + yu(i)*zd(l,j)*dconjg(zpos(2,k))*ckm(l,i)
       end do
       return
       end
@@ -524,6 +508,17 @@ c     left charged Higgs-quark effective Yukawa
      $     ysd(3,3,2),ypd(3,3,2),init_yukawa_eff
       if (init_yukawa_eff) call yukawa_eff_init
       yh_eff_l =  yhl(i,j,k)
+      return
+      end
+
+      double complex function yhl_eff_r(i,j,k)
+c     right charged Higgs-lepton effective Yukawa 
+      implicit double precision (a-h,o-z)
+      double complex yhlr,ysl,ypl
+      logical init_yukawa_l
+      common/yukawa_lept/yhlr(3,3,2),ysl(3,3,2),ypl(3,3,2),init_yukawa_l
+      if (init_yukawa_l) call yukawa_eff_init
+      yhl_eff_r =  yhlr(i,j,k)
       return
       end
 

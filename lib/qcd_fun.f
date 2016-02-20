@@ -7,7 +7,7 @@ c     Released: 28:10:1992(J.R.)
 c     Revised:  21:02:2001(J.R.)
 c     Error in calculations of Lambda QCD for 5 flavours corrected 
 c     Revised:  02:07:2007(J.R.)
-c     Fixed compatibility issues netween FCNC and Higgs libraries
+c     Fixed compatibility issues between FCNC and Higgs libraries
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     Set of auxiliary functions for the QCD corrections to the widths    c
@@ -123,7 +123,7 @@ c     Update new top mass and qcd6 values
           return
         end if
 10      x_old = x_new
-      stop 'Error in lambda QCD calculations!'
+      stop 'Error in lambda6 QCD calculations!'
       end
 
       subroutine lambda4(bm)
@@ -155,7 +155,7 @@ c     Update new qcd4 values
           return
         end if
 10      x_old = x_new
-      stop 'Error in lambda QCD calculations!'
+      stop 'Error in lambda4 QCD calculations!'
       end
 
       block data init_qcd
@@ -347,7 +347,7 @@ c     Update new top mass and qcd6 values
           return
         end if
 10      x_old = x_new
-      stop 'Error in NLO lambda QCD calculations!'
+      stop 'Error in NLO lambda6 QCD calculations!'
       end
 
       subroutine lambda4_nlo(bm)
@@ -364,7 +364,6 @@ c     Lambda QCD calculation for 4 flavors and given lambda5 flavors
       b04 = 11 - 2*nf/3.d0
       b14 = 102 - 38*nf/3.d0
 
-
       x_old = al
       do 10 i=1,30
         x_new = 1/b04/a5*(1 - b14/b04/b04*log(x_old)/x_old)
@@ -375,17 +374,16 @@ c     Update new qcd4 values
           return
         end if
 10      x_old = x_new
-      stop 'Error in NLO lambda QCD calculations!'
+      stop 'Error in NLO lambda4 QCD calculations!'
       end
 
       double precision function qmass_nlo(qm,amu0,amu)
 c     NLO running quark mass
-c     qmass_nlo returns running quark mass at the scale amu
-c     for qm - quark mass at the scale amu0
+c     qmass_nlo returns running quark mass at scale amu for given qm(amu0)
       implicit double precision (a-h,o-z)
       common/lamqcd_nlo/qcd4,qcd5,qcd6,qstep(6),qerr
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      if (amu0.gt.amu) stop 'qmass_nlo works for amu>amu0!'
+      if (amu0.gt.amu) stop 'qmass_nlo works for only amu>amu0!'
       qmass_nlo = qm
       if (amu0.eq.amu) return
       nf0 = max(1,nflav(amu0))

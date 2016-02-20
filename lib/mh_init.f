@@ -256,7 +256,7 @@ c     Physical Higgs masses have to be recalculated after parameter change
       return
       end
  
-      subroutine vpar_update(zm_new,wm_new,alpha_new)
+      subroutine vpar_update(zm_new,wm_new,alpha_new,st2_new)
 c     Consistent calculation of data related to M_Z, M_W
       implicit double precision (a-h,o-z)
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
@@ -269,12 +269,12 @@ c     Consistent calculation of data related to M_Z, M_W
       e = sqrt(e2)
       zm = zm_new
       wm = wm_new
-      st2 = 0.232d0
-      ct2 = 1 - st2
-      ct = sqrt(ct2)       
-c      ct = wm/zm
+c      ct = wm/zm                ! on shell value of c_W
 c      ct2 = ct*ct
 c      st2 = 1 - ct2
+      st2 = st2_new             ! external s_W^2, usually MSbar
+      ct2 = 1 - st2
+      ct = sqrt(ct2)       
       st = sqrt(st2)
       sct = st*ct
       sct2 = sct*sct
@@ -373,6 +373,7 @@ c     parameterization
       implicit double precision (a-h,o-z)
       double complex tmp
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
+      common/kpivv/ak0,del_ak0,akp,del_akp,pc,del_pc,alam
       al2 = al*al
       al3 = al2*al
       al4 = al3*al
@@ -389,6 +390,8 @@ c     CKM sin(theta_ij) and phase delta
       end if
       if (dble(tmp).lt.0) del = pi + del
       call ckm_init(s12,s23,s13,del)
+c     store Lambda for K->pivv calculations
+      alam = al
       return
       end
 
@@ -417,20 +420,18 @@ c     equal to zero - significantly speeds up calculations
       return
       end
 
-      subroutine par_content(jf,js,jg,jc,jn,jq,jl)
-c     Integers if,is,ig,ic,in,iq switches on/off contributions of
-c     (respectively) matter fermions, sfermions, gauge/Higgs bosons,
-c     charginos, neutralinos, gluons and gluinos to the Green's functions.
-c     ix=0(1) switches proper contribution off(on)
-      common/parcont/if,is,ig,ic,in,iq,il
+      subroutine par_content(jh,jc,jn,jng,jg)
+c     Integers ih,ic,in,ing,ig switches on/off contributions of
+c     (respectively) gauge/Higgs bosons, charginos, neutralinos, mixed
+c     neutralino-gluinos and gluinos to the Green's functions.  ix=0(1)
+c     switches proper contribution off(on)
+      common/debug_4q/ih,ic,in,ing,ig
       external init_control
-      if = jf
-      is = js
+      ih = jh
       ig = jg
       ic = jc
       in = jn
-      iq = jq
-      il = jl
+      ing = jng
       return
       end
 
@@ -497,6 +498,7 @@ c     Physical quantities initialization
       common/km_mat/ckm(3,3)
       common/km_par/vkm1,vkm2,vkm3,phi
       common/fmass/em(3),um(3),dm(3)
+      common/qmass_pole/ump(3),dmp(3)
       common/fmass_high/umu(3),uml(3),amuu(3),dmu(3),dml(3),amud(3)
       common/crdat/pbarn,ae,ve
       common/fvert/qf(4),vf(4),af(4),nc(4)
@@ -528,6 +530,8 @@ c     Light fermion masses at mu = 2GeV used by Ciuchini et al.
       data em/5.1099891d-4,1.05658d-1,1.777d0/
       data um/4d-3,1.279d0,163.5d0/
       data dm/7d-3,0.094d0,4.17d0/
+      data ump/4d-3,1.279d0,173.2d0/
+      data dmp/7d-3,0.110d0,4.17d0/
       data vkm1,vkm2,vkm3,phi/0.222d0,0.975d0,0.044d0,0.d0/
       data ckm/(1.d0,0.d0),(0.d0,0.d0),(0.d0,0.d0),
      $         (0.d0,0.d0),(1.d0,0.d0),(0.d0,0.d0),
@@ -576,13 +580,13 @@ c     control variables initialization
       common/vswitch/vstat,fstat
       common/bswitch/bstat
       common/hm_stat/hstat
-      common/parcont/if,is,ig,ic,in,iq,il
       common/dimreg/idflag
+      common/debug_4q/ih,ic,in,ing,ig
       common/sf_cont/eps,indx(3,3),iconv
 c     status of Higgs and fermion sector initialization
       data higgs,fermion/2*.false./
       data idflag/1/
-      data if,is,ig,ic,in,iq,il/7*1/
+      data ih,ig,ic,in,ing/5*1/
       data vstat,fstat,hstat,bstat/2*.true.,2*.false./
       data eps/1.d-5/
       data indx/0,1,3,

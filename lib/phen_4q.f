@@ -529,7 +529,6 @@ c      SM part only!
       common/meson_data/dmk,amk,epsk,fk,dmd,amd,fd,
      $    amb(2),dmb(2),tau_b(2),fb(2)
       common/bx_4q/bk(5),bd(5),bb(2,5),amu_k,amu_d,amu_b
-      common/debug_4q/ih,ic,in,ing,ig
       common/eff_yuk_4q/eps_d(3),eff_yuk,init_eff_yuk
       common/diag_type/ihpeng,izpeng,ifpeng,ibox
 c     include Higgs penguins
@@ -550,7 +549,7 @@ c     B_d,B_s mesons
       data amb/5.27958d0,5.36677d0/
       data dmb/3.337d-13,1.17d-11/
       data tau_b/1.519d-12,1.466d-12/
-      data fb/0.196d0,0.238d0/
+      data fb/0.193d0,0.232d0/
       data bb/2*0.87d0,2*0.8d0,2*0.71d0,2*1.71d0,2*1.16d0/
       data bb_sm/1.18d0,1.22d0/
 c     Scales for B_X calculations
@@ -558,7 +557,6 @@ c     Scales for B_X calculations
 c     Debug/status variables
       data init_eta/.true./
       data init_alpha_susy/.true./
-      data ih,ic,in,ing,ig/5*1/
 c     For SM-like formfactor (vector-LL) in kaon and (partially) BB
 c     mixing much more refined calculation of QCD factors exist.
 c     Lets replace our simplified formulae by the exact numerical values,

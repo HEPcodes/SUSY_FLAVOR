@@ -24,16 +24,17 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       double complex function zdd_vl_g(i,j)
 c     Gauge contribution
       implicit double precision (a-h,o-z)
-      double complex ckm
+      double complex ckm_phys,ckm0,udl,udr,uul,uur
+      common/fmass_high/umu(3),uml(3),amuu(3),dmu(3),dml(3),amud(3)
+      common/ckm_switch/ckm_phys(3,3),ckm0(3,3),udl(3,3),udr(3,3),
+     $     uul(3,3),uur(3,3)
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/fmass/em(3),um(3),dm(3)
-      common/km_mat/ckm(3,3)
       zdd_vl_g = (0.d0,0.d0)
       do m=1,3
-         zdd_vl_g = zdd_vl_g + dconjg(ckm(i,m))*ckm(j,m)
-     $        * ((1 - 4.d0/3*st2)*(cp1(wm,um(m),um(m)) - 0.5d0)
-     $        + 8.d0/3*st2*um(m)*um(m)*cp0(wm,um(m),um(m)) ! Wuu 
-     $        + ct2*(6*cp1(wm,wm,um(m)) - 1)) ! WWu 
+         zdd_vl_g = zdd_vl_g + dconjg(ckm_phys(m,j))*ckm_phys(m,i)
+     $        * ((1 - 4.d0/3*st2)*(cp1(wm,umu(m),umu(m)) - 0.5d0)
+     $        + 8.d0/3*st2*umu(m)*umu(m)*cp0(wm,umu(m),umu(m)) ! Wuu 
+     $        + ct2*(6*cp1(wm,wm,umu(m)) - 1)) ! WWu 
       end do
       zdd_vl_g = e*e2/4/sct/st2*zdd_vl_g
       return
@@ -42,14 +43,17 @@ c     Gauge contribution
       double complex function zdd_vl_hg(i,j)
 c     Higgs-gauge contribution
       implicit double precision (a-h,o-z)
-      double complex ckm,yh_eff_l
+      double complex yh_eff_l
+      double complex ckm_phys,ckm0,udl,udr,uul,uur
+      common/fmass_high/umu(3),uml(3),amuu(3),dmu(3),dml(3),amud(3)
+      common/ckm_switch/ckm_phys(3,3),ckm0(3,3),udl(3,3),udr(3,3),
+     $     uul(3,3),uur(3,3)
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/fmass/em(3),um(3),dm(3)
-      common/km_mat/ckm(3,3)
       zdd_vl_hg = (0.d0,0.d0)
       do m=1,3
-         zdd_vl_hg = zdd_vl_hg + (dconjg(ckm(i,m)*yh_eff_l(j,m,2)) 
-     $        + ckm(j,m)*yh_eff_l(i,m,2))*um(m)*cp0(wm,wm,um(m))
+         zdd_vl_hg = zdd_vl_hg + (ckm_phys(m,i)*dconjg(yh_eff_l(j,m,2)) 
+     $        + yh_eff_l(i,m,2)*dconjg(ckm_phys(m,j)))
+     $        * umu(m)*cp0(wm,wm,umu(m))
       end do
       zdd_vl_hg = e2*wm/sq2/ct*zdd_vl_hg
       return
@@ -61,14 +65,14 @@ c     Higgs contribution
       double complex yh_eff_l
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
-      common/fmass/em(3),um(3),dm(3)
+      common/fmass_high/umu(3),uml(3),amuu(3),dmu(3),dml(3),amud(3)
       zdd_vl_h = (0.d0,0.d0)
       do m=1,3
          do l=1,2
            zdd_vl_h = zdd_vl_h - yh_eff_l(i,m,l)*dconjg(yh_eff_l(j,m,l))
-     $           * (2*st2/3.d0*(cp1(cm(l),um(m),um(m)) - 0.5d0)
-     $           + (1 - 4*st2/3.d0)*um(m)*um(m)*cp0(cm(l),um(m),um(m)) ! Huu
-     $           + (ct2 - st2)/2*(cp1(cm(l),cm(l),um(m)) + 0.5d0)) ! HHu 
+     $           * (2*st2/3.d0*(cp1(cm(l),umu(m),umu(m)) - 0.5d0)
+     $           + (1 - 4*st2/3.d0)*umu(m)**2*cp0(cm(l),umu(m),umu(m)) ! Huu
+     $           + (ct2 - st2)/2*(cp1(cm(l),cm(l),umu(m)) + 0.5d0)) ! HHu 
          end do
       end do
       zdd_vl_h = e/2/sct*zdd_vl_h
@@ -171,16 +175,19 @@ c     Full A^V_L formfactor
      $     zdd_vl_gl
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/debug_4q/ih,ic,in,ing,ig
-      zdd_vl = (ih*(zdd_vl_g(i,j) + zdd_vl_hg(i,j) + zdd_vl_h(i,j))
-     $     + ic*zdd_vl_c(i,j) + in*zdd_vl_n(i,j) 
-     $     + ig*zdd_vl_gl(i,j))/16/pi/pi
+      common/susy_sign/isus
+      zdd_vl = zdd_vl_g(i,j)
+      if (ih.eq.1) zdd_vl = zdd_vl + zdd_vl_hg(i,j) + zdd_vl_h(i,j) 
+      if (ic.eq.1) zdd_vl = zdd_vl + isus*zdd_vl_c(i,j)
+      if (in.eq.1) zdd_vl = zdd_vl + isus*zdd_vl_n(i,j)
+      if (ig.eq.1) zdd_vl = zdd_vl + isus*zdd_vl_gl(i,j)
+      zdd_vl = zdd_vl/16/pi/pi
       return
       end
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     Formfactor A^V_R                                             c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-
 
       double complex function zdd_vr_g(i,j)
 c     Gauge contribution
@@ -202,14 +209,14 @@ c     Higgs contribution
       double complex yh_eff_r
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
-      common/fmass/em(3),um(3),dm(3)
+      common/fmass_high/umu(3),uml(3),amuu(3),dmu(3),dml(3),amud(3)
       zdd_vr_h = (0.d0,0.d0)
       do m=1,3
          do l=1,2
            zdd_vr_h = zdd_vr_h + yh_eff_r(i,m,l)*dconjg(yh_eff_r(j,m,l))
-     $           * (((1 - 4*st2/3.d0)*(cp1(cm(l),um(m),um(m)) - 0.5d0)
-     $           + 2*st2/3.d0*um(m)*um(m)*cp0(cm(l),um(m),um(m))) ! Huu
-     $           - (ct2 - st2)*(cp1(cm(l),cm(l),um(m)) + 0.5d0)) ! HHu
+     $           * (((1 - 4*st2/3.d0)*(cp1(cm(l),umu(m),umu(m)) - 0.5d0)
+     $           + 2*st2/3.d0*umu(m)*umu(m)*cp0(cm(l),umu(m),umu(m))) ! Huu
+     $           - (ct2 - st2)*(cp1(cm(l),cm(l),umu(m)) + 0.5d0)) ! HHu
         end do
       end do
       zdd_vr_h = e/4/sct*zdd_vr_h
@@ -310,11 +317,19 @@ c     Full A^V_R formfactor
      $     zdd_vr_gl
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/debug_4q/ih,ic,in,ing,ig
-      zdd_vr = (ih*(zdd_vr_g(i,j) + zdd_vr_hg(i,j) + zdd_vr_h(i,j)) 
-     $     + ic*zdd_vr_c(i,j) + in*zdd_vr_n(i,j) 
-     $     + ig*zdd_vr_gl(i,j))/16/pi/pi
+      common/susy_sign/isus
+      external isus_data
+      zdd_vr = zdd_vr_g(i,j)
+      if (ih.eq.1) zdd_vr = zdd_vr + zdd_vr_hg(i,j) + zdd_vr_h(i,j) 
+      if (ic.eq.1) zdd_vr = zdd_vr + isus*zdd_vr_c(i,j)
+      if (in.eq.1) zdd_vr = zdd_vr + isus*zdd_vr_n(i,j)
+      if (ig.eq.1) zdd_vr = zdd_vr + isus*zdd_vr_gl(i,j)
+      zdd_vr = zdd_vr/16/pi/pi
       return
       end
 
-
+      block data isus_data
+      common/susy_sign/isus
+      data isus/1/
+      end
       

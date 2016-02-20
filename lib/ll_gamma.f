@@ -11,7 +11,7 @@ c     Hamiltonian for the l^J -> l^I + gamma decay, e.g.           c
 c     mu -> e gamma at the MZ energy scale                         c
 c     General form of the Hamiltonian is:                          c
 c     -iH = SUM_{i=1}^5 (cfl^i_L H^i_L + cfr^i_R H^i_R)            c
-c     No small SM-like W or Higgs corrections from U_MNS included  c
+c     Small SM-like W or Higgs corrections from U_MNS not included c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       subroutine ll_gam_c(i,j,cfl,cfr)
@@ -64,12 +64,13 @@ c     Full coefficients
       implicit double precision (a-h,o-z)
       double complex cfl(5),cfr(5)
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
+      common/debug_4q/ih,ic,in,ing,ig
       do k=1,5
         cfl(k) = (0.d0,0.d0)
         cfr(k) = (0.d0,0.d0)
       end do
-      call ll_gam_c(i,j,cfl,cfr)
-      call ll_gam_n(i,j,cfl,cfr)
+      if (ic.eq.1) call ll_gam_c(i,j,cfl,cfr)
+      if (in.eq.1) call ll_gam_n(i,j,cfl,cfr)
       do k=1,5
         cfl(k) = cfl(k)/16/pi/pi
         cfr(k) = cfr(k)/16/pi/pi

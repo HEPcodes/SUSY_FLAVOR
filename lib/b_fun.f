@@ -3,8 +3,10 @@ c     Maintainer: Janusz Rosiek (janusz.rosiek@fuw.edu.pl)
 c     Program web page: http://www.fuw.edu.pl/susy_flavor
 
 c     FILENAME: B_FUN.F
-c     Last revised: 28: 3:1994(J.R.)
+c     Revised: 28: 3:1994(J.R.)
 c     Next order of F expansion around s=0 added
+c     Revised:  8: 6:2013(J.R.)
+c     New common /cmem/ added to comply with changes in c_fun.f
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     This file contains two-point standard loop integrals         c
@@ -338,7 +340,7 @@ c     Complex dilogarithm
       common/spence/ber(9),pi,pi6,eps
       external init_spence
       if (x.eq.(0.d0,0.d0)) then
-        li2 = 0
+        li2 = (0.d0,0.d0)
         return
       else if (x.eq.(1.d0,0.d0)) then
         li2 = pi6
@@ -367,12 +369,12 @@ c     Complex dilogarithm
       sign = sign*y
       li2 = li2 + sign*(1 - y/4)
       y = y*y
-      z = 1
+      z = (1.d0,0.d0)
       den = 1
       do 10 i=1,9
         z = z*y
 c     avoid underflow
-        if (abs(z).lt.1.d-80) z=0
+        if (abs(z).lt.1.d-80) z=(0.d0,0.d0)
         den = 2*i*(2*i + 1)*den
 10      li2 = li2 + sign*ber(i)*z/den
       return
@@ -390,9 +392,9 @@ c     avoid underflow
 
       block data init_spence
       implicit double precision (a-h,o-z)
-      logical cstat(7),dbstat,infstat
-      double complex cval(7)
-      common/cmem/cval,cstat
+      logical dbstat,infstat
+      double complex c0_0
+      common/cmem/c0_0,p2_0,q2_0,pq_0,a1_0,a2_0,a3_0,eps_c0
       common/spence/ber(9),pi,pi6,eps
       common/renorm/del,amiu2,infstat
       common/bdif/dbstat
@@ -405,8 +407,11 @@ c     Bernoulli numbers
 c     pi6 = pi^2/6
 c     eps: variable in loop integrals denominators: p^2 - m^2 - i*eps 
       data pi,pi6,eps/3.1415926535897932d0,1.6449340668482264d0,1.d-5/
-      data cstat,dbstat/8*.false./
+      data dbstat/.false./
       data del,amiu2,infstat/0.d0,8.3152513d3,.false./
+      data c0_0/(0.d0,0.d0)/
+      data p2_0,q2_0,pq_0,a1_0,a2_0,a3_0/6*-1.d-5/
+      data eps_c0/1.d-8/
       end
 
       subroutine db_stat(dbstat)
@@ -421,7 +426,6 @@ c     eps: variable in loop integrals denominators: p^2 - m^2 - i*eps
       logical istat,infstat
       common/renorm/del,amiu2,infstat
       infstat = istat
-      call creset
       return
       end
 

@@ -8,24 +8,113 @@ c     Changelog:
 c     20:09:2012 (J.R.) corrected bug in calculation of effective
 c     gluino-fermion vertices (zu_eff, zd_eff)
 c     20:09:2012 (J.R.) corrected calculation of effective neutral
-c     Yukawa couplings for ilev=0 (no resummation) - previouslu taken at
+c     Yukawa couplings for ilev=0 (no resummation) - previously taken at
 c     tree level instead of unresummed 1-loop
-
+c     11:07:2013 (J.R.) minor additions, common/yukawa_ren/ stores both
+c     tree level and bare Yukawa couplings, set_yukawa switches them
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     Renormalization of the Yukawa couplings and CKM matrix          c
 c     in the decoupling limit v/M_SUSY << 1                           c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
+      subroutine reset_tree_level
+c     reset fermion and sfermion sector to tree level couplings
+      implicit double precision(a-h,o-z)
+      logical sqdiag,sldiag
+      call init_tree_yukawa     ! reset Yukawa 
+      call set_ckm(0)           ! reinitialize CKM
+c     reinitialize sfermion sector, shouldn't fail at this point!
+c     incorrect SUSY parameters should be eliminated by prior checks
+      if (sldiag().or.sqdiag()) stop 'Check SUSY parameters!'
+      return
+      end
+
+      subroutine set_ckm(is)
+c     initialize CKM to bare or physical values
+c        is = 0      physical
+c        is = 1      bare
+      implicit double precision (a-h,o-z)
+      double complex ckm,ckm_herm
+      double complex ckm_phys,ckm0,udl,udr,uul,uur
+      common/ckm_switch/ckm_phys(3,3),ckm0(3,3),udl(3,3),udr(3,3),
+     $     uul(3,3),uur(3,3)
+      common/ckm/ckm(3,3)
+      common/km_mat/ckm_herm(3,3)
+      do i=1,3
+         do j=1,3
+            if (is.eq.0) then
+               ckm(i,j) = ckm_phys(i,j)
+               ckm_herm(i,j) = dconjg(ckm_phys(j,i))
+            else
+               ckm(i,j) = ckm0(i,j)
+               ckm_herm(i,j) = dconjg(ckm0(j,i))
+            end if
+         end do
+      end do
+      return
+      end
+
+      subroutine set_yukawa(is)
+c     initialize Yukawa couplings to bare or physical values
+c        is = 0      physical
+c        is = 1      bare
+      implicit double precision (a-h,o-z)
+      double complex yl,yu,yd
+      double complex yl0,yu0,yd0,yl_bare,yu_bare,yd_bare
+      common/yukawa/yl(3),yu(3),yd(3)      
+      common/yukawa_ren/yl0(3),yu0(3),yd0(3),
+     $     yl_bare(3),yu_bare(3),yd_bare(3)
+      do i=1,3
+         if (is.eq.0) then
+            yl(i) = yl0(i)
+            yu(i) = yu0(i)
+            yd(i) = yd0(i)
+         else
+            yl(i) = yl_bare(i)
+            yu(i) = yu_bare(i)
+            yd(i) = yd_bare(i)
+         end if
+      end do
+      return
+      end
+      
+      subroutine init_tree_yukawa()
+c     Initialization of Yukawa coupling
+      implicit double precision (a-h,o-z)
+      double complex yl,yu,yd
+      double complex yl0,yu0,yd0,yl_bare,yu_bare,yd_bare
+      common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
+      common/fmass/em(3),um(3),dm(3)
+      common/yukawa/yl(3),yu(3),yd(3)
+      common/yukawa_ren/yl0(3),yu0(3),yd0(3),
+     $     yl_bare(3),yu_bare(3),yd_bare(3)
+      common/vev/v1,v2
+      do i=1,3
+         yu(i) = sq2*um(i)/v2
+         yd(i) = - sq2*dm(i)/v1
+         yl(i) = - sq2*em(i)/v1
+      end do
+      do i=1,3
+         yu0(i) = yu(i)
+         yd0(i) = yd(i)
+         yl0(i) = yl(i)
+      end do
+      return
+      end
+
       subroutine renormalize_yukawa_declim
 c     Yukawa renormalization, decoupling limit
       implicit double precision (a-h,o-z)
       double complex yl,yu,yd
+      double complex yl0,yu0,yd0,yl_bare,yu_bare,yd_bare
       double complex eps_dd,sig_dd_ny,sig_dd_yb,sig_uu_ny
       double complex eps_ll,sig_ll_ny,sig_ll_yt
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/vev/v1,v2
-      common/yukawa/yl(3),yu(3),yd(3)
+      common/yukawa/yl(3),yu(3),yd(3)      
+      common/yukawa_ren/yl0(3),yu0(3),yd0(3),
+     $     yl_bare(3),yu_bare(3),yd_bare(3)
       common/fmass/em(3),um(3),dm(3)
 c     SUSY sector initialized at this point, but with CKM_phys instead
 c     of CKM_0!!
@@ -52,6 +141,11 @@ c     Mu and e Yukawa with the use of bare yl(3)
       do i=1,2
          yl(i) = - sq2*(em(i) - sig_ll_ny(i,i) - sig_ll_yt(i))/(v1 
      $        + v2*eps_ll(i))
+      end do
+      do i=1,3
+         yu_bare(i) = yu(i)
+         yd_bare(i) = yd(i)
+         yl_bare(i) = yl(i)
       end do
       return
       end
@@ -147,10 +241,10 @@ c     fermion rotation matrices at loop level 0,1,2
       common/lepton_switch/ull(3,3),ulr(3,3)
       common/fmass/em(3),um(3),dm(3)
       external usl_sig,usr_sig,dsl_sig,dsr_sig,esl_sig,esr_sig
-      call u_rotation(usr_sig,um,uul,2)
-      call u_rotation(usl_sig,um,uur,2)
       call u_rotation(dsl_sig,dm,udl,2)
       call u_rotation(dsr_sig,dm,udr,2)
+      call u_rotation(usr_sig,um,uul,2)
+      call u_rotation(usl_sig,um,uur,2)
       call u_rotation(esl_sig,em,ull,1)
       call u_rotation(esr_sig,em,ulr,1)
       return
@@ -168,11 +262,13 @@ c     matrix in the decoupling limit v1,v2 << M_SUSY
      $     ysd(3,3,2),ypd(3,3,2),init_yukawa_eff
       common/yukawa_lept/yhlr(3,3,2),ysl(3,3,2),ypl(3,3,2),init_yukawa_l
       common/debug_4q/ih,ic,in,ing,ig
+      common/declim_ih/ihr
       ierr = 0
 c     reset status of effective yukawa calculation
       init_yukawa_eff = .true.
       init_yukawa_l = .true.
 c     Only chirally enhanced contributions required here, no Higgs diagrams
+      ihr = ih
       ih = 0
 c     renormalization sequence
       call renormalize_yukawa_declim
@@ -185,44 +281,7 @@ c     renormalization sequence
       end if
       call evaluate_u_rotations ! wave function rotations
 c     reset Higgs diagrams status
-      ih = 1
-      return
-      end
-
-      subroutine reset_tree_level
-c     reset fermion and sfermion sector to tree level couplings
-      implicit double precision(a-h,o-z)
-      logical sqdiag,sldiag
-      call init_tree_yukawa     ! reset Yukawa 
-      call set_ckm(0)           ! reinitialize CKM
-c     reinitialize sfermion sector, shouldn't fail at this point!
-c     incorrect SUSY parameters should be eliminated by prior checks
-      if (sldiag().or.sqdiag()) stop 'Check SUSY parameters!'
-      return
-      end
-
-      subroutine set_ckm(is)
-c     initialize CKM to bare or physical values
-c        is = 0      physical
-c        is = 1      bare
-      implicit double precision (a-h,o-z)
-      double complex ckm,ckm_herm
-      double complex ckm_phys,ckm0,udl,udr,uul,uur
-      common/ckm_switch/ckm_phys(3,3),ckm0(3,3),udl(3,3),udr(3,3),
-     $     uul(3,3),uur(3,3)
-      common/ckm/ckm(3,3)
-      common/km_mat/ckm_herm(3,3)
-      do i=1,3
-         do j=1,3
-            if (is.eq.0) then
-               ckm(i,j) = ckm_phys(i,j)
-               ckm_herm(i,j) = dconjg(ckm_phys(j,i))
-            else
-               ckm(i,j) = ckm0(i,j)
-               ckm_herm(i,j) = dconjg(ckm0(j,i))
-            end if
-         end do
-      end do
+      ih = ihr
       return
       end
 
@@ -230,6 +289,7 @@ c        is = 1      bare
 c     iterative Yukawa and CKM renormalization beyond the decoupling limit
       implicit double precision (a-h,o-z)
       double complex yl,yu,yd,yu_new(3),yd_new(3),yl_new(3)
+      double complex yl0,yu0,yd0,yl_bare,yu_bare,yd_bare
       double complex dsl_sig,usl_sig,esl_sig
       double complex ckm_phys,ckm0,udl,udr,uul,uur
       double complex ckm
@@ -243,6 +303,8 @@ c     iterative Yukawa and CKM renormalization beyond the decoupling limit
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/vev/v1,v2
       common/yukawa/yl(3),yu(3),yd(3)
+      common/yukawa_ren/yl0(3),yu0(3),yd0(3),
+     $     yl_bare(3),yu_bare(3),yd_bare(3)
       common/fmass/em(3),um(3),dm(3)
       common/ckm_switch/ckm_phys(3,3),ckm0(3,3),udl(3,3),udr(3,3),
      $     uul(3,3),uur(3,3)
@@ -264,10 +326,14 @@ c     Iterate up and down Yukawas, from 3rd to 1st generation
             yl_new(i) = - sq2*(em(i) - dconjg(esl_sig(i,i)))/v1
             errout = max(errout,abs(yl(i)/yl_new(i) - 1))
             yl(i) = yl_new(i)
+c     store "bare" Yukawas in separate common block
+            yu_bare(i) = yu(i)
+            yd_bare(i) = yd(i)
+            yl_bare(i) = yl(i)
          end do
 c     Iterate bare CKM matrix         
          call evaluate_u_rotations
-c     CKM^0 = U_uL V U_dL^+ (??? U_dL ???)
+c     CKM^0 = U_uL V U_dL^+
          do i=1,3
             do j=1,3
                ckm0(i,j) = (0.d0,0.d0)

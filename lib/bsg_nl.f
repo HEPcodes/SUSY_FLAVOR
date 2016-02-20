@@ -31,15 +31,17 @@ c     bm          - renormalization scale mu_b
       double precision function rq_bsg(delta,bm)
 c     Br(B->X_s gamma) in the non-leading order, r_quark function
       implicit double precision (a-h,o-z)
-      double complex r,ckm
+      double complex r
       logical bxg_init
+      double complex ckm_phys,ckm0,udl,udr,uul,uur
+      common/ckm_switch/ckm_phys(3,3),ckm0(3,3),udl(3,3),udr(3,3),
+     $     uul(3,3),uur(3,3)
       common/vpar/st,ct,st2,ct2,sct,sct2,q,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/bsg_dat/al1,al2,br_cev,al_em,xi3,r(8),gam(8),bxg_init
       common/qmass_pole/um(3),dm(3)
-      common/km_mat/ckm(3,3)
       z = um(2)*um(2)/dm(3)/dm(3)
       rq_bsg = 6*al_em/pi/g_bsg(z)*f_bsg(z,dm(3))
-     $     * abs(dconjg(ckm(2,3))*ckm(3,3)/ckm(2,3))**2
+     $     * abs(ckm_phys(3,2)*ckm_phys(3,3)/ckm_phys(2,3))**2
      $     * (d2_bsg(bm) + a_bsg(delta,bm) + del_bsg(bm))
       return
       end
@@ -240,76 +242,80 @@ c     non SM contribution from opposite chirality coupling
       double complex function c7_bsg_l()
 c     Coefficient c7^(0) at MW scale
       implicit double precision (a-h,o-z)
-      double complex ckm
       double complex cfl(5),cfr(5)
+      double complex ckm_phys,ckm0,udl,udr,uul,uur
+      common/ckm_switch/ckm_phys(3,3),ckm0(3,3),udl(3,3),udr(3,3),
+     $     uul(3,3),uur(3,3)
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/fmass/em(3),um(3),dm(3)
-      common/ckm/ckm(3,3)
       common/fermi/g_ferm
       do ijk=1,5
          cfl(ijk) = (0.d0,0.d0)
          cfr(ijk) = (0.d0,0.d0)
       end do
       call dd_gam(3,2,cfl,cfr)
-      c7_bsg_l = - 8*pi*pi/sq2/g_ferm/dm(3)/ckm(3,2)/dconjg(ckm(3,3))
-     $     *(cfl(1) - cfl(4)*dm(3) + cfr(4)*dm(2))
+      c7_bsg_l = - 8*pi*pi/sq2/g_ferm/dm(3)/ckm_phys(3,2)
+     $     /dconjg(ckm_phys(3,3))*(cfl(1) - cfl(4)*dm(3) + cfr(4)*dm(2))
       return
       end
 
       double complex function c8_bsg_l()
 c     Coefficient c8^(0) at MW scale
       implicit double precision (a-h,o-z)
-      double complex ckm
       double complex cfl(5),cfr(5)
+      double complex ckm_phys,ckm0,udl,udr,uul,uur
+      common/ckm_switch/ckm_phys(3,3),ckm0(3,3),udl(3,3),udr(3,3),
+     $     uul(3,3),uur(3,3)
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/fmass/em(3),um(3),dm(3)
-      common/ckm/ckm(3,3)
       common/fermi/g_ferm
       do ijk=1,5
          cfl(ijk) = (0.d0,0.d0)
          cfr(ijk) = (0.d0,0.d0)
       end do
       call dd_gluon(3,2,cfl,cfr)
-      c8_bsg_l = - 8*pi*pi/sq2/g_ferm/dm(3)/ckm(3,2)/dconjg(ckm(3,3))
-     $     *(cfl(1) - cfl(4)*dm(3) + cfr(4)*dm(2))
+      c8_bsg_l = - 8*pi*pi/sq2/g_ferm/dm(3)/ckm_phys(3,2)
+     $     /dconjg(ckm_phys(3,3))*(cfl(1) - cfl(4)*dm(3) + cfr(4)*dm(2))
       return
       end
 
       double complex function c7_bsg_r()
 c     Coefficient c7^(0) at MW scale
       implicit double precision (a-h,o-z)
-      double complex ckm
       double complex cfl(5),cfr(5)
+      double complex ckm_phys,ckm0,udl,udr,uul,uur
+      common/ckm_switch/ckm_phys(3,3),ckm0(3,3),udl(3,3),udr(3,3),
+     $     uul(3,3),uur(3,3)
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/fmass/em(3),um(3),dm(3)
-      common/ckm/ckm(3,3)
       common/fermi/g_ferm
       do ijk=1,5
          cfl(ijk) = (0.d0,0.d0)
          cfr(ijk) = (0.d0,0.d0)
       end do
       call dd_gam(3,2,cfl,cfr)
-      c7_bsg_r = - 8*pi*pi/sq2/g_ferm/dm(3)/ckm(3,2)/dconjg(ckm(3,3))
-     $     * (cfr(1) - cfr(4)*dm(3) + cfl(4)*dm(2))
+      c7_bsg_r = - 8*pi*pi/sq2/g_ferm/dm(3)/ckm_phys(3,2)
+     $     /dconjg(ckm_phys(3,3))*(cfr(1) - cfr(4)*dm(3) + cfl(4)*dm(2))
       return
       end
 
       double complex function c8_bsg_r()
 c     Coefficient c8^(0) at MW scale
       implicit double precision (a-h,o-z)
-      double complex ckm
       double complex cfl(5),cfr(5)
+      double complex ckm_phys,ckm0,udl,udr,uul,uur
+      common/ckm_switch/ckm_phys(3,3),ckm0(3,3),udl(3,3),udr(3,3),
+     $     uul(3,3),uur(3,3)
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/fmass/em(3),um(3),dm(3)
-      common/ckm/ckm(3,3)
       common/fermi/g_ferm
       do ijk=1,5
          cfl(ijk) = (0.d0,0.d0)
          cfr(ijk) = (0.d0,0.d0)
       end do
       call dd_gluon(3,2,cfl,cfr)
-      c8_bsg_r = - 8*pi*pi/sq2/g_ferm/dm(3)/ckm(3,2)/dconjg(ckm(3,3))
-     $     * (cfr(1) - cfr(4)*dm(3) + cfl(4)*dm(2))
+      c8_bsg_r = - 8*pi*pi/sq2/g_ferm/dm(3)/ckm_phys(3,2)
+     $     /dconjg(ckm_phys(3,3))*(cfr(1) - cfr(4)*dm(3) + cfl(4)*dm(2))
       return
       end
 
@@ -488,7 +494,6 @@ c     gamma^(0)eff_i7 vector
       implicit double precision (a-h,o-z)
       double complex r
       logical bxg_init,fm_init
-      common/qmass_pole/um(3),dm(3)
       common/bsg_fm/fmc(8,8),d_old,fm_init
       common/bsg_dat/al1,al2,br_cev,al_em,xi3,r(8),gam(8),bxg_init
       common/ceff_pow/p(6),cc(6,8),h(8),a(8),e(8),g(8),f(8)
@@ -496,8 +501,6 @@ c     gamma^(0)eff_i7 vector
      $     1.20206d0/
       data bxg_init,fm_init/.false.,.true./
       data d_old/-1.d0/
-      data um/3.d-3,1.384d0,175.d0/
-      data dm/5.d-3,0.096d0,4.77d0/
 c     ceff_pow initialization
       data p/0.d0,0.d0,0.4086d0,-0.4230d0,-0.8994d0,0.1456d0/
       data cc/-1.d0,1.d0,0.d0,0.d0,0.d0,0.d0,

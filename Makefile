@@ -1,8 +1,9 @@
-all: sflav
+#all: sprog
+all: sfile
 
 FOPT = -O0 -g -fno-automatic -fbounds-check -Wall -fbacktrace
 #FOPT = -O -fno-automatic -Wall
-F77 = gfortran
+F77 = gfortran-4.8
 COMP = $(F77) $(FOPT)
 
 obj/rombint.o: lib/rombint.f
@@ -47,15 +48,15 @@ obj/zdd_vert0.o: lib/zdd_vert0.f
 obj/d_self0.o: lib/d_self0.f
 	$(COMP) -c lib/d_self0.f
 	mv d_self0.o obj
-#obj/suu_vert0.o: lib/suu_vert0.f
-#	$(COMP) -c lib/suu_vert0.f
-#	mv suu_vert0.o obj
 #obj/puu_vert0.o: lib/puu_vert0.f
 #	$(COMP) -c lib/puu_vert0.f
 #	mv puu_vert0.o obj
-obj/u_self0.o: lib/u_self0.f
-	$(COMP) -c lib/u_self0.f
-	mv u_self0.o obj
+#obj/suu_vert0.o: lib/suu_vert0.f
+#	$(COMP) -c lib/suu_vert0.f
+#	mv suu_vert0.o obj
+#obj/u_self0.o: lib/u_self0.f
+#	$(COMP) -c lib/u_self0.f
+#	mv u_self0.o obj
 obj/phen_4q.o: lib/phen_4q.f
 	$(COMP) -c lib/phen_4q.f
 	mv phen_4q.o obj
@@ -90,9 +91,6 @@ obj/vg_def.o: lib/vg_def.f
 obj/vf_def.o: lib/vf_def.f
 	$(COMP) -c lib/vf_def.f
 	mv vf_def.o obj
-obj/vh_def.o: lib/vh_def.f
-	$(COMP) -c lib/vh_def.f
-	mv vh_def.o obj
 obj/mh_init.o: lib/mh_init.f
 	$(COMP) -c lib/mh_init.f
 	mv mh_init.o obj
@@ -127,6 +125,23 @@ obj/ll_gamma.o: lib/ll_gamma.f
 obj/phen_2l.o: lib/phen_2l.f
 	$(COMP) -c lib/phen_2l.f
 	mv phen_2l.o obj
+obj/sflav_main.o: lib/sflav_main.f
+	$(COMP) -c lib/sflav_main.f
+	mv sflav_main.o obj
+
+obj/suu_vert.o: lib/suu_vert.f
+	$(COMP) -c lib/suu_vert.f
+	mv suu_vert.o obj
+obj/u_self.o: lib/u_self.f
+	$(COMP) -c lib/u_self.f
+	mv u_self.o obj
+obj/vh_def.o: lib/vh_def.f
+	$(COMP) -c lib/vh_def.f
+	mv vh_def.o obj
+obj/sff_fun.o: lib/sff_fun.f
+	$(COMP) -c lib/sff_fun.f
+	mv sff_fun.o obj
+
 
 libfcnc.a: obj/bsg_nl.o obj/ddg_fun.o obj/dd_gamma.o obj/dd_gluon.o	\
 	obj/dd_vv.o obj/dd_ll.o obj/dd_mix.o obj/uu_mix.o		\
@@ -135,8 +150,9 @@ libfcnc.a: obj/bsg_nl.o obj/ddg_fun.o obj/dd_gamma.o obj/dd_gluon.o	\
 	obj/c_fun.o obj/qcd_fun.o obj/vg_def.o obj/vf_def.o		\
 	obj/mh_init.o obj/eisch1.o obj/rombint.o obj/cdm_q.o		\
 	obj/cdm_g.o obj/vegas.o obj/edm_q.o obj/sflav_io.o		\
-	obj/yuk_ren.o obj/u_self0.o obj/q_self0_dlim.o			\
-	obj/l_self0_dlim.o obj/ll_gamma.o obj/phen_2l.o
+	obj/yuk_ren.o obj/q_self0_dlim.o obj/sflav_main.o		\
+	obj/l_self0_dlim.o obj/ll_gamma.o obj/phen_2l.o obj/u_self.o	\
+	obj/sff_fun.o obj/suu_vert.o obj/vh_def.o
 
 	ar crs libfcnc.a obj/bsg_nl.o obj/ddg_fun.o obj/dd_gamma.o	\
 	obj/dd_gluon.o obj/dd_vv.o obj/dd_ll.o obj/dd_mix.o		\
@@ -144,21 +160,31 @@ libfcnc.a: obj/bsg_nl.o obj/ddg_fun.o obj/dd_gamma.o obj/dd_gluon.o	\
 	obj/phen_2q.o obj/mh_diag.o obj/cd_fun.o obj/b_fun.o		\
 	obj/db_fun.o obj/c_fun.o obj/qcd_fun.o obj/vg_def.o		\
 	obj/vf_def.o obj/mh_init.o obj/eisch1.o obj/rombint.o		\
-	obj/cdm_q.o obj/cdm_g.o obj/vegas.o obj/edm_q.o obj/sflav_io.o	\
-	obj/yuk_ren.o obj/u_self0.o obj/q_self0_dlim.o			\
-	obj/l_self0_dlim.o obj/ll_gamma.o obj/phen_2l.o
+	obj/cdm_q.o obj/cdm_g.o obj/vegas.o obj/edm_q.o			\
+	obj/sflav_io.o obj/yuk_ren.o obj/q_self0_dlim.o			\
+	obj/sflav_main.o obj/l_self0_dlim.o obj/ll_gamma.o		\
+	obj/phen_2l.o obj/u_self.o obj/sff_fun.o obj/suu_vert.o		\
+	obj/vh_def.o
+
+
 #
 #	Useful but cause problems on BSD systems:
 #	ar ts libfcnc.a
 #
 
-sflav:	susy_flavor.f libfcnc.a 
-	$(COMP) -o sflav susy_flavor.f  -L. -lfcnc
+sfile:	susy_flavor_file.f libfcnc.a 
+	$(COMP) -o sfile susy_flavor_file.f  -L. -lfcnc
 	@echo "Executing SUSY_FLAVOR..."
-	./sflav
+	./sfile
+	cat susy_flavor.out
+
+sprog:	susy_flavor_prog.f libfcnc.a 
+	$(COMP) -o sprog susy_flavor_prog.f  -L. -lfcnc
+	@echo "Executing SUSY_FLAVOR..."
+	./sprog
 
 clean:
-	rm -rf *.o obj/*.o *.a *~ lib/*~ sflav 
+	rm -rf *.o obj/*.o *.a *~ lib/*~ sprog sfile
 
 tar:	
 	rm -rf obj/*

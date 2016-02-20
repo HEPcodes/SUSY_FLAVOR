@@ -745,7 +745,7 @@ c     Gluino and down squark in loop
       common/nc_suppress/eps_d,eps_u,acc
       external init_d_self,init_nc_diag
       dsl_sig = (0.d0,0.d0)
-      if (ih.eq.1) dsl_sig = dsl_sig + dsl_sig4(i,j) 
+c      if (ih.eq.1) dsl_sig = dsl_sig + dsl_sig4(i,j) 
       if (in+ic.gt.0) then
          eps = eps_d
          eps_d = acc
@@ -850,7 +850,7 @@ c     Gluino and down squark in loop
       common/nc_suppress/eps_d,eps_u,acc
       external init_d_self,init_nc_diag
       dsr_sig = (0.d0,0.d0)
-      if (ih.eq.1) dsr_sig = dsr_sig + dsr_sig4(i,j) 
+c      if (ih.eq.1) dsr_sig = dsr_sig + dsr_sig4(i,j) 
       if (in+ic.gt.0) then
          eps = eps_d
          eps_d = acc
@@ -955,7 +955,7 @@ c     gluino and up squark in loop
       common/nc_suppress/eps_d,eps_u,acc
       external init_d_self,init_nc_diag
       usl_sig = (0.d0,0.d0)
-      if (ih.eq.1) usl_sig = usl_sig + usl_sig4(i,j) 
+c      if (ih.eq.1) usl_sig = usl_sig + usl_sig4(i,j) 
       if (in+ic.gt.0) then
          eps = eps_u
          eps_u = acc
@@ -1060,7 +1060,7 @@ c     gluino and up squark in loop
       common/nc_suppress/eps_d,eps_u,acc
       external init_d_self,init_nc_diag
       usr_sig = (0.d0,0.d0)
-      if (ih.eq.1) usr_sig = usr_sig + usr_sig4(i,j) 
+c      if (ih.eq.1) usr_sig = usr_sig + usr_sig4(i,j) 
       if (in+ic.gt.0) then
          eps = eps_u
          eps_u = acc

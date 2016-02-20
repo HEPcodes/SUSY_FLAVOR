@@ -113,13 +113,11 @@ c     second index j,i=1 or 2 defines B meson, B_d or B_s respectively
       common/bx_4q/bk(5),bd(5),bb(2,5),amu_k,amu_d,amu_b
       external init_4q,init_2q,init_units
       if (max(i,j).ne.3) stop 'No b quark index in b_ll?'
-      if (min(i,j).eq.3) stop '(b-bar b) decay not implemented!'
+      if (min(i,j).eq.3) stop 'B_b decay not implemented!'
       call dl_wil_run(i,j,k,l)
 c     form factors
       ii = min(i,j)      
       amb2 = amb(ii)*amb(ii)
-      if (ii.eq.1) fb2 = 0.19d0**2
-      if (ii.eq.2) fb2 = 0.227d0**2
       rm = amb2/(qmass_nlo(dml(ii),amud(ii),amu_b)
      $     + qmass_nlo(dml(3),amud(3),amu_b))
       del = em(k) - em(l)
@@ -135,7 +133,7 @@ c     matrix element
       if (k.ne.l) b_ll = b_ll + del*del*(amb2 - sum*sum)*abs(fv)**2
      $     - 2*del*(amb2 - sum*sum)*dble(fs*dconjg(fv))
 c     branching ratio itself
-      b_ll = b_ll*fb2*tau_b(ii)/128/pi/amb(ii)/hbar
+      b_ll = b_ll*fb(ii)*fb(ii)*tau_b(ii)/128/pi/amb(ii)/hbar
      $     * sqrt(1 - sum*sum/amb2)*sqrt(1 - del*del/amb2)
       return
       end
@@ -150,10 +148,11 @@ c     compare hep-ph/0408142
       implicit double precision (a-h,o-z)
       double complex xx
       double complex dd_vv_l,dd_vv_r
-      double complex ckm
+      double complex ckm_phys,ckm0,udl,udr,uul,uur
+      common/ckm_switch/ckm_phys(3,3),ckm0(3,3),udl(3,3),udr(3,3),
+     $     uul(3,3),uur(3,3)
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/kpivv/ak0,del_ak0,akp,del_akp,pc,del_pc,alam
-      common/km_mat/ckm(3,3)
       external init_2q
       xx = (0.d0,0.d0)
       do k=1,3
@@ -166,7 +165,7 @@ c     Br(K^0_L -> pi^0 \bar v v)
       br_k0 = ak0*dimag(xx)**2
 c     Br(K^+ -> pi^+ \bar v v)
       br_kp = akp*(dimag(xx)**2 
-     $     + dble(dconjg(ckm(2,2))*ckm(1,2)*pc/alam + xx)**2)
+     $     + dble(ckm_phys(2,2)*dconjg(ckm_phys(2,1))*pc/alam + xx)**2)
       return
       end
 
@@ -200,15 +199,10 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     Decays B_u -> tau v and B_u -> D tau v (charged B_u meson)
       implicit double precision (a-h,o-z)
       double complex c_np
-      double complex yhl,yhr,ysu,ypu,ysd,ypd
-      double complex yhlr,ysl,ypl
+      double complex yh_eff_r,yhl_eff_r
       double complex ckm_phys,ckm0,udl,udr,uul,uur
-      logical init_yukawa_eff,init_yukawa_l
       common/ckm_switch/ckm_phys(3,3),ckm0(3,3),udl(3,3),udr(3,3),
      $     uul(3,3),uur(3,3)
-      common/yukawa_eff/yhl(3,3,2),yhr(3,3,2),ysu(3,3,2),ypu(3,3,2),
-     $     ysd(3,3,2),ypd(3,3,2),init_yukawa_eff
-      common/yukawa_lept/yhlr(3,3,2),ysl(3,3,2),ypl(3,3,2),init_yukawa_l
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
       common/meson_data/dmk,amk,epsk,fk,dmd,amd,fd,
@@ -220,12 +214,43 @@ c     Decays B_u -> tau v and B_u -> D tau v (charged B_u meson)
 c     B+ mass and width
       bm = 5.27917d0
 c     common New Physics contribution
-      c_np = - yhr(3,1,1)*dconjg(yhlr(3,3,1))/sq2/2/cm(1)/cm(1)/g_fermi
-     $     /ckm_phys(1,3)
+      c_np = - yh_eff_r(3,1,1)*dconjg(yhl_eff_r(3,3,1))/sq2/2/cm(1)
+     $     /cm(1)/g_fermi/ckm_phys(1,3)
       br_taunu = tau_b(1)*gev_s*bm/8/pi*abs(g_fermi*em(3)*fb(1)
      $     * ckm_phys(1,3)*(1 - em(3)*em(3)/bm/bm)
      $     * (1 + bm*bm/dm(3)/em(3)*c_np))**2
       dtaunu_rat = 0.28d0*(1 + 1.38d0*dble(c_np) + 0.88d0*abs(c_np)**2)
+      return
+      end
+
+ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c     Br(t->ch(dh))                                                        c
+ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+
+      double precision function gam_suu(i,j,k)
+c     Decays width u^J -> u^K H^0_i
+      implicit double precision (a-h,o-z)
+      double complex form(2)
+      common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
+      common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
+      common/fmass/em(3),um(3),dm(3)
+      call suu_vert(i,j,k,form)
+      f1 = (((um(j) - um(k))**2 - rm(i)**2)*((um(j) + um(k))**2 - rm(i)
+     $     **2))**0.5d0
+      f2 = (um(j)**2 + um(k)**2 - rm(i)**2)/2/um(j)
+      gam_suu = f1*(f2*(abs(form(1))**2 + abs(form(2))**2) + 2*um(k)
+     $     *dble(form(1)*dconjg(form(2))))/16/pi/um(j)**2
+      return
+      end
+
+      double precision function br_suu(i,j,k)
+c     Br(u^J -> u^K H^0_i) normalized to t->bW
+      implicit double precision (a-h,o-z)
+      common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
+      common/qmass_pole/um(3),dm(3)
+      xt = um(3)*um(3)/wm2
+      gam_tbw = e2/st2/64/pi*um(3)*(2 + xt)*(1 - 1/xt)**2
+      br_suu = gam_suu(i,j,k)/gam_tbw
       return
       end
 

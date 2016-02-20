@@ -19,11 +19,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       double precision function cp0(am,bm,cm)
 c     Three point scalar function (1 in the numerator)
       implicit double precision (a-h,o-z)
-      dimension x(3)
+      dimension x(3),ind(3)
       x(1) = am*am
       x(2) = bm*bm
       x(3) = cm*cm
-      call sort_arr(x,3)
+      call sort_arr(x,ind,3)
       a = x(1)
       b = x(2)
       c = x(3)
@@ -52,13 +52,13 @@ c     Three point scalar function (1 in the numerator)
 c     Three point scalar function (k^2 in the numerator)
       implicit double precision (a-h,o-z)
       logical infstat
-      dimension x(3)
+      dimension x(3),ind(3)
       common/renorm/del,amiu2,infstat
       external init_spence
       x(1) = am*am
       x(2) = bm*bm
       x(3) = cm*cm
-      call sort_arr(x,3)
+      call sort_arr(x,ind,3)
       a = x(1)
       b = x(2)
       c = x(3)
@@ -88,12 +88,12 @@ c     Three point scalar function (k^2 in the numerator)
       double precision function dp0(am,bm,cm,dm)
 c     Four point scalar function (1 in the numerator)
       implicit double precision (a-h,o-z)
-      dimension x(4)
+      dimension x(4),ind(4)
       x(1) = am*am
       x(2) = bm*bm
       x(3) = cm*cm
       x(4) = dm*dm
-      call sort_arr(x,4)
+      call sort_arr(x,ind,4)
       a = x(1)
       b = x(2)
       c = x(3)
@@ -156,12 +156,12 @@ c     Mass combination abcd
       double precision function dp1(am,bm,cm,dm)
 c     Four point scalar function (k^2 in the numerator)
       implicit double precision (a-h,o-z)
-      dimension x(4)
+      dimension x(4),ind(4)
       x(1) = am*am
       x(2) = bm*bm
       x(3) = cm*cm
       x(4) = dm*dm
-      call sort_arr(x,4)
+      call sort_arr(x,ind,4)
       a = x(1)
       b = x(2)
       c = x(3)
@@ -232,19 +232,26 @@ c     Mass combination abcd
       return
       end
 
-      subroutine sort_arr(x,n)
+      subroutine sort_arr(x,ind,n)
       implicit double precision (a-h,o-z)
-      dimension x(n)
+      dimension x(n),ind(n)
       common/cp_acc/eps
       external init_cd_fun
       if (n.lt.2) return
+c     initial ordering
+      do i=1,n
+         ind(i) = i
+      end do
 c     Sort array. Final ordering x(1) <= x(2) <= ... <= x(n)
       do i=1,n-1
         do j=1,n-i
           if (x(j).gt.x(j+1)) then
-             tmp     =  x(j+1)
-             x(j+1)  =  x(j)
-             x(j)    =  tmp
+             tmp    = x(j+1)
+             x(j+1) = x(j)
+             x(j)   = tmp
+             itmp     = ind(j+1)
+             ind(j+1) = ind(j)
+             ind(j)   = itmp
            end if
         end do
       end do

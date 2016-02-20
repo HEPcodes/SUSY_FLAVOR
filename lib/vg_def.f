@@ -20,8 +20,10 @@ c     Z0 - 2 slepton vertex
       common/slmass/vm(3),slm(6),zv(3,3),zl(6,6)
       common/delta/del(6,6)
       v_llz = - 2*st2*del(i,j)
-      do 10 k=1,3
-10      v_llz = v_llz + dconjg(zl(k,i))*zl(k,j)
+      do k=1,3
+         v_llz = v_llz + dconjg(zl(k,i))*zl(k,j)
+      end do
+      v_llz = e/2/sct*v_llz
       return
       end
  
@@ -48,19 +50,6 @@ c     Z0 - 2 u-squark vertex
       v_uuz = - 4.d0/3*st2*del(i,j)
       do 10 k=1,3
 10      v_uuz = v_uuz + dconjg(zu(k,i))*zu(k,j)
-      return
-      end
- 
-      double complex function v_ccz(i,j)
-c     Z0 - 2 chargino vector vertex
-      implicit double precision (a-h,o-z)
-      double complex zpos,zneg
-      common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/charg/fcm(2),zpos(2,2),zneg(2,2)
-      common/delta/del(6,6)
-      v_ccz = ((dconjg(zpos(1,i))*zpos(1,j) 
-     $     + zneg(1,i)*dconjg(zneg(1,j)))
-     $     + 2*del(i,j)*(ct2 - st2))/2
       return
       end
  

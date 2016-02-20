@@ -2,16 +2,16 @@ c     SUSY_FLAVOR: program for calculating rare decays in the general MSSM
 c     Maintainer: Janusz Rosiek (janusz.rosiek@fuw.edu.pl)
 c     Program web page: http://www.fuw.edu.pl/susy_flavor
 
-c     FILENAME: SUSY_FLAVOR.F
-c     Released: 15:02:2010(J.R.)
+c     FILENAME: SUSY_FLAVOR_PROG.F
+c     Released: 25:10:2013(J.R.)
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     Driver file for SUSY_FLAVOR library                             c
-c     Example of MSSM parameter initialization                        c
+c     Example of MSSM parameter initialization inside the program     c
 c     Test output for SUSY spectrum and implemented rare decays       c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
-      program susy_flavor
+      program susy_flavor_prog
       implicit double precision (a-h,o-z)
       dimension sll(3),slr(3),amsq(3),amsu(3),amsd(3)
       double complex slmi_l(3),slmi_r(3),slmi_lr(3,3),slmi_lrp(3,3)
@@ -21,68 +21,61 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       double complex amg,amgg,amue
       common/sf_cont/eps,indx(3,3),iconv
       dimension corr_l(3),corr_d(3),corr_u(3),corr_ckm(3,3)
- 
-c     decide if input parameters are read from file susy_flavor.in or
-c     defined directly inside the program
-      write(*,'(a,$)')
-     $     'Read input from file susy_flavor.in (no=1,yes=2)? '
-      read(*,*) input_type
-      if (input_type.eq.2) then
-         call sflav_input(ilev) ! Parameters read from file susy_flavor.in 
-         goto 100
-      end if
       
+      common/ph_units/hbar,gev_cm,gev_s
+
 c     Parameters defined inside the code.  
 
 c     Input parameters convention choice
-      iconv = 1                 ! SLHA2 input conventions
-c     iconv = 2                 ! hep-ph/9511250 input conventions
-
+c     iconv = 1                 ! SLHA2 input conventions
+      iconv = 2                 ! hep-ph/9511250 input conventions
+      
 c     fixes the treatment of enhanced chiral correction resummation
-c     ilev = 0                  ! no resummation, SUSY corrections strictly 1-loop
-c     ilev = 1                  ! resummation using the decoupling limit
+      ilev = 0                  ! no resummation, SUSY corrections strictly 1-loop
+      ilev = 1                  ! resummation using the decoupling limit
       ilev = 2                  ! exact iterative solution, may not always converge
-
+      
 c     SM basic input initialization
       zm0 = 91.1876d0           ! M_Z
-      wm0 = 80.398d0            ! M_W
+      wm0 = 80.385d0            ! M_W
       alpha_z = 1/127.934d0     ! alpha_em(M_Z)
-      call vpar_update(zm0,wm0,alpha_z)
+      st2_new = 0.232d0         ! s_W^2 (here MSbar value)
+      call vpar_update(zm0,wm0,alpha_z,st2_new)
 
 c     QCD parameters
-      alpha_s = 0.1172d0        ! alpha_s(MZ)
+      alpha_s = 0.1174d0        ! alpha_s(MZ)
       call lam_fit(alpha_s)     ! fits Lambda_QCD at 3 loop level
       call lam_fit_nlo(alpha_s) ! fits Lambda_QCD at NLO level
 
 c     CKM matrix initialization
-      alam = 0.2258d0           ! lambda
-      apar = 0.808d0            ! A
-      rhobar = 0.177d0          ! rho bar
-      etabar = 0.360d0          ! eta bar
+      alam = 0.22543d0          ! lambda
+      apar = 0.812d0            ! A
+      rhobar = 0.145d0          ! rho bar
+      etabar = 0.343d0          ! eta bar
       call ckm_wolf(alam,apar,rhobar,etabar)
 
 c     Fermion mass initialization, input: MSbar running quark masses
       top_scale = 163.2d0
-      top = 163.2d0             ! m_t(top_scale)
+      top = 163.2d0             ! running m_t(top_scale)
       bot_scale = 4.17d0
-      bot = 4.17d0              ! m_b(bot_scale)
+      bot = 4.17d0              ! running m_b(bot_scale)
       call init_fermion_sector(top,top_scale,bot,bot_scale)
 
 c     Higgs sector parameters
       pm    = 200               ! M_A
-      tanbe = 50                ! tan(beta)
-      amue  = (300.d0,100.d0)   ! mu
+      tanbe = 4                 ! tan(beta)
+      amue  = (200.d0,100.d0)   ! mu
       call init_higgs_sector(pm,tanbe,amue,ierr)
       if (ierr.ne.0) stop 'negative tree level Higgs mass^2?'
-
+      
 c     Gaugino sector parameters. CAUTION: if M1 is set to 0 here then
 c     program sets M1 and M2 GUT-related, i.e. M1 = 5/3 s_W^2/c_W^2*M2
-      amgg  = (200.d0,-50.d0)   ! M1 (bino mass)
-      amg   = (300.d0,150.d0)   ! M2 (wino mass)
+      amgg  = (200.d0,-100.d0)  ! M1 (bino mass)
+      amg   = (300.d0,200.d0)   ! M2 (wino mass)
       amglu = 600               ! M3 (gluino mass)
       call init_ino_sector(amgg,amg,amglu,amue,tanbe,ierr)
       if (ierr.ne.0) write(*,*) '-ino mass below M_Z/2?'
-
+      
 c     Slepton diagonal soft breaking parameters
       sll(1) = 300.d0           ! left selectron mass scale
       sll(2) = 300.d0           ! left smuon mass scale
@@ -96,7 +89,7 @@ c     slmi_x(1),slmi_x(2), slmi_x(3) are 12,23,31 entry respectively
          slmi_l(i) = dcmplx(0.d0,0.d0) ! slepton LL mass insertion
          slmi_r(i) = dcmplx(0.d0,0.d0) ! slepton RR mass insertion
       end do 
-      slmi_l(1) = (2.d-2,1.d-2) ! example, non-vanishing LL 12 entry
+      slmi_l(1) = (2.d-2,3.d-2) ! example, non-vanishing LL 12 entry
 c     Slepton LR mass insertions, non-hermitian in general
 c     All entries dimensionless (normalized to diagonal masses)
       do i=1,3
@@ -108,18 +101,18 @@ c     non-holomorphic LR mixing terms
          end do
       end do 
 c     Example: diagonal entries normalized to Y_l as in SUGRA  
-      slmi_lr(1,1) = (1.5d-4,0.d0) ! A_e
-      slmi_lr(2,2) = (3.0d-2,0.d0) ! A_mu
-      slmi_lr(3,3) = (5.0d-1,0.d0) ! A_tau
-      slmi_lr(2,3) = (1.d-2,2.d-2) ! example, non-vanishing LR 23 entry
+      slmi_lr(1,1) = (1.d-4,0.d0) ! A_e
+      slmi_lr(2,2) = (1.d-2,0.d0) ! A_mu
+      slmi_lr(3,3) = (1.d-1,0.d0) ! A_tau
+      slmi_lr(2,3) = (2.d-2,1.d-2) ! example, non-vanishing LR 23 entry
 c     Calculate physical masses and mixing angles
       call init_slepton_sector(sll,slr,slmi_l,slmi_r,slmi_lr,slmi_lrp
      $     ,ierr)
       if (ierr.ne.0) stop 'negative tree level slepton mass^2?'
-
+      
 c     Squark diagonal soft breaking parameters
       amsq(1) = 500.d0          ! left squark mass, 1st generation
-      amsq(2) = 500.d0          ! left squark mass, 2nd generation
+      amsq(2) = 450.d0          ! left squark mass, 2nd generation
       amsq(3) = 400.d0          ! left squark mass, 3rd generation
       amsd(1) = 550.d0          ! right down squark mass
       amsd(2) = 550.d0          ! right strange squark mass
@@ -134,7 +127,7 @@ c     sqmi_l(1),sqmi_l(2), sqmi_l(3) are 12,23,31 entry respectively, etc.
          sumi_r(i) = (0.d0,0.d0) ! up-squark RR mass insertion
          sdmi_r(i) = (0.d0,0.d0) ! down-squark RR mass insertion
       end do 
-      sqmi_l(2) = (2.d-2,-1.d-2) ! example, non-vanishing LL 23 entry
+      sqmi_l(2) = (-1.d-2,1.d-2) ! example, non-vanishing LL 23 entry
 c     Squark holomorphic LR mass insertions, non-hermitian in general
 c     All entries dimensionless (normalized to masses)
       do i=1,3
@@ -150,12 +143,13 @@ c     non-holomorphic LR mixing terms
 c     Example: diagonal entries normalized to Y_d,Y_u as in SUGRA  
       sumi_lr(1,1) = dcmplx(1.d-5,0.d0)
       sumi_lr(2,2) = dcmplx(4.d-3,0.d0)
-      sumi_lr(3,3) = dcmplx(1.d0,0.d0)
-      sdmi_lr(1,1) = dcmplx(-1.d-3,0.d0)
-      sdmi_lr(2,2) = dcmplx(-2.d-2,0.d0)
-      sdmi_lr(3,3) = dcmplx(-8.d-1,0.d0)
-      sumi_lr(2,3) = (1.0d-2,2.d-2) ! example, non-vanishing up LR 23 entry
-      sdmi_lr(2,3) = (-3.d-2,1.d-2) ! example, non-vanishing down LR 23 entry
+      sumi_lr(3,3) = dcmplx(1.d0,-0.5d0)
+      sdmi_lr(1,1) = dcmplx(-1.d-4,0.d0)
+      sdmi_lr(2,2) = dcmplx(-2.d-3,0.d0)
+      sdmi_lr(3,3) = dcmplx(-8.d-2,4.d-2)
+      sumi_lr(2,3) = (2.0d-2,1.d-2) ! example, non-vanishing up LR 23 entry
+      sumi_lr(3,2) = (5.0d-2,1.d-2) ! example, non-vanishing up LR 23 entry
+      sdmi_lr(2,3) = (1.d-2,-1.d-2) ! example, non-vanishing down LR 23 entry
 c     Calculate physical masses and mixing angles
       call init_squark_sector(amsq,amsu,amsd,sqmi_l,sumi_r,sdmi_r,
      $     sumi_lr,sdmi_lr,sumi_lrp,sdmi_lrp,ierr)
@@ -170,24 +164,19 @@ c     Approximation. Only real mu, A_t, A_b allowed - replaced x->abs(x)
       if (ierr.ne.0) stop 'negative 1-loop EPA CP-even Higgs mass^2?'
 
 c     !!! End of input section !!!
- 100  continue
 
-c     Control output
-      write(*,99)'************************************************'
-      write(*,99)'MSSM Lagrangian parameters and tree level masses'
-      write(*,99)'written on file mssm_data.txt'
-      write(*,99)'************************************************'
-      ifl = 1                   ! output file number
-      open(ifl,file='mssm_data.txt',status='unknown')
-      call print_MSSM_par(ifl)  ! Lagrangian parameters
-      call print_MSSM_masses(ifl) ! tree level physical masses
-      close(ifl)
+      ilev = 2                  ! resummation level
 
 c     perform resummation of chirally enhanced corrections
       call set_resummation_level(ilev,ierr)
 
-      call chiral_corr_size(corr_l,corr_d,corr_u,corr_ckm)
+ 97   format('Physical results for resummation level ',i1,
+     $     ' (error code ',i1,')')
+      write(*,97)ilev,ierr
       write(*,*)
+
+      call chiral_corr_size(corr_l,corr_d,corr_u,corr_ckm)
+ 
       write(*,96)'Corrections to lepton Yukawa couplings:     ',
      $     (100*corr_l(i),i=1,3)
       write(*,96)'Corrections to down-quark Yukawa couplings: ',
@@ -202,11 +191,6 @@ c     perform resummation of chirally enhanced corrections
  96   format(a,3(f8.1,"%",1x))
 
 c     Results for implemented observables:
-      write(*,*)'******************************************************'
- 97   format('Physical results for resummation level ',i1,
-     $     ' (error code ',i1,')')
-      write(*,97)ilev,ierr
-      write(*,*)
       write(*,99)'Electric dipole moments:'
       write(*,99)'Electron EDM = ',edm_l(1)
       write(*,99)'Muon EDM     = ',edm_l(2)
@@ -235,6 +219,7 @@ c     Results for implemented observables:
       write(*,99)'Leptonic B decays:'
       write(*,99)'BR(B_d -> mu^+ mu^-) = ',b_ll(3,1,2,2)
       write(*,99)'BR(B_s -> mu^+ mu^-) = ',b_ll(3,2,2,2)
+      
       write(*,99)'BR(B_s -> mu^+ e^-)  = ',b_ll(3,2,2,1)
       call b_taunu(br_taunu,dtaunu_ratio)
       write(*,99)'BR(B_u -> tau nu)    = ',br_taunu
@@ -251,11 +236,13 @@ c     Physical quantities for BR(B->X_s g) calculation
       call dd_kaon(eps_k,delta_mk)
       write(*,99)'eps_K     = ',eps_k
       write(*,99)'Delta m_K = ',delta_mk
+c     write(*,99)'Delta m_K = ',delta_mk*gev_s/1.d12 ! in ps^-1
       write(*,*)
 
       write(*,99)'DD mixing:'
       call uu_dmeson(delta_md)
       write(*,99)'Delta m_D = ',delta_md
+c     write(*,99)'Delta m_D = ',delta_md*gev_s/1.d12 ! in ps^-1
       write(*,*)
 
       write(*,99)'BB mixing:'
@@ -263,13 +250,18 @@ c     Physical quantities for BR(B->X_s g) calculation
       write(*,99)'Re(H_eff_Bd) = ',dmb_re
       write(*,99)'Im(H_eff_Bd) = ',dmb_im
       write(*,99)'Delta m_B_d  = ',delta_mbd
+c     write(*,99)'Delta m_B_d  = ',delta_mbd*gev_s/1.d12 ! in ps^-1
       call dd_bmeson(2,delta_mbs,dmb_re,dmb_im)
       write(*,99)'Delta m_B_s  = ',delta_mbs
+c     write(*,99)'Delta m_B_s  = ',delta_mbs*gev_s/1.d12 ! in ps^-1
       write(*,*)
+
+c     repeat calculations and print them to susy_flavor.out, not to
+c     screen
+
+      call susy_flavor          ! main routine calculating physical observables
+      call sflav_output(ilev,ierr) ! output written to susy_flavor.out
 
  99   format(a,6(1pe11.4,1x))
       end
-
-
-
 

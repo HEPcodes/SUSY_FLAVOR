@@ -704,6 +704,7 @@ c     Cross sections should be recalculated after this procedure
       else
          stop 'istat out of range in set_2hdm'
       end if
+      call init_tree_yukawa
       return
       end
 

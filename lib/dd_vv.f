@@ -4,6 +4,8 @@ c     Program web page: http://www.fuw.edu.pl/susy_flavor
       
 c     FILENAME: DD_VV.F
 c     Released: 25:03:1995 (J.R.)
+c     Revised: 18.10.2013 (J.R.)
+c     Bare -> Physical CKM replaced in gauge and Higgs diagrams
       
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     This file contains expression for the coefficient of the    c
@@ -20,16 +22,17 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       double complex function dd_vv_l_sm(i,j,k,l)
 c     Gauge contributions
       implicit double precision (a-h,o-z)
-      double complex ckm
+      double complex ckm_phys,ckm0,udl,udr,uul,uur
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/fmass/em(3),um(3),dm(3)
-      common/km_mat/ckm(3,3)
+      common/fmass_high/umu(3),uml(3),amuu(3),dmu(3),dml(3),amud(3)
+      common/ckm_switch/ckm_phys(3,3),ckm0(3,3),udl(3,3),udr(3,3),
+     $     uul(3,3),uur(3,3)
       dd_vv_l_sm = (0.d0,0.d0)
       if (k.ne.l) return
-      xt =  um(3)*um(3)/wm2
+      xt =  umu(3)*umu(3)/wm2
 c     Penguins + Boxes
-      dd_vv_l_sm = - e2*e2/st2/st2/wm2*dconjg(ckm(i,3))*ckm(j,3)
-     $     * (g_dv(xt) - 4*f_dv(xt))
+      dd_vv_l_sm = - e2*e2/st2/st2/wm2*ckm_phys(3,i)
+     $     * dconjg(ckm_phys(3,j))*(g_dv(xt) - 4*f_dv(xt))
       return
       end
 
@@ -48,20 +51,18 @@ c     Penguins + Boxes
       double complex function dd_vv_l_h(i,j,k,l)
 c     Higgs contributions
       implicit double precision (a-h,o-z)
-      double complex ckm
+      double complex yh_eff_l
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
+      common/fmass_high/umu(3),uml(3),amuu(3),dmu(3),dml(3),amud(3)
       common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
-      common/fmass/em(3),um(3),dm(3)
-      common/km_mat/ckm(3,3)
-      common/hangle/ca,sa,cb,sb
       dd_vv_l_h = (0.d0,0.d0)
       if (k.ne.l) return
       do m=1,3
 c     Penguins
-         dd_vv_l_h = dd_vv_l_h + dconjg(ckm(i,m))*ckm(j,m)*um(m)**4
-     $        * cp0(cm(1),um(m),um(m))
+         dd_vv_l_h = dd_vv_l_h + yh_eff_l(i,m,1)*dconjg(yh_eff_l(j,m,1))
+     $        * umu(m)**2*cp0(cm(1),umu(m),umu(m))
       end do
-      dd_vv_l_h = (e2/st2/wm2*cb/sb)**2/8*dd_vv_l_h
+      dd_vv_l_h = e2/st2/wm2/4*dd_vv_l_h
       return
       end
 
@@ -201,9 +202,12 @@ c     Full A^V_L formfactor
       double complex dd_vv_l_sm,dd_vv_l_h,dd_vv_l_c,dd_vv_l_n,dd_vv_l_gl
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/debug_4q/ih,ic,in,ing,ig
-      dd_vv_l = (dd_vv_l_sm(i,j,k,l) + ih*dd_vv_l_h(i,j,k,l)
-     1        +  ic*dd_vv_l_c(i,j,k,l) + in*dd_vv_l_n(i,j,k,l)
-     2        +  ig*dd_vv_l_gl(i,j,k,l))/16/pi/pi
+      dd_vv_l = dd_vv_l_sm(i,j,k,l)
+      if (ih.eq.1) dd_vv_l = dd_vv_l + dd_vv_l_h(i,j,k,l)
+      if (in.eq.1) dd_vv_l = dd_vv_l + dd_vv_l_n(i,j,k,l)
+      if (ic.eq.1) dd_vv_l = dd_vv_l + dd_vv_l_c(i,j,k,l)
+      if (ig.eq.1) dd_vv_l = dd_vv_l + dd_vv_l_gl(i,j,k,l)
+      dd_vv_l = dd_vv_l/16/pi/pi
       return
       end
 
@@ -221,21 +225,21 @@ c     Gauge contributions
       double complex function dd_vv_r_h(i,j,k,l)
 c     Higgs contributions
       implicit double precision (a-h,o-z)
-      double complex ckm
+      double complex yh_eff_r
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
+      common/fmass_high/umu(3),uml(3),amuu(3),dmu(3),dml(3),amud(3)
       common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
-      common/fmass/em(3),um(3),dm(3)
-      common/km_mat/ckm(3,3)
-      common/hangle/ca,sa,cb,sb
       dd_vv_r_h = (0.d0,0.d0)
       if (k.ne.l) return
       do m=1,3
+         do n=1,2
 c     Penguins
-        dd_vv_r_h = dd_vv_r_h + dconjg(ckm(i,m))*ckm(j,m)*um(m)**2
-     1            * (sb*sb/cb/cb*cp0(cm(1),um(m),um(m))
-     2            + cp0(wm,um(m),um(m)))
+            dd_vv_r_h = dd_vv_r_h + yh_eff_r(i,m,n)
+     $           * dconjg(yh_eff_r(j,m,n))
+     $           * umu(m)**2*cp0(cm(n),umu(m),umu(m))
+         end do
       end do
-      dd_vv_r_h = - (e2/st2/wm2)**2/8*dm(i)*dm(j)*dd_vv_r_h
+      dd_vv_r_h = - e2/st2/wm2/4*dd_vv_r_h
       return
       end
 
@@ -377,9 +381,12 @@ c     Full A^V_R formfactor
       double complex dd_vv_r_sm,dd_vv_r_h,dd_vv_r_c,dd_vv_r_n,dd_vv_r_gl
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/debug_4q/ih,ic,in,ing,ig
-      dd_vv_r = (dd_vv_r_sm(i,j,k,l) + ih*dd_vv_r_h(i,j,k,l)
-     $     +  ic*dd_vv_r_c(i,j,k,l) + in*dd_vv_r_n(i,j,k,l)
-     $     +  ig*dd_vv_r_gl(i,j,k,l))/16/pi/pi
+      dd_vv_r = dd_vv_r_sm(i,j,k,l)
+      if (ih.eq.1) dd_vv_r = dd_vv_r + dd_vv_r_h(i,j,k,l)
+      if (in.eq.1) dd_vv_r = dd_vv_r + dd_vv_r_n(i,j,k,l)
+      if (ic.eq.1) dd_vv_r = dd_vv_r + dd_vv_r_c(i,j,k,l)
+      if (ig.eq.1) dd_vv_r = dd_vv_r + dd_vv_r_gl(i,j,k,l)
+      dd_vv_r = dd_vv_r/16/pi/pi
       return
       end
 

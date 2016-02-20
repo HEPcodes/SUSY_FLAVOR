@@ -7,6 +7,9 @@ c     Revised: 29: 9:1992 (P.Ch.)
 c     Corrected code for s3 for a=b=0
 c     Revised: 23: 6:1999 (J.R.)
 c     Preventing overflows in c0 for alfa=0,1
+c     Revised: 06: 6:2013 (J.R.)
+c     Added moment to list of C-functions arguments; simplified
+c     resetting after argument change - now automatic and inside c0 only
 
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -33,200 +36,151 @@ c                                                                    c
 c   p2 = p^2    q2 = q^2    pq = 1/2 ((p + q)^2 - p^2 - q^2)         c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
-      double complex function c11(a1,a2,a3)
+      double complex function c11(p2,q2,pq,a1,a2,a3)
       implicit double precision (a-h,o-z)
       double complex b0,c0
-      logical cstat(7),infstat
-      double complex cval(7)
-      common/cmem/cval,cstat
-      common/cargs/p2,q2,pq
+      logical infstat
       common/renorm/del,amiu2,infstat
-      if (cstat(2)) then
-        c11 = cval(2)
-        return
-      end if
       if (infstat) then
-        c11 = 0
+        c11 = (0.d0,0.d0)
         return
       end if
       det = p2*q2 - pq*pq
       s1 = p2 + a1*a1 - a2*a2
       s2 = q2 + 2*pq + a2*a2 - a3*a3
       x = p2 + q2 + 2*pq
-      c11 = q2*(b0(x,a1,a3) - b0(q2,a2,a3) + s1*c0(a1,a2,a3))
-     1    - pq*(b0(p2,a1,a2) - b0(x,a1,a3) + s2*c0(a1,a2,a3))
+      c11 = q2*(b0(x,a1,a3) - b0(q2,a2,a3) + s1*c0(p2,q2,pq,a1,a2,a3))
+     $     - pq*(b0(p2,a1,a2) - b0(x,a1,a3) + s2*c0(p2,q2,pq,a1,a2,a3))
       c11 = - c11/det/2
-      cval(2) = c11
-      cstat(2) = .true.
       return
       end
 
-      double complex function c12(a1,a2,a3)
+      double complex function c12(p2,q2,pq,a1,a2,a3)
       implicit double precision (a-h,o-z)
       double complex b0,c0
-      logical cstat(7),infstat
-      double complex cval(7)
-      common/cmem/cval,cstat
-      common/cargs/p2,q2,pq
+      logical infstat
       common/renorm/del,amiu2,infstat
-      if (cstat(3)) then
-        c12 = cval(3)
-        return
-      end if
       if (infstat) then
-        c12 = 0
+        c12 = (0.d0,0.d0)
         return
       end if
       det = p2*q2 - pq*pq
       s1 = p2 + a1*a1 - a2*a2
       s2 = q2 + 2*pq + a2*a2 - a3*a3
       x = p2 + q2 + 2*pq
-      c12 = - pq*(b0(x,a1,a3) - b0(q2,a2,a3) + s1*c0(a1,a2,a3))
-     1    + p2*(b0(p2,a1,a2) - b0(x,a1,a3) + s2*c0(a1,a2,a3))
+      c12 = - pq*(b0(x,a1,a3) - b0(q2,a2,a3) + s1*c0(p2,q2,pq,a1,a2,a3))
+     $     + p2*(b0(p2,a1,a2) - b0(x,a1,a3) + s2*c0(p2,q2,pq,a1,a2,a3))
       c12 = - c12/det/2
-      cval(3) = c12
-      cstat(3) = .true.
       return
       end
 
-      double complex function c21(a1,a2,a3)
+      double complex function c21(p2,q2,pq,a1,a2,a3)
       implicit double precision (a-h,o-z)
       double complex b0,b1,c11,c24
-      logical cstat(7),infstat
-      double complex cval(7)
-      common/cmem/cval,cstat
-      common/cargs/p2,q2,pq
+      logical infstat
       common/renorm/del,amiu2,infstat
-      if (cstat(4)) then
-        c21 = cval(4)
-        return
-      end if
       if (infstat) then
-        c21 = 0
+        c21 = (0.d0,0.d0)
         return
       end if
       det = p2*q2 - pq*pq
       s1 = p2 + a1*a1 - a2*a2
       s2 = q2 + 2*pq + a2*a2 - a3*a3
       x = p2 + q2 + 2*pq
-      c21 = q2*(b1(x,a1,a3) + b0(q2,a2,a3) + s1*c11(a1,a2,a3)
-     1    + 2*c24(a1,a2,a3)) - pq*(b1(p2,a1,a2) - b1(x,a1,a3)
-     2    + s2*c11(a1,a2,a3))
+      c21 = q2*(b1(x,a1,a3) + b0(q2,a2,a3) + s1*c11(p2,q2,pq,a1,a2,a3)
+     $     + 2*c24(p2,q2,pq,a1,a2,a3)) - pq*(b1(p2,a1,a2) - b1(x,a1,a3)
+     $     + s2*c11(p2,q2,pq,a1,a2,a3))
       c21 = - c21/det/2
-      cval(4) = c21
-      cstat(4) = .true.
       return
       end
 
-      double complex function c22(a1,a2,a3)
+      double complex function c22(p2,q2,pq,a1,a2,a3)
       implicit double precision (a-h,o-z)
       double complex b1,c12,c24
-      logical cstat(7),infstat
-      double complex cval(7)
-      common/cmem/cval,cstat
-      common/cargs/p2,q2,pq
+      logical infstat
       common/renorm/del,amiu2,infstat
-      if (cstat(5)) then
-        c22 = cval(5)
-        return
-      end if
       if (infstat) then
-        c22 = 0
+        c22 = (0.d0,0.d0)
         return
       end if
       det = p2*q2 - pq*pq
       s1 = p2 + a1*a1 - a2*a2
       s2 = q2 + 2*pq + a2*a2 - a3*a3
       x = p2 + q2 + 2*pq
-      c22 = - pq*(b1(x,a1,a3) - b1(q2,a2,a3) + s1*c12(a1,a2,a3))
-     1    - p2*(b1(x,a1,a3) - s2*c12(a1,a2,a3) - 2*c24(a1,a2,a3))
+      c22 = - p2*(b1(x,a1,a3) - s2*c12(p2,q2,pq,a1,a2,a3) 
+     $     - 2*c24(p2,q2,pq,a1,a2,a3)) - pq*(b1(x,a1,a3) 
+     $     - b1(q2,a2,a3) + s1*c12(p2,q2,pq,a1,a2,a3)) 
       c22 = - c22/det/2
-      cval(5) = c22
-      cstat(5) = .true.
       return
       end
 
-      double complex function c23(a1,a2,a3)
+      double complex function c23(p2,q2,pq,a1,a2,a3)
       implicit double precision (a-h,o-z)
       double complex b0,b1,c11,c24
-      logical cstat(7),infstat
-      double complex cval(7)
-      common/cmem/cval,cstat
-      common/cargs/p2,q2,pq
+      logical infstat
       common/renorm/del,amiu2,infstat
-      if (cstat(6)) then
-        c23 = cval(6)
-        return
-      end if
       if (infstat) then
-        c23 = 0
+        c23 = (0.d0,0.d0)
         return
       end if
       det = p2*q2 - pq*pq
       s1 = p2 + a1*a1 - a2*a2
       s2 = q2 + 2*pq + a2*a2 - a3*a3
       x = p2 + q2 + 2*pq
-      c23 = - pq*(b1(x,a1,a3) + b0(q2,a2,a3) + s1*c11(a1,a2,a3)
-     1    + 2*c24(a1,a2,a3)) + p2*(b1(p2,a1,a2) - b1(x,a1,a3)
-     2    + s2*c11(a1,a2,a3))
+      c23 = - pq*(b1(x,a1,a3) + b0(q2,a2,a3) + s1*c11(p2,q2,pq,a1,a2,a3)
+     $    + 2*c24(p2,q2,pq,a1,a2,a3)) + p2*(b1(p2,a1,a2) - b1(x,a1,a3)
+     $    + s2*c11(p2,q2,pq,a1,a2,a3))
       c23 = - c23/det/2
-      cval(6) = c23
-      cstat(6) = .true.
       return
       end
 
-      double complex function c24(a1,a2,a3)
+      double complex function c24(p2,q2,pq,a1,a2,a3)
       implicit double precision (a-h,o-z)
       double complex b0,c0,c11,c12
-      logical cstat(7),infstat
-      double complex cval(7)
-      common/cmem/cval,cstat
-      common/cargs/p2,q2,pq
+      logical infstat
       common/renorm/del,amiu2,infstat
-      if (cstat(7)) then
-        c24 = cval(7)
-        return
-      end if
       if (infstat) then
         c24 = - del/4
         return
       end if
       s1 = p2 + a1*a1 - a2*a2
       s2 = q2 + 2*pq + a2*a2 - a3*a3
-      c24 = (s1*c11(a1,a2,a3) + s2*c12(a1,a2,a3) + 2*a1*a1*c0(a1,a2,a3)
-     1    - b0(q2,a2,a3) - 1)/4
-      cval(7) = c24
-      cstat(7) = .true.
+      c24 = (s1*c11(p2,q2,pq,a1,a2,a3) + s2*c12(p2,q2,pq,a1,a2,a3) 
+     $     + 2*a1*a1*c0(p2,q2,pq,a1,a2,a3) - b0(q2,a2,a3) - 1)/4
       return
       end
 
-      subroutine creset
-      implicit double precision (a-h,o-z)
-      double complex cval(7)
-      logical cstat(7)
-      common/cmem/cval,cstat
-      do 10 i=1,7
-10    cstat(i) = .false.
+      double complex function c0(p2,q2,pq,a1,a2,a3)
+      implicit double precision (a-h,m,o-z)
+      logical infstat
+      double complex c0_0,c0_body
+      common/cmem/c0_0,p2_0,q2_0,pq_0,a1_0,a2_0,a3_0,eps_c0
+      common/renorm/del,amiu2,infstat
+      if (infstat) then
+        c0 = (0.d0,0.d0)
+        return
+      end if
+c     if arguments changed, calculate new c0 value; use old one otherwise 
+      if (max(abs(p2-p2_0),abs(q2-q2_0),abs(pq-pq_0),abs(a1-a1_0),
+     $     abs(a2-a2_0),abs(a3-a3_0)).ge.eps_c0) then
+         c0 = c0_body(p2,q2,pq,a1,a2,a3)
+         p2_0 = p2
+         q2_0 = q2
+         pq_0 = pq
+         a1_0 = a1
+         a2_0 = a2
+         a3_0 = a3
+         c0_0 = c0
+      else
+         c0 = c0_0
+      end if
       return
       end
 
-      double complex function c0(a1,a2,a3)
+      double complex function c0_body(p2,q2,pq,a1,a2,a3)
       implicit double precision (a-h,m,o-z)
       double complex s3,alfa,y0,y1,y2,y3,sf1,sf2,sf3,f
-      logical cstat(7),infstat
-      double complex cval(7)
-      common/cmem/cval,cstat
-      common/cargs/p2,q2,pq
       common/spence/ber(9),pi,pi6,eps
-      common/renorm/del,amiu2,infstat
-      if (cstat(1)) then
-        c0 = cval(1)
-        return
-      end if
-      if (infstat) then
-        c0 = 0
-        return
-      end if
       a = q2
       b = p2
       c = 2*pq
@@ -250,17 +204,15 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          y2 = y0/(1 - alfa)
          sf2 = s3(y2,a + b + c,e + d,f)
       else 
-         sf2 = 0
+         sf2 = (0.d0,0.d0)
       end if
       if (abs(alfa).ne.0.d0) then
          y3 = - y0/alfa
          sf3 = s3(y3,a,d,f)
       else 
-         sf3 = 0
+         sf3 = (0.d0,0.d0)
       end if
-      c0 = (sf1 - sf2 + sf3)/(c + 2*b*alfa)
-      cval(1) = c0
-      cstat(1) = .true.
+      c0_body = (sf1 - sf2 + sf3)/(c + 2*b*alfa)
       return
       end
 
@@ -269,7 +221,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       double complex c,eta,R,y0,y1,y2,z1,z2,delta
       if (a.eq.0.d0) then
         if (b.eq.0.d0) then
-          s3 = (0.d0, 0.d0)
+          s3 = (0.d0,0.d0)
           return
         end if
         z1 = b
@@ -316,7 +268,7 @@ c     c0 for p=q=0, pq=s/2 and equal masses in loop
       common/spence/ber(9),pi,pi6,eps
       common/renorm/del,amiu2,infstat
       if (infstat) then
-        c0_on = 0
+        c0_on = (0.d0,0.d0)
         return
       end if
       if (s.eq.0) then
