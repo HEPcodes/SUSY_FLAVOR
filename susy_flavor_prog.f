@@ -35,9 +35,11 @@ c     fixes the treatment of enhanced chiral correction resummation
       ilev = 1                  ! resummation using the decoupling limit
       ilev = 2                  ! exact iterative solution, may not always converge
       
+      call sprog_input          ! reset default SM and hadronic parameters
+
 c     SM basic input initialization
       zm0 = 91.1876d0           ! M_Z
-      wm0 = 80.385d0            ! M_W
+      wm0 = 80.398d0            ! M_W
       alpha_z = 1/127.934d0     ! alpha_em(M_Z)
       st2_new = 0.232d0         ! s_W^2 (here MSbar value)
       call vpar_update(zm0,wm0,alpha_z,st2_new)
@@ -55,15 +57,15 @@ c     CKM matrix initialization
       call ckm_wolf(alam,apar,rhobar,etabar)
 
 c     Fermion mass initialization, input: MSbar running quark masses
-      top_scale = 163.2d0
-      top = 163.2d0             ! running m_t(top_scale)
+      top_scale = 163.09d0
+      top = 163.09d0             ! running m_t(top_scale)
       bot_scale = 4.17d0
       bot = 4.17d0              ! running m_b(bot_scale)
       call init_fermion_sector(top,top_scale,bot,bot_scale)
 
 c     Higgs sector parameters
       pm    = 200               ! M_A
-      tanbe = 4                 ! tan(beta)
+      tanbe = 10                 ! tan(beta)
       amue  = (200.d0,100.d0)   ! mu
       call init_higgs_sector(pm,tanbe,amue,ierr)
       if (ierr.ne.0) stop 'negative tree level Higgs mass^2?'

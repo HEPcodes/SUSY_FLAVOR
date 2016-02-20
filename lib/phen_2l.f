@@ -24,8 +24,8 @@ c     fermion masses
          return
       end if
       call ll_gam(i,j,cfl,cfr)
-      cl = cfl(1) + em(i)*cfl(4) + em(j)*cfr(4)
-      cr = cfr(1) + em(j)*cfl(4) + em(i)*cfr(4)
+      cl = cfl(1) + em(i)*cfl(4) - em(j)*cfr(4)
+      cr = cfr(1) - em(j)*cfl(4) + em(i)*cfr(4)
       gam_llg = e2*em(j)**3/4/pi*(abs(cl)**2 + abs(cr)**2)
       return
       end
@@ -39,14 +39,18 @@ c     BR(l^J->l^I) decay
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/fmass/em(3),um(3),dm(3)
       common/fermi/g_fermi
+      common/tau_gam/br_tau_evv
       if (em(j).le.em(i)) then
          br_llg = 0
          return
       end if
       call ll_gam(i,j,cfl,cfr)
-      cl = cfl(1) + em(i)*cfl(4) + em(j)*cfr(4)
-      cr = cfr(1) + em(j)*cfl(4) + em(i)*cfr(4)
+c     in standard notation c7l(r) is 32*pi*pi*st2/em(j)/e2*cl(r) 
+      cl = cfl(1) + em(i)*cfl(4) - em(j)*cfr(4)
+      cr = cfr(1) - em(j)*cfl(4) + em(i)*cfr(4)
       br_llg = 3*(4*pi*e/em(j)/g_fermi)**2*(abs(cl)**2 + abs(cr)**2)
+      br_tau_evv = 0.1872d0
+      if (j.eq.3) br_llg = br_llg*br_tau_evv
       return
       end
 
@@ -56,7 +60,7 @@ c     magnetic moment anomaly of lepton, a=(g-2)/2
       double complex cfl(5),cfr(5)
       common/fmass/em(3),um(3),dm(3)
       call ll_gam(i,i,cfl,cfr)
-      g_minus_2_anomaly = - 4*em(i)*dble(cfl(1) + em(i)*(cfl(4)+cfr(4)))
+      g_minus_2_anomaly = - 4*em(i)*dble(cfl(1) + em(i)*(cfl(4)-cfr(4)))
       return
       end
 

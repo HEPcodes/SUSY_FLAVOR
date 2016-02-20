@@ -183,6 +183,102 @@ c     clear MINPAR/EXTPAR and soft terms data
       return
       end
 
+      subroutine sprog_input
+c     Set default SM/hadronic parameters
+      implicit double precision (a-h,o-z)
+      common/edm_qcd/eta_en,eta_cn,eta_gn,alamx_n
+      common/kpivv/ak0,del_ak0,akp,del_akp,pc,del_pc,alam_k
+      common/sm_4q/eta_cc,eta_ct,eta_tt,eta_b,bk_sm,bd_sm,bb_sm(2)
+      common/meson_data/dmk,amk,epsk,fk,dmd,amd,fd,
+     $    amb(2),dmb(2),tau_b(2),fb(2)
+      common/bx_4q/bk(5),bd(5),bb(2,5),amu_k,amu_d,amu_b
+      common/fmass_high/umu(3),uml(3),amuu(3),dmu(3),dml(3),amud(3)
+      common/fmass/em(3),um(3),dm(3)
+      common/sflav_data/control_data(3),sm_data(31),ckm_data(4),
+     $     extpar_data(49),extim_data(49),hadron_data(56),tb_min(6)
+c     set default SM variables, clear SUSY parameters
+      call sflav_defaults
+      alpha_z = 1/sm_data(1)    ! 1/alpha_em(M_Z)
+      alpha_s = sm_data(3)      ! alpha_s(MZ)
+      zm0 = sm_data(4)          ! M_Z
+c     Fermion mass initialization, input: MSbar running quark masses
+      bottom = sm_data(5)       ! mb(mb)
+      bot_scale = bottom
+      top_pole = sm_data(6)     ! mt(pole)
+      top = 0.94d0*top_pole     ! mt(mt_pole) - running mt at mt(pole)
+      top_scale = top
+      em(3) = sm_data(7)        ! m_tau (pole)
+      em(1) = sm_data(11)       ! m_e (pole)
+      em(2) = sm_data(13)       ! m_mu (pole)
+      dml(1) = sm_data(21)      ! md(2 GeV)
+      uml(1) = sm_data(22)      ! mu(2 GeV)
+      dml(2) = sm_data(23)      ! ms(2 GeV)
+      uml(2) = sm_data(24)      ! mc(mc)
+      wm0 = sm_data(30)         ! M_W (not standard SLHA2!)
+      st2 = sm_data(31)         ! sin^2(theta_W) in MSbar (not standard SLHA2!)
+c     Electroweak and strong parameter initialization
+      call vpar_update(zm0,wm0,alpha_z,st2) ! sets electroweak parameters
+      call lam_fit(alpha_s)     ! fits Lambda_QCD at 3 loop level
+      call lam_fit_NLO(alpha_s) ! fits Lambda_QCD at NLO level
+      call init_fermion_sector(top,top_scale,bottom,bot_scale)
+c     read the CKM data
+      alam = ckm_data(1)        ! lambda
+      apar = ckm_data(2)        ! A
+      rhobar = ckm_data(3)      ! rho bar
+      etabar = ckm_data(4)      ! eta bar
+      call ckm_wolf(alam,apar,rhobar,etabar)
+c     read the hadronic data
+      fk = hadron_data(1)       ! f_K
+      fd = hadron_data(2)       ! f_D
+      fb(1) = hadron_data(3)    ! f_B_d
+      fb(2) = hadron_data(4)    ! f_B_s
+      bk_sm = hadron_data(5)    ! B_K for SM contribution to KKbar
+      eta_cc = hadron_data(6)   ! eta_cc in KK mixing (SM)
+      eta_ct = hadron_data(7)   ! eta_cc in KK mixing (SM)
+      eta_tt = hadron_data(8)   ! eta_cc in KK mixing (SM)
+      amu_k = hadron_data(9)    ! scale for B_K (non-SM)    
+      do i=1,5
+         bk(i) = hadron_data(9+i) ! B_K for VLL, SLL(2), LR(2) 
+      end do 
+      bd_sm = hadron_data(15)   ! B_D for SM contribution 
+      amu_d = hadron_data(16)   ! scale for B_D (non-SM)
+      do i=1,5
+         bd(i) = hadron_data(16+i) ! B_D for VLL, SLL(2), LR(2) 
+      end do 
+      bb_sm(1) = hadron_data(22) ! B_Bd for SM contribution 
+      amu_b = hadron_data(23)   ! scale for B_B (non-SM, both Bd and Bs)
+      do i=1,5
+         bb(1,i) = hadron_data(23+i) ! B_Bd for VLL, SLL(2), LR(2) 
+      end do 
+      bb_sm(2) = hadron_data(29) ! B_Bs for SM contribution 
+      eta_b = hadron_data(30)   ! eta_b for  BsBsbar (SM)
+      do i=1,5
+         bb(2,i) = hadron_data(30+i) ! B_Bs for VLL, SLL(2), LR(2) 
+      end do 
+      tau_b(1) = hadron_data(36) ! Bd lifetime (experimental)
+      tau_b(2) = hadron_data(37) ! Bs lifetime (experimental)
+      amb(1) = hadron_data(38)  ! Bd mass (experimental)
+      amb(2) = hadron_data(39)  ! Bs mass (experimental)
+      dmb(1) = hadron_data(40)  ! Delta Bd (experimental)
+      dmb(2) = hadron_data(41)  ! Delta Bs (experimental)
+      amk = hadron_data(42)     ! K0 mass (experimental)
+      dmk = hadron_data(43)     ! Delta mK (experimental)
+      epsk = hadron_data(44)    ! eps_K (experimental)
+      amd = hadron_data(45)     ! D0 mass (experimental)
+      dmd = hadron_data(46)     ! Delta mD (experimental)
+      ak0 = hadron_data(47)     ! parameter kappa in K^0->pi^0vv calculations
+      akp = hadron_data(48)     ! parameter kappa in K^+->pi^+vv calculations
+      pc = hadron_data(49)      ! parameter P_c in K->pivv calculations
+      del_ak0 = hadron_data(50) ! error of ak0
+      del_akp = hadron_data(51) ! error of akp
+      del_pc = hadron_data(52)  ! error of pc 
+      eta_en = hadron_data(53)  ! neutron EDM QCD correction factors
+      eta_cn = hadron_data(54)  ! neutron EDM QCD correction factors
+      eta_gn = hadron_data(55)  ! neutron EDM QCD correction factors
+      alamx_n = hadron_data(56) ! neutron EDM chiral symmetry breaking scale
+      return
+      end
+
       subroutine sflav_input(ilev,ierr)
 c     Input read from file susy_flavor.in
       implicit double precision (a-h,o-z)

@@ -175,12 +175,11 @@ c     Full A^V_L formfactor
      $     zdd_vl_gl
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/debug_4q/ih,ic,in,ing,ig
-      common/susy_sign/isus
       zdd_vl = zdd_vl_g(i,j)
       if (ih.eq.1) zdd_vl = zdd_vl + zdd_vl_hg(i,j) + zdd_vl_h(i,j) 
-      if (ic.eq.1) zdd_vl = zdd_vl + isus*zdd_vl_c(i,j)
-      if (in.eq.1) zdd_vl = zdd_vl + isus*zdd_vl_n(i,j)
-      if (ig.eq.1) zdd_vl = zdd_vl + isus*zdd_vl_gl(i,j)
+      if (ic.eq.1) zdd_vl = zdd_vl + zdd_vl_c(i,j)
+      if (in.eq.1) zdd_vl = zdd_vl + zdd_vl_n(i,j)
+      if (ig.eq.1) zdd_vl = zdd_vl + zdd_vl_gl(i,j)
       zdd_vl = zdd_vl/16/pi/pi
       return
       end
@@ -317,19 +316,14 @@ c     Full A^V_R formfactor
      $     zdd_vr_gl
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/debug_4q/ih,ic,in,ing,ig
-      common/susy_sign/isus
-      external isus_data
       zdd_vr = zdd_vr_g(i,j)
       if (ih.eq.1) zdd_vr = zdd_vr + zdd_vr_hg(i,j) + zdd_vr_h(i,j) 
-      if (ic.eq.1) zdd_vr = zdd_vr + isus*zdd_vr_c(i,j)
-      if (in.eq.1) zdd_vr = zdd_vr + isus*zdd_vr_n(i,j)
-      if (ig.eq.1) zdd_vr = zdd_vr + isus*zdd_vr_gl(i,j)
+      if (ic.eq.1) zdd_vr = zdd_vr + zdd_vr_c(i,j)
+      if (in.eq.1) zdd_vr = zdd_vr + zdd_vr_n(i,j)
+      if (ig.eq.1) zdd_vr = zdd_vr + zdd_vr_gl(i,j)
       zdd_vr = zdd_vr/16/pi/pi
       return
       end
 
-      block data isus_data
-      common/susy_sign/isus
-      data isus/1/
-      end
+
       
