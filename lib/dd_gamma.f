@@ -108,12 +108,15 @@ c     gluino-down squark contributions
       implicit double precision (a-h,o-z)
       double complex cfl(5),cfr(5)
       double complex ai,aj,bi,bj
-      double complex zu,zd,gm2,gm3
-      common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      double complex zu0,zd0,gm2,gm3
+      double complex zd
+      logical init_alpha_susy
+      common/alpha_s_susy/g3u,g3d,init_alpha_susy
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/gmass/gm1,gm2,gm3
+      if (init_alpha_susy) call init_alpha_s_susy
+      qs = 8/9.d0*g3d*g3d 
       do k=1,6
-         qs = 32/9.d0*pi*alfas((gm1 + sdm(k))/2)
          ai = - dconjg(zd(i,k))
          bi =   dconjg(zd(i+3,k))
          aj = - zd(j,k)

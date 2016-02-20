@@ -31,16 +31,17 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       double complex function dd_vll_sm(i,j)
 c     Full A^V_LL SM formfactor
       implicit double precision (a-h,o-z)
-      double complex ckm_e,ckm_0,ydl,ydr,yul,yur
+      double complex ckm_phys,ckm0,udl,udr,uul,uur
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/fmass_high/umu(3),uml(3),amuu(3),dmu(3),dml(3),amud(3)
-      common/ckm_switch/ckm_e(3,3),ckm_0(3,3),
-     $     ydl(3,3),ydr(3,3),yul(3,3),yur(3,3),iswitch
+      common/ckm_switch/ckm_phys(3,3),ckm0(3,3),udl(3,3),udr(3,3),
+     $     uul(3,3),uur(3,3)
       dd_vll_sm = (0.d0,0.d0)
       do m=1,3
          do n=1,3
             dd_vll_sm = dd_vll_sm + e2*e2/4/st2/st2
-     $           * dconjg(ckm_e(i,m)*ckm_e(i,n))*ckm_e(j,m)*ckm_e(j,n)
+     $           * ckm_phys(m,i)*ckm_phys(n,i)
+     $           * dconjg(ckm_phys(m,j)*ckm_phys(n,j))
      $           * ((1 + (umu(m)*umu(n)/wm2)**2/4)/2
      $           * dp1(wm,wm,umu(m),umu(n)) 
      $           - (umu(m)*umu(n)/wm)**2*dp0(wm,wm,umu(m),umu(n)))
@@ -52,18 +53,18 @@ c     Full A^V_LL SM formfactor
       double complex function dd_vll_hg(i,j)
 c     Charged Higgs contributions
       implicit double precision (a-h,o-z)
-      double complex ckm_e,ckm_0,ydl,ydr,yul,yur
+      double complex ckm_phys,ckm0,udl,udr,uul,uur
       double complex yh_eff_l
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
       common/fmass_high/umu(3),uml(3),amuu(3),dmu(3),dml(3),amud(3)
-      common/ckm_switch/ckm_e(3,3),ckm_0(3,3),
-     $     ydl(3,3),ydr(3,3),yul(3,3),yur(3,3),iswitch
+      common/ckm_switch/ckm_phys(3,3),ckm0(3,3),udl(3,3),udr(3,3),
+     $     uul(3,3),uur(3,3)
       dd_vll_hg = (0.d0,0.d0)
       do m=1,3
          do n=1,3
-            dd_vll_hg = dd_vll_hg - e2/st2/2*yh_eff_l(i,m,1)*ckm_e(j,m)
-     $           * dconjg(yh_eff_l(j,n,1)*ckm_e(i,n)) 
+            dd_vll_hg = dd_vll_hg - e2/st2/2*yh_eff_l(i,m,1)
+     $           * dconjg(yh_eff_l(j,n,1)*ckm_phys(m,j))*ckm_phys(n,i)
      $           * umu(m)*umu(n)*dp0(wm,cm(1),umu(m),umu(n))
             dd_vll_hg = dd_vll_hg + yh_eff_l(i,m,1)*yh_eff_l(i,n,1)
      $           * dconjg(yh_eff_l(j,n,1)*yh_eff_l(j,m,1))/8
@@ -127,10 +128,11 @@ c     neutralino contributions
       double complex function dd_vll_ng(i,j)
 c     gluino-neutralino contributions
       implicit double precision (a-h,o-z)
-      double complex vl_ddn,zn,zu,zd,gm2,gm3
+      double complex vl_ddn,zn,zu0,zd0,gm2,gm3
+      double complex zd
       logical init_alpha_susy
       common/alpha_s_susy/g3u,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/neut/fnm(4),zn(4,4)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
@@ -155,10 +157,11 @@ c     gluino-neutralino contributions
       double complex function dd_vll_g(i,j)
 c     gluino contributions
       implicit double precision (a-h,o-z)
-      double complex zu,zd,gm2,gm3
+      double complex zu0,zd0,gm2,gm3
+      double complex zd
       logical init_alpha_susy
       common/alpha_s_susy/g3u,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
       dd_vll_g = (0.d0,0.d0)
@@ -269,10 +272,11 @@ c     neutralino contributions
       double complex function dd_vrr_ng(i,j)
 c     gluino-neutralino contributions
       implicit double precision (a-h,o-z)
-      double complex vr_ddn,zn,zu,zd,gm2,gm3
+      double complex vr_ddn,zn,zu0,zd0,gm2,gm3
+      double complex zd
       logical init_alpha_susy
       common/alpha_s_susy/g3u,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/neut/fnm(4),zn(4,4)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
@@ -297,10 +301,11 @@ c     gluino-neutralino contributions
       double complex function dd_vrr_g(i,j)
 c      gluino contributions
       implicit double precision (a-h,o-z)
-      double complex zu,zd,gm2,gm3
+      double complex zu0,zd0,gm2,gm3
+      double complex zd
       logical init_alpha_susy
       common/alpha_s_susy/g3u,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
       dd_vrr_g = (0.d0,0.d0)
@@ -405,10 +410,11 @@ c     neutralino contributions
       double complex function dd_vlr_ng(i,j)
 c      gluino-neutralino contributions
       implicit double precision (a-h,o-z)
-      double complex vl_ddn,vr_ddn,zn,zu,zd,gm2,gm3
+      double complex vl_ddn,vr_ddn,zn,zu0,zd0,gm2,gm3
+      double complex zd
       logical init_alpha_susy
       common/alpha_s_susy/g3u,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/neut/fnm(4),zn(4,4)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
@@ -445,10 +451,11 @@ c      gluino-neutralino contributions
       double complex function dd_vlr_g(i,j)
 c      gluino contributions
       implicit double precision (a-h,o-z)
-      double complex zu,zd,gm2,gm3
+      double complex zu0,zd0,gm2,gm3
+      double complex zd
       logical init_alpha_susy
       common/alpha_s_susy/g3u,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
       dd_vlr_g = (0.d0,0.d0)
@@ -556,10 +563,11 @@ c      neutralino contributions
       double complex function dd_sll_ng(i,j)
 c     gluino-neutralino contributions
       implicit double precision (a-h,o-z)
-      double complex vl_ddn,vr_ddn,zn,zu,zd,gm2,gm3
+      double complex vl_ddn,vr_ddn,zn,zu0,zd0,gm2,gm3
+      double complex zd
       logical init_alpha_susy
       common/alpha_s_susy/g3u,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/neut/fnm(4),zn(4,4)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
@@ -586,10 +594,11 @@ c     gluino-neutralino contributions
       double complex function dd_sll_g(i,j)
 c     gluino contributions
       implicit double precision (a-h,o-z)
-      double complex zu,zd,gm2,gm3
+      double complex zu0,zd0,gm2,gm3
+      double complex zd
       logical init_alpha_susy
       common/alpha_s_susy/g3u,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
       dd_sll_g = (0.d0,0.d0)
@@ -693,10 +702,11 @@ c     neutralino contributions
       double complex function dd_srr_ng(i,j)
 c     gluino-neutralino contributions
       implicit double precision (a-h,o-z)
-      double complex vl_ddn,vr_ddn,zn,zu,zd,gm2,gm3
+      double complex vl_ddn,vr_ddn,zn,zu0,zd0,gm2,gm3
+      double complex zd
       logical init_alpha_susy
       common/alpha_s_susy/g3u,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/neut/fnm(4),zn(4,4)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
@@ -723,10 +733,11 @@ c     gluino-neutralino contributions
       double complex function dd_srr_g(i,j)
 c      gluino contributions
       implicit double precision (a-h,o-z)
-      double complex zu,zd,gm2,gm3
+      double complex zu0,zd0,gm2,gm3
+      double complex zd
       logical init_alpha_susy
       common/alpha_s_susy/g3u,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
       dd_srr_g = (0.d0,0.d0)
@@ -760,9 +771,9 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     Higgs and gauge contributions
       implicit double precision (a-h,o-z)
       double complex yh_eff_l,yh_eff_r
-      double complex ckm_e,ckm_0,ydl,ydr,yul,yur
-      common/ckm_switch/ckm_e(3,3),ckm_0(3,3),
-     $     ydl(3,3),ydr(3,3),yul(3,3),yur(3,3),iswitch
+      double complex ckm_phys,ckm0,udl,udr,uul,uur
+      common/ckm_switch/ckm_phys(3,3),ckm0(3,3),udl(3,3),udr(3,3),
+     $     uul(3,3),uur(3,3)
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
       common/fmass_high/umu(3),uml(3),amuu(3),dmu(3),dml(3),amud(3)
@@ -771,7 +782,7 @@ c     Higgs and gauge contributions
          do n=1,3
             do k=1,2
                dd_slr_hg = dd_slr_hg - e2/2/st2*yh_eff_r(i,m,k)
-     $              * ckm_e(j,m)*dconjg(ckm_e(i,n)*yh_eff_r(j,n,k))
+     $              *ckm_phys(n,i)*dconjg(ckm_phys(m,j)*yh_eff_r(j,n,k))
      $              * dp1(wm,cm(k),umu(m),umu(n))
                do l=1,2
                   dd_slr_hg = dd_slr_hg
@@ -836,10 +847,11 @@ c     neutralino contributions
       double complex function dd_slr_ng(i,j)
 c     gluino-neutralino contributions
       implicit double precision (a-h,o-z)
-      double complex vl_ddn,vr_ddn,zn,zu,zd,gm2,gm3
+      double complex vl_ddn,vr_ddn,zn,zu0,zd0,gm2,gm3
+      double complex zd
       logical init_alpha_susy
       common/alpha_s_susy/g3u,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/neut/fnm(4),zn(4,4)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
@@ -877,10 +889,11 @@ c     gluino-neutralino contributions
       double complex function dd_slr_g(i,j)
 c      gluino contributions
       implicit double precision (a-h,o-z)
-      double complex zu,zd,gm2,gm3
+      double complex zu0,zd0,gm2,gm3
+      double complex zd
       logical init_alpha_susy
       common/alpha_s_susy/g3u,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
       dd_slr_g = (0.d0,0.d0)
@@ -964,10 +977,11 @@ c     neutralino contributions
       double complex function dd_tl_ng(i,j)
 c     gluino-neutralino contributions
       implicit double precision (a-h,o-z)
-      double complex vl_ddn,vr_ddn,zn,zu,zd,gm2,gm3
+      double complex vl_ddn,vr_ddn,zn,zu0,zd0,gm2,gm3
+      double complex zd
       logical init_alpha_susy
       common/alpha_s_susy/g3u,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/neut/fnm(4),zn(4,4)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
@@ -993,10 +1007,11 @@ c     gluino-neutralino contributions
       double complex function dd_tl_g(i,j)
 c     gluino contributions
       implicit double precision (a-h,o-z)
-      double complex zu,zd,gm2,gm3
+      double complex zu0,zd0,gm2,gm3
+      double complex zd
       logical init_alpha_susy
       common/alpha_s_susy/g3u,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
       dd_tl_g = (0.d0,0.d0)
@@ -1076,10 +1091,11 @@ c     neutralino contributions
       double complex function dd_tr_ng(i,j)
 c     gluino-neutralino contributions
       implicit double precision (a-h,o-z)
-      double complex vl_ddn,vr_ddn,zn,zu,zd,gm2,gm3
+      double complex vl_ddn,vr_ddn,zn,zu0,zd0,gm2,gm3
+      double complex zd
       logical init_alpha_susy
       common/alpha_s_susy/g3u,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/neut/fnm(4),zn(4,4)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
@@ -1105,10 +1121,11 @@ c     gluino-neutralino contributions
       double complex function dd_tr_g(i,j)
 c     gluino contributions
       implicit double precision (a-h,o-z)
-      double complex zu,zd,gm2,gm3
+      double complex zu0,zd0,gm2,gm3
+      double complex zd
       logical init_alpha_susy
       common/alpha_s_susy/g3u,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
       dd_tr_g = (0.d0,0.d0)
@@ -1140,63 +1157,58 @@ c     General form of the Hamiltonian is:                          c
 c     H = A^S_LL H^S_LL + A^S_RR H^S_RR + A^S_LR H^S_LR            c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
-c     To be reworked after changes to sdd_vert and pdd_vert
-c     temporarily commented out
-
 c      Scalar-LL,RR,LR formfactor to delta_F=2 mixing (KK,BB)
+c     Y_dL^IJk = ysd(I,J,k)^* etc. 
 
-c      double complex function dd_sll_yuk(i,j)
-c      implicit double precision (a-h,o-z)
-c      double complex form(2)
-c      common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
-c      dd_sll_yuk = (0.d0,0.d0)
-c      do k=1,2
-c         call ys_eff(i,j,k,form)
-c         dd_sll_yuk = dd_sll_yuk - (form(1)/rm(k))**2/2
-c         call yp_eff(i,j,k,form)
-c         dd_sll_yuk = dd_sll_yuk - (form(1)/pm(k))**2/2
-c      end do
-c      return
-c      end
+      double complex function dd_sll_yuk(i,j)
+      implicit double precision (a-h,o-z)
+      double complex yhl,yhr,ysu,ypu,ysd,ypd
+      logical init_yukawa_eff
+      common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
+      common/yukawa_eff/yhl(3,3,2),yhr(3,3,2),ysu(3,3,2),ypu(3,3,2),
+     $     ysd(3,3,2),ypd(3,3,2),init_yukawa_eff
+      if (init_yukawa_eff) call yukawa_eff_init
+      dd_sll_yuk = (0.d0,0.d0)
+      do k=1,2
+         dd_sll_yuk = dd_sll_yuk + (ysd(i,j,k)/rm(k))**2
+     $        - (ypd(i,j,k)/pm(k))**2
+      end do
+      dd_sll_yuk = dconjg(dd_sll_yuk)/4
+      return
+      end
 
-c      double complex function dd_srr_yuk(i,j)
-c      implicit double precision (a-h,o-z)
-c      double complex form(2)
-c      common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
-c      dd_srr_yuk = (0.d0,0.d0)
-c      do k=1,2
-c         call ys_eff(j,i,k,form)
-c         dd_srr_yuk = dd_srr_yuk - (form(1)/rm(k))**2/2
-c         call yp_eff(j,i,k,form)
-c         dd_srr_yuk = dd_srr_yuk - (form(1)/pm(k))**2/2
-c      end do
-c      dd_srr_yuk = dconjg(dd_srr_yuk)
-c      return
-c      end
+      double complex function dd_srr_yuk(i,j)
+      implicit double precision (a-h,o-z)
+      double complex yhl,yhr,ysu,ypu,ysd,ypd
+      logical init_yukawa_eff
+      common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
+      common/yukawa_eff/yhl(3,3,2),yhr(3,3,2),ysu(3,3,2),ypu(3,3,2),
+     $     ysd(3,3,2),ypd(3,3,2),init_yukawa_eff
+      if (init_yukawa_eff) call yukawa_eff_init
+      dd_srr_yuk = (0.d0,0.d0)
+      do k=1,2
+         dd_srr_yuk = dd_srr_yuk + (ysd(j,i,k)/rm(k))**2
+     $        - (ypd(j,i,k)/pm(k))**2
+      end do
+      dd_srr_yuk = dd_srr_yuk/4
+      return
+      end
       
-c      double complex function dd_slr_yuk(i,j)
-c      implicit double precision (a-h,o-z)
-c      double complex form(2),tmp
-c      common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
-c      dd_slr_yuk = (0.d0,0.d0)
-c      do k=1,2
-c         call ys_eff(i,j,k,form)
-c         tmp = form(1)
-c         call ys_eff(j,i,k,form)
-c         dd_slr_yuk = dd_slr_yuk - tmp*dconjg(form(1))/rm(k)**2
-c         call yp_eff(i,j,k,form)
-c         tmp = form(1)
-c         call yp_eff(j,i,k,form)
-c         dd_slr_yuk = dd_slr_yuk - tmp*dconjg(form(1))/pm(k)**2
-c      end do
-c      return
-c      end
-
-
-      
-
-
-
-
-
+      double complex function dd_slr_yuk(i,j)
+      implicit double precision (a-h,o-z)
+      double complex yhl,yhr,ysu,ypu,ysd,ypd
+      logical init_yukawa_eff
+      common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
+      common/yukawa_eff/yhl(3,3,2),yhr(3,3,2),ysu(3,3,2),ypu(3,3,2),
+     $     ysd(3,3,2),ypd(3,3,2),init_yukawa_eff
+      if (init_yukawa_eff) call yukawa_eff_init
+      dd_slr_yuk = (0.d0,0.d0)
+      do k=1,2
+         dd_slr_yuk = dd_slr_yuk 
+     $        + ysd(j,i,k)*dconjg(ysd(i,j,k))/rm(k)**2
+     $        + ypd(j,i,k)*dconjg(ypd(i,j,k))/pm(k)**2
+      end do
+      dd_slr_yuk = dd_slr_yuk/2
+      return
+      end
 

@@ -30,6 +30,7 @@ c     Up quark + W in loop
 c     Up quark + charged Higgs in loop
       implicit double precision (a-h,o-z)
       double complex b1,ckm
+      double complex yl,yu,yd
       common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
       common/km_mat/ckm(3,3)
       common/yukawa/yl(3),yu(3),yd(3)
@@ -89,11 +90,12 @@ c     Chargino and up squark in loop
 c     Gluino and down squark in loop
       implicit double precision (a-h,o-z)
       double complex b1
-      double complex zu,zd
+      double complex zu0,zd0
+      double complex zd
       double complex gm2,gm3
       logical init_alpha_susy
       common/alpha_s_susy/g3u,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/gmass/gm1,gm2,gm3
       dv_sig0_9 = 0
       if (init_alpha_susy) call init_alpha_s_susy
@@ -145,6 +147,7 @@ c     Up quark + W in loop
 c     Up quark + charged Higgs in loop
       implicit double precision (a-h,o-z)
       double complex b1,ckm
+      double complex yl,yu,yd
       common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
       common/fmass/em(3),um(3),dm(3)
       common/yukawa/yl(3),yu(3),yd(3)
@@ -204,11 +207,12 @@ c     Chargino and up squark in loop
 c     Gluino and down squark in loop
       implicit double precision (a-h,o-z)
       double complex b1
-      double complex zu,zd
+      double complex zu0,zd0
+      double complex zd
       double complex gm2,gm3
       logical init_alpha_susy
       common/alpha_s_susy/g3u,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/gmass/gm1,gm2,gm3
       da_sig0_9 = 0
       if (init_alpha_susy) call init_alpha_s_susy
@@ -246,6 +250,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     Up quark + charged Higgs in loop
       implicit double precision (a-h,o-z)
       double complex b0,ckm
+      double complex yl,yu,yd
       common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
       common/km_mat/ckm(3,3)
       common/yukawa/yl(3),yu(3),yd(3)
@@ -305,11 +310,12 @@ c     Chargino and up squark in loop
 c     Gluino and down squark in loop
       implicit double precision (a-h,o-z)
       double complex b0
-      double complex zu,zd
+      double complex zu0,zd0
+      double complex zd
       double complex gm2,gm3
       logical init_alpha_susy
       common/alpha_s_susy/g3u,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
       ds_sig0_9 = 0
@@ -345,6 +351,7 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     Up quark + charged Higgs in loop
       implicit double precision (a-h,o-z)
       double complex b0,ckm
+      double complex yl,yu,yd
       common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
       common/km_mat/ckm(3,3)
       common/fmass/em(3),um(3),dm(3)
@@ -404,11 +411,12 @@ c     Chargino and up squark in loop
 c     Gluino and down squark in loop
       implicit double precision (a-h,o-z)
       double complex b0
-      double complex zu,zd
+      double complex zu0,zd0
+      double complex zd
       double complex gm2,gm3
       logical init_alpha_susy
       common/alpha_s_susy/g3u,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
       dp_sig0_9 = 0

@@ -1,35 +1,58 @@
-************************************************
+Read input from file susy_flavor.in (no=1,yes=2)? ************************************************
 MSSM Lagrangian parameters and tree level masses
 written on file mssm_data.txt
 ************************************************
 
-Physical observables:
+Corrections to lepton Yukawa couplings:         10.9%     10.9%     11.0%
+Corrections to down-quark Yukawa couplings:     20.2%     20.6%     36.2%
+Corrections to up-quark Yukawa couplings:        0.8%      1.1%      1.1%
+Corrections to CKM matrix elements: 
+      0.0%      0.0%     20.7%
+      0.0%      0.0%     13.2%
+      8.7%     13.4%      0.0%
+
+ ******************************************************
+Physical results for resummation level 2 (error code 0)
 
 Electric dipole moments:
-Electron EDM =  4.7256E-25
-Muon EDM     =  9.7726E-23
-Tau EDM      =  1.6425E-21
-Neutron EDM  =  5.9331E-24
+Electron EDM = -2.4603E-24
+Muon EDM     = -5.0865E-22
+Tau EDM      = -8.3605E-21
+Neutron EDM  = -1.8716E-23
+
+g-2 anomaly, SUSY contribution:
+Electron (g-2)/2 =  1.2000E-13
+Muon (g-2)/2     =  5.1304E-09
+Tau (g-2)/2      =  1.4244E-06
+
+l^J->l^I gamma decays:
+Br(mu-> e gamma)   =  8.3654E-07
+Br(tau-> e gamma)  =  8.2255E-19
+Br(tau-> mu gamma) =  1.1490E-10
 
 Neutrino K decays:
-BR(K_L^0 -> pi^0 vv) =  2.8741E-11
-BR(K^+   -> pi^+ vv) =  7.8746E-11
+BR(K_L^0 -> pi^0 vv) =  4.6419E-11
+BR(K^+   -> pi^+ vv) =  1.0554E-10
 
 Leptonic B decays:
-BR(B_d -> mu^+ mu^-) =  1.2009E-10
-BR(B_s -> mu^+ mu^-) =  5.0332E-09
+BR(B_d -> mu^+ mu^-) =  3.1086E-08
+BR(B_s -> mu^+ mu^-) =  2.3655E-06
+BR(B_s -> mu^+ e^-)  =  1.0411E-12
+BR(B_u -> tau nu)    =  8.1918E-06
+BR(B_u -> D tau nu)/BR(B_u -> D l nu) =  2.0642E-01
 
-B-> X_s photon decay:
-BR(B -> X_S gamma) =  2.5756E-04
+BR(B -> X_S gamma) =  1.1635E-03
 
 KK mixing:
-eps_K =  2.3366E-03
-Delta m_K =  2.4362E-15
+eps_K     =  2.2810E-03
+Delta m_K =  2.4350E-15
 
 DD mixing:
-Delta m_D =  1.6656E-17
+Delta m_D =  1.2671E-17
 
 BB mixing:
-Delta m_B_d =  3.6999E-13
-Delta m_B_s =  1.3242E-11
+Re(H_eff_Bd) =  1.2149E-13
+Im(H_eff_Bd) = -1.3149E-13
+Delta m_B_d  =  3.5804E-13
+Delta m_B_s  =  1.6102E-11
 

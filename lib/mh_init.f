@@ -8,6 +8,8 @@ c     block data init_mh splitted into init_phys, init_const
 c     and init_control
 c     Revised: 20:02:2008
 c     Initialization routines for SUSY sectors added
+c     Revised: 20:02:2012
+c     Normalization of LR soft terms changed
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     File contains initialization of standard masses and couplings,    c
@@ -37,21 +39,23 @@ c     running s,b masses at m_t scale
       common/required_init/higgs,fermion
       external init_phys,init_control
 c     Initialization of the running fermion masses. Masses of the light
-c     quarks at scalemu=2 GeV are set in block data init_sm.  mt(mt) and
-c     mb(mb) are initialized there and overwritten here by setting
-c     mt(tscale) and mb(bscale). Routine calculates all quark masses at
-c     mu=tscale and rewrites into common/fmass/
-      uml(3) = tm
+c     quarks at scale mu=2 GeV are set in block data init_sm.  mc is
+c     given at the scale mc. mt(mt) and mb(mb) are initialized there and
+c     overwritten here by setting mt(tscale) and mb(bscale). Routine
+c     calculates all quark masses at mu=tscale and rewrites into
+c     common/fmass/
       amuu(3) = tscale
-      dml(3) = bm
+      uml(3) = tm               ! top mass at tscale
       amud(3) = bscale
+      dml(3) = bm               ! bottom mass at bscale
+      amuu(2) = uml(2)          ! charm mass assumed to be given as mc(mc) 
       call init_run_qmass
       do i=1,3
          dm(i) = dmu(i)
          um(i) = umu(i)
       end do
 c     if Higgs sector is initialized, calculate also Yukawa couplings
-      if (higgs) call init_yukawa
+      if (higgs) call init_tree_yukawa
       fermion = .true.
       return
       end
@@ -75,7 +79,7 @@ c     calculate VEV's
       v1    = 2*zm*sct*cos(beta)/e
       v2    = 2*zm*sct*sin(beta)/e
 c     calculate Yukawa couplings if fermion masses initialized
-      if (fermion) call init_yukawa
+      if (fermion) call init_tree_yukawa
 c     calculate Higgs mass parameters in the Lagrangian
       sg2   = pm*pm
       sum   = sg2 - 2*abs(mu*mu)
@@ -123,8 +127,8 @@ c     calculate -ino masses
       return
       end
 
-      subroutine init_slepton_sector(all,arr,alr,ierr,slmi_l,slmi_r,
-     $     slmi_lr)
+      subroutine init_slepton_sector(all,arr,slmi_l,slmi_r,slmi_lr,
+     $     slmi_lrp,ierr)
 c     Tree-level initialization of slepton sector
 c     Routine assumes A_l'=0
 c     slmi_l, slmi_r, slmi_lr contain slepton LL, RR and LR mass insertions
@@ -132,15 +136,12 @@ c     Exit code ierr=1: one or more slepton mass squares below 0
 c     Higgs and fermion initialization has to be called prior to this routine! 
       implicit double precision (a-h,o-z)
       dimension all(3),arr(3)
-      double complex slmi_l(3),slmi_r(3),slmi_lr(3,3),alr(3)
+      double complex slmi_l(3),slmi_r(3),slmi_lr(3,3),slmi_lrp(3,3)
       double complex ls,ks,ds,es,us,ws
       double complex lms,rms,ums,dms,qms
       logical sldiag,higgs,fermion
-      common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/yukawa/yl(3),yu(3),yd(3)
       common/soft/ls(3,3),ks(3,3),ds(3,3),es(3,3),us(3,3),ws(3,3)
       common/msoft/lms(3,3),rms(3,3),ums(3,3),dms(3,3),qms(3,3)
-      common/vev/v1,v2
       common/required_init/higgs,fermion
       common/sf_cont/eps,indx(3,3),iconv
 c     Higgs and fermion initialization has to be called prior to this one:
@@ -150,21 +151,21 @@ c     Higgs and fermion initialization has to be called prior to this one:
 c     set diagonal soft slepton parameters
          lms(i,i) = (1 + eps*i)*all(i)*abs(all(i))
          rms(i,i) = (1 - eps*i)*arr(i)*abs(arr(i))
-         ls(i,i) = sqrt(abs(all(i)*arr(i)))*yl(i)*alr(i)
-         do j=1,3
-c     clear non-holomorphic LR mixing
-            ks(i,j) = (0.d0,0.d0)
-         end do
       end do
-c     set slepton mass insertions
+c     expand slepton LL and RR mass insertions
       do i=1,2
          do j=i+1,3
-            lms(i,j) = slmi_l(indx(i,j))*sqrt(lms(i,i)*lms(j,j))
+            lms(i,j) = slmi_l(indx(i,j))*sqrt(abs(lms(i,i)*lms(j,j)))
             lms(j,i) = dconjg(lms(i,j))
-            rms(i,j) = slmi_r(indx(i,j))*sqrt(rms(i,i)*rms(j,j))
+            rms(i,j) = slmi_r(indx(i,j))*sqrt(abs(rms(i,i)*rms(j,j)))
             rms(j,i) = dconjg(rms(i,j))
-            ls(i,j) = slmi_lr(i,j)*sqrt(abs(lms(i,i)*rms(j,j)))*sq2/v1
-            ls(j,i) = slmi_lr(j,i)*sqrt(abs(lms(i,i)*rms(j,j)))*sq2/v1
+         end do
+      end do
+c     expand slepton LR mass insertions
+      do i=1,3
+         do j=1,3
+            ls(i,j) = slmi_lr(i,j)*abs(lms(i,i)*rms(j,j))**0.25d0
+            ks(i,j) = slmi_lrp(i,j)*abs(lms(i,i)*rms(j,j))**0.25d0
          end do
       end do
 c     if slepton input data in SLHA format, rewrite them to
@@ -175,8 +176,8 @@ c     call diagonalization routine
       return
       end
 
-      subroutine init_squark_sector(asq,asu,asd,at,ab,ierr,sqmi_l
-     $     ,sumi_r,sdmi_r,sumi_lr,sdmi_lr)
+      subroutine init_squark_sector(asq,asu,asd,sqmi_l,sumi_r,sdmi_r,
+     $     sumi_lr,sdmi_lr,sumi_lrp,sdmi_lrp,ierr)
 c     Tree-level initialization of squark sector
 c     Routine assumes A_d'=A_u'=0
 c     sqmi_l, sdmi_r, sumi_r, sdmi_lr, sumi_lr contain squark LL, RR and
@@ -186,15 +187,13 @@ c     Higgs and fermion initialization has to be called prior to this routine!
       implicit double precision (a-h,o-z)
       dimension asq(3),asu(3),asd(3)
       double complex sqmi_l(3),sumi_r(3),sdmi_r(3)
-      double complex sumi_lr(3,3),sdmi_lr(3,3),at(3),ab(3)
+      double complex sumi_lr(3,3),sdmi_lr(3,3)
+      double complex sumi_lrp(3,3),sdmi_lrp(3,3)
       double complex ls,ks,ds,es,us,ws
       double complex lms,rms,ums,dms,qms
       logical sqdiag,higgs,fermion
-      common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/yukawa/yl(3),yu(3),yd(3)
       common/soft/ls(3,3),ks(3,3),ds(3,3),es(3,3),us(3,3),ws(3,3)
       common/msoft/lms(3,3),rms(3,3),ums(3,3),dms(3,3),qms(3,3)
-      common/vev/v1,v2
       common/required_init/higgs,fermion
       common/sf_cont/eps,indx(3,3),iconv
 c     Higgs and fermion initialization has to be called prior to this one:
@@ -205,15 +204,8 @@ c     set diagonal soft squark parameters
          ums(i,i) = (1 - eps*i)*asu(i)*abs(asu(i))
          dms(i,i) = (1 - eps*i)*asd(i)*abs(asd(i))
          qms(i,i) = (1 + eps*i)*asq(i)*abs(asq(i))
-         ds(i,i) = sqrt(abs(asq(i)*asd(i)))*yd(i)*ab(i)
-         us(i,i) = sqrt(abs(asq(i)*asu(i)))*yu(i)*at(i)
-         do j=1,3
-c     clear non-holomorphic LR mixing
-            es(i,j) = (0.d0,0.d0)
-            ws(i,j) = (0.d0,0.d0)
-         end do
       end do
-c     set squark mass insertions
+c     expand LL and RR squark mass insertions
       do i=1,2
          do j=i+1,3
             qms(i,j) = sqmi_l(indx(i,j))*sqrt(qms(i,i)*qms(j,j))
@@ -222,10 +214,15 @@ c     set squark mass insertions
             dms(j,i) = dconjg(dms(i,j))
             ums(i,j) = sumi_r(indx(i,j))*sqrt(ums(i,i)*ums(j,j))
             ums(j,i) = dconjg(ums(i,j))
-            ds(i,j) = sdmi_lr(i,j)*sqrt(abs(qms(i,i)*dms(j,j)))*sq2/v1
-            ds(j,i) = sdmi_lr(j,i)*sqrt(abs(qms(i,i)*dms(j,j)))*sq2/v1
-            us(i,j) = sumi_lr(i,j)*sqrt(abs(qms(i,i)*ums(j,j)))*sq2/v2
-            us(j,i) = sumi_lr(j,i)*sqrt(abs(qms(i,i)*ums(j,j)))*sq2/v2
+         end do
+      end do
+c     expand squark LR mass insertions
+      do i=1,3
+         do j=1,3
+            ds(i,j) = sdmi_lr(i,j)*abs(qms(i,i)*dms(j,j))**0.25d0
+            us(i,j) = sumi_lr(i,j)*abs(qms(i,i)*ums(j,j))**0.25d0
+            es(i,j) = sdmi_lrp(i,j)*abs(qms(i,i)*dms(j,j))**0.25d0
+            ws(i,j) = sumi_lrp(i,j)*abs(qms(i,i)*ums(j,j))**0.25d0
          end do
       end do
 c     if squark input data in SLHA format, rewrite them to
@@ -382,23 +379,26 @@ c     CKM sin(theta_ij) and phase delta
       s12 = al
       s23 = a*al2
       s13 = abs(tmp)
-      del = atan(dimag(tmp)/dble(tmp))
-      if (dble(tmp).le.0) del = pi + del
+      if (dble(tmp).eq.0) then
+         del = pi/2
+      else
+         del = atan(dimag(tmp)/dble(tmp))
+      end if
+      if (dble(tmp).lt.0) del = pi + del
       call ckm_init(s12,s23,s13,del)
       return
       end
 
       subroutine ckm_eff_init
       implicit double precision (a-h,o-z)
-      double complex v_ckm,ckm_eff,ckm_0,ydl,ydr,yul,yur
-      common/km_mat/v_ckm(3,3)
-      common/ckm_switch/ckm_eff(3,3),ckm_0(3,3),
-     $     ydl(3,3),ydr(3,3),yul(3,3),yur(3,3),iswitch
-      iswitch = 1
+      double complex ckm,ckm_phys,ckm0,udl,udr,uul,uur
+      common/ckm/ckm(3,3)
+      common/ckm_switch/ckm_phys(3,3),ckm0(3,3),udl(3,3),udr(3,3),
+     $     uul(3,3),uur(3,3)
       do i=1,3
          do j=1,3
-            ckm_eff(i,j) = v_ckm(i,j)
-            ckm_0(i,j)   = v_ckm(i,j)
+            ckm_phys(i,j) = ckm(i,j)
+            ckm0(i,j)     = ckm(i,j)
          end do
       end do
       return
@@ -519,12 +519,12 @@ c     Light fermion masses at mu = 2GeV used by Ciuchini et al.
       data umu,uml,amuu/4.d-3,1.3d0,163.5d0,
      $     4.d-3,1.279d0,163.5d0,
      $     2.d0,1.279d0,163.5d0/
-      data dmu,dml,amud/7.d-3,0.11d0,4.17d0,
-     $     7.d-3,0.11d0,4.17d0,
+      data dmu,dml,amud/7.d-3,0.094d0,4.17d0,
+     $     7.d-3,0.094d0,4.17d0,
      $     2.d0,2.d0,4.17d0/
-      data em/.511d-3,105.659d-3,1.777d0/
+      data em/5.1099891d-4,1.05658d-1,1.777d0/
       data um/4d-3,1.3d0,165.d0/
-      data dm/7d-3,1.1d-1,4.17d0/
+      data dm/7d-3,0.094d0,4.17d0/
       data vkm1,vkm2,vkm3,phi/0.222d0,0.975d0,0.044d0,0.d0/
       data ckm/(1.d0,0.d0),(0.d0,0.d0),(0.d0,0.d0),
      $         (0.d0,0.d0),(1.d0,0.d0),(0.d0,0.d0),
@@ -590,9 +590,11 @@ c     status of Higgs and fermion sector initialization
 
       block data init_units
       implicit double precision (a-h,o-z)
-      common/ph_units/hbar,gev
+      common/ph_units/hbar,gev_cm,gev_s
 c     1 GeV in cm^(-1)
-      data gev/5.067689d+13/
+      data gev_cm/5.067689d+13/
+c     1 GeV in s^(-1)
+      data gev_s/1.519255d+24/
 c     Planck constant in GeV sec 
       data hbar/6.58211915d-25/
       end

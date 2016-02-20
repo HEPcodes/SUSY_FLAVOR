@@ -28,6 +28,7 @@ c     sldiag=true if one or more masses negative
       double precision mv(3,3),imv(3,3),zv1(3,3),zv2(3,3)
       double precision msl(6,6),imsl(6,6),zl1(6,6),zl2(6,6),work(12)
       double complex ls,ks,ds,es,us,ws
+      double complex yl,yu,yd
       logical zzs_stat,zps_stat
       common/sl_matrix/sl_mat(6,6),sv_mat(3,3)
       common/zzs_stat/zzs_cra,zzs_crb,zzs_cr,ss,nh,zzs_stat
@@ -84,10 +85,11 @@ c     Slepton masses and mixing angles
           sl_mat(i,j+3)     = - (v2*ks(i,j) - v1*ls(i,j))/sq2
           if (i.eq.j) then
             sl_mat(i,j)     = sl_mat(i,j)
-     $          + e2/8*(1 - 2*ct2)/sct2*vmin + (v1*yl(i))**2/2
+     $          + e2/8*(1 - 2*ct2)/sct2*vmin + abs(v1*yl(i))**2/2
             sl_mat(i+3,j+3) = sl_mat(i+3,j+3) - e2/4/ct2*vmin
-     $           + (v1*yl(i))**2/2
-            sl_mat(i,j+3)   = sl_mat(i,j+3) + v2*yl(i)/sq2*dconjg(h)
+     $           + abs(v1*yl(i))**2/2
+c     check yukawa star below!!!
+            sl_mat(i,j+3)   = sl_mat(i,j+3) + v2/sq2*dconjg(h*yl(i))
           end if
           sl_mat(j+3,i)     = dconjg(sl_mat(i,j+3))
         end do
@@ -126,6 +128,7 @@ c     sqdiag=true if one or more masses negative
       double complex lms,rms,ums,dms,qms
       double complex ls,ks,ds,es,us,ws
       double complex sd_mat,su_mat
+      double complex yl,yu,yd
       double precision msu(6,6),imsu(6,6),zu1(6,6),zu2(6,6)
       double precision msd(6,6),imsd(6,6),zd1(6,6),zd2(6,6),work(12)
       logical zzs_stat,zps_stat
@@ -171,10 +174,11 @@ c      D-squark mass matrix initialization
           sd_mat(i,j+3)     = - (v2*es(i,j) - v1*ds(i,j))/sq2
           if (i.eq.j) then
             sd_mat(i,j)     = sd_mat(i,j) - e2*vmin*(1 + 2*ct2)/24/sct2
-     $          + (yd(i)*v1)**2/2
+     $          + abs(yd(i)*v1)**2/2
             sd_mat(i+3,j+3) = sd_mat(i+3,j+3) - e2*vmin/12/ct2
-     $          + (yd(i)*v1)**2/2
-            sd_mat(i,j+3)   = sd_mat(i,j+3) + v2*dconjg(h)*yd(i)/sq2
+     $          + abs(yd(i)*v1)**2/2
+c     check yukawa star below!!!
+            sd_mat(i,j+3)   = sd_mat(i,j+3) + v2/sq2*dconjg(h*yd(i))
           end if
           sd_mat(j+3,i)     = dconjg(sd_mat(i,j+3))
 c      U-squark mass matrix initialization
@@ -189,10 +193,11 @@ c      U-squark mass matrix initialization
           su_mat(i,j+3)     = - dconjg(v2*us(i,j) + v1*ws(i,j))/sq2
           if (i.eq.j) then
             su_mat(i,j)     = su_mat(i,j) - e2*vmin*(1 - 4*ct2)/24/sct2
-     $            + (yu(i)*v2)**2/2
+     $            + abs(yu(i)*v2)**2/2
             su_mat(i+3,j+3) = su_mat(i+3,j+3) + e2/6/ct2*vmin
-     $           + (yu(i)*v2)**2/2
-            su_mat(i,j+3)   = su_mat(i,j+3) - v1*h*yu(i)/sq2
+     $           + abs(yu(i)*v2)**2/2
+c     check yukawa star below!!!
+            su_mat(i,j+3)   = su_mat(i,j+3) - v1/sq2*h*yu(i)
           end if
           su_mat(j+3,i)     = dconjg(su_mat(i,j+3))
         end do
@@ -248,6 +253,8 @@ c     cdiag=true if one or two masses less then 1 MeV
       common/charg/fcm(2),zpos(2,2),zneg(2,2)
       common/hpar/hm1,hm2,hs,h
       common/gmass/gm1,gm2,gm3
+      common/nc_suppress/eps_d,eps_u,acc
+      external init_nc_diag
       data swap/0.d0,1.d0,1.d0,0.d0/
       cdiag = .false.
 c     Cross sections should be recalculated after this procedure
@@ -255,8 +262,8 @@ c     Cross sections should be recalculated after this procedure
       zps_stat = .false.
 c     Chargino mass matrix initialization
       x(1,1) = gm2
-      x(1,2) = e*v2/sq2/st
-      x(2,1) = e*v1/sq2/st
+      x(1,2) = e*v2/sq2/st*eps_u
+      x(2,1) = e*v1/sq2/st*eps_d
       x(2,2) = h
 c     Build X*Xherm and X*hermX
       do i=1,2
@@ -357,6 +364,8 @@ c     ndiag=true if one or more neutralinos is lighter than 1 MeV
       common/neut/fnm(4),zn(4,4)
       common/gmass/gm1,gm2,gm3
       common/hpar/hm1,hm2,hs,h
+      common/nc_suppress/eps_d,eps_u,acc
+      external init_nc_diag
 c     Cross sections should be recalculated after this procedure
       zzs_stat = .false.
       zps_stat = .false.
@@ -367,11 +376,11 @@ c     Neutralino mass matrix initialization
       g2 = e/st/2
       y(1,1) = gm3
       y(1,2) = 0.d0
-      y(1,3) = - v1*g3
-      y(1,4) = v2*g3
+      y(1,3) = - v1*g3*eps_d
+      y(1,4) = v2*g3*eps_u
       y(2,2) = gm2
-      y(2,3) = v1*g2
-      y(2,4) = - v2*g2
+      y(2,3) = v1*g2*eps_d
+      y(2,4) = - v2*g2*eps_u
       y(3,3) = 0.d0
       y(3,4) = - h
       y(4,4) = 0.d0
@@ -951,4 +960,9 @@ c     Argument nh unused (important for the FDC only).
       return
       end
 
-
+      block data init_nc_diag
+      implicit double precision (a-h,o-z)
+      common/nc_suppress/eps_d,eps_u,acc
+      data eps_d,eps_u/2*1.d0/
+      data acc/1.d-7/
+      end

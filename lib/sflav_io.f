@@ -4,6 +4,9 @@ c     Program web page: http://www.fuw.edu.pl/susy_flavor
 
 c     FILENAME: SFLAV_IO.F
 c     Released: 20:02:2010(J.R.)
+c     Changelog:
+c     20:09:2012 (J.R.) - corrected lacking hermitization of sfermion
+c     mass matrices for input_type = 2
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     SLHA2 based input routine for SUSY_FLAVOR                       c
@@ -20,7 +23,7 @@ c     read the ifl file until the first character in line is blank space
  100  stop 'Incomplete or corrupted SUSY_FLAVOR.SLHA input file'
       end
 
-      subroutine sflav_input
+      subroutine sflav_input(ilev)
 c     Input read from file susy_flavor.in
       implicit double precision (a-h,o-z)
       double complex amg,amgg,amue
@@ -31,24 +34,21 @@ c     Input read from file susy_flavor.in
       dimension tmpi(3,3),tmpr(3,3)
       common/fmass_high/umu(3),uml(3),amuu(3),dmu(3),dml(3),amud(3)
       common/fmass/em(3),um(3),dm(3)
-      common/yukawa/yl(3),yu(3),yd(3)
       common/soft/ls(3,3),ks(3,3),ds(3,3),es(3,3),us(3,3),ws(3,3)
       common/msoft/lms(3,3),rms(3,3),ums(3,3),dms(3,3),qms(3,3)
-      common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/vev/v1,v2
       common/sf_cont/eps,indx(3,3),iconv
 c     open input file
       ifl = 1
       open(ifl,file='susy_flavor.in',status='old')
 c     Find non-standard Block SOFTINP, check the status of soft parameters
- 21   read(ifl,'(a14)',END=100)line
+ 21   read(ifl,'(a14)',END=101)line
       if (line(7:13).ne.'SOFTINP') goto 21
       call skip_comments(ifl)
       read(ifl,*)k,iconv        ! soft parameters convention
 c     iconv = 1:
-c          sfermion input parameters in conventions of hep-ph/9511250
-c     iconv = 2:
 c          sfermion input parameters in SLHA2 conventions
+c     iconv = 2:
+c          sfermion input parameters in conventions of hep-ph/9511250
       if ((iconv.ne.1).and.(iconv.ne.2)) stop
      $     'susy_flavor.in: incorrect iconv value'
       read(ifl,*)k,input_type   ! dimension of soft parameters 
@@ -60,7 +60,19 @@ c          fermion soft terms given as absolute values
 c     for more information read comments in susy_flavor.in file
       if ((input_type.ne.1).and.(input_type.ne.2)) stop
      $     'susy_flavor.in: incorrect input_type value'
+      read(ifl,*)k,ilev         ! chiral resummation level
+c     ilev = 0: no resummation
+c     ilev = 1: analytical resummation in the decoupling limit
+c     ilev = 2: iterative numerical resummation (default)
+      if ((ilev.ne.0).and.(ilev.ne.1).and.(ilev.ne.2)) stop
+     $     'susy_flavor.in: incorrect ilev value'
+      goto 102
+c     SOFTINP block absent, set default values
+ 101  iconv = 1                 ! SLHA2 conventions
+      input_type = 2            ! dimensionful sfermion parameters
+      ilev = 2                  ! chiral resummation level
 c     find SM input block, read the SM data
+ 102  rewind(ifl)
  10   read(ifl,'(a14)',END=100)line
       if (line(7:14).ne.'SMINPUTS') goto 10
       call skip_comments(ifl)
@@ -79,8 +91,14 @@ c     Fermion mass initialization, input: MSbar running quark masses
       read(ifl,*)k,dml(1)       ! md(2 GeV)
       read(ifl,*)k,uml(1)       ! mu(2 GeV)
       read(ifl,*)k,dml(2)       ! ms(2 GeV)
-      read(ifl,*)k,uml(2)       ! mc(2 GeV)
-      read(ifl,*)k,wm0          ! M_W (not standard SLHA2!)
+      read(ifl,*)k,uml(2)       ! mc(mc)
+      read(ifl,'(a1)',END=100)line
+      if (line(1:1).ne.' ') then
+         wm0 = 80.398d0
+      else 
+         backspace(ifl)
+         read(ifl,*)k,wm0       ! M_W (not standard SLHA2!)
+      end if
 c     Electroweak and strong parameter initialization
       call vpar_update(zm0,wm0,alpha_z) ! sets electroweak parameters
       CALL lam_fit(alpha_s)     ! fits Lambda_QCD at 3 loop level 
@@ -101,6 +119,9 @@ c     find EXTPAR input block, read the real Higgs and gaugino data
  12   read(ifl,'(a14)',END=100)line
       if (line(7:12).ne.'EXTPAR') goto 12
       call skip_comments(ifl)
+      read(ifl,*)k,qscale       ! input scale, has to be -1 (EW scale)
+      if (abs(qscale+1).gt.1.d-6) 
+     $     stop 'susy_flavor.in: input has to be defined at EW scale!'
       read(ifl,*)k,x1           ! M1 (bino mass, complex)
       read(ifl,*)k,x2           ! M2 (wino mass, complex)
       read(ifl,*)k,amglu        ! M3 (gluino mass)
@@ -155,22 +176,27 @@ c     left and right slepton mass
          read(ifl,*)k,l,tmpi(k,l) ! right slepton mass M_ER^2, imaginary part
          rms(k,l) = dcmplx(tmpr(k,l),tmpi(k,l))
       end do
-      if (input_type.eq.1) then
 c     remove instabilities by adding tiny mass splitting
-         do i=1,3
-            lms(i,i) = (1 + eps*i)*lms(i,i)
-            rms(i,i) = (1 - eps*i)*rms(i,i)
-         end do
-c     expand delta parameters to full mass entries and make h.c.
+      do i=1,3
+         lms(i,i) = (1 + eps*i)*lms(i,i)
+         rms(i,i) = (1 - eps*i)*rms(i,i)
+      end do
+c     expand delta parameters to full mass entries
+      if (input_type.eq.1) then
          do k=1,2
             do l=k+1,3
                lms(k,l) = lms(k,l)*sqrt(lms(k,k)*lms(l,l))
-               lms(l,k) = dconjg(lms(k,l))
                rms(k,l) = rms(k,l)*sqrt(rms(k,k)*rms(l,l))
-               rms(l,k) = dconjg(rms(k,l))
             end do
          end do
       end if
+c     initialize h.c. LL and RR entries
+      do k=1,2
+         do l=k+1,3
+            lms(l,k) = dconjg(lms(k,l))
+            rms(l,k) = dconjg(rms(k,l))
+         end do
+      end do
 c     slepton LR mixing
       rewind(ifl)
  15   read(ifl,'(a14)',END=100)line
@@ -186,15 +212,12 @@ c     slepton LR mixing
          ls(k,l) = dcmplx(tmpr(k,l),tmpi(k,l))
          ks(k,l) = (0.d0,0.d0)  ! non-holomorphic terms set to zero
       end do
+c     expand LR mixing from dimensionless to dimensionful
       if (input_type.eq.1) then
-c     calculate full LR mixing 
          do k=1,3
             do l=1,3
-               if (k.ne.l) then
-                  ls(k,l) = sqrt(abs(lms(k,k)*rms(l,l)))*sq2/v1*ls(k,l)
-               end if  
+               ls(k,l) = ls(k,l)*abs(lms(k,k)*rms(l,l))**0.25d0
             end do
-            ls(k,k) = yl(k)*ls(k,k)*(lms(k,k)*rms(k,k))**0.25d0
          end do
       end if
 c     if slepton input data in SLHA format, rewrite them to
@@ -247,25 +270,30 @@ c     left and right squark mass
          read(ifl,*)k,l,tmpi(k,l) ! right down-squark mass M_DR^2, imaginary part
          dms(k,l) = dcmplx(tmpr(k,l),tmpi(k,l))
       end do
-      if (input_type.eq.1) then
 c     remove instabilities by adding tiny mass splitting
-         do i=1,2
-            qms(i,i) = (1 + eps*i)*dble(qms(i,i))
-            ums(i,i) = (1 - eps*i)*dble(ums(i,i))
-            dms(i,i) = (1 - eps*i)*dble(dms(i,i))
-         end do
-c     expand delta parameters to full mass entries and make h.c.
+      do i=1,3
+         qms(i,i) = (1 + eps*i)*dble(qms(i,i))
+         ums(i,i) = (1 - eps*i)*dble(ums(i,i))
+         dms(i,i) = (1 - eps*i)*dble(dms(i,i))
+      end do
+c     expand delta parameters to full mass entries
+      if (input_type.eq.1) then
          do k=1,2
             do l=k+1,3
                qms(k,l) = qms(k,l)*sqrt(qms(k,k)*qms(l,l))
-               qms(l,k) = dconjg(qms(k,l))
                ums(k,l) = ums(k,l)*sqrt(ums(k,k)*ums(l,l))
-               ums(l,k) = dconjg(ums(k,l))
                dms(k,l) = dms(k,l)*sqrt(dms(k,k)*dms(l,l))
-               dms(l,k) = dconjg(dms(k,l))
             end do
          end do
       end if
+c     initialize h.c. of LL and RR entries
+      do k=1,2
+         do l=k+1,3
+            qms(l,k) = dconjg(qms(k,l))
+            ums(l,k) = dconjg(ums(k,l))
+            dms(l,k) = dconjg(dms(k,l))
+         end do
+      end do
 c     squark LR mixing
       rewind(ifl)
  19   read(ifl,'(a14)',END=100)line
@@ -300,20 +328,17 @@ c     store dimensionless |A_t|, |A_b| for EPA Higgs mass calculation
          yts = abs(us(3,3))
          ybs = abs(ds(3,3))
       else
-         yts = abs(us(3,3))/(qms(3,3)*ums(3,3))**0.25d0
-         ybs = abs(ds(3,3))/(qms(3,3)*dms(3,3))**0.25d0
+         yts = abs(us(3,3)/(qms(3,3)*ums(3,3))**0.25d0)
+         ybs = abs(ds(3,3)/(qms(3,3)*dms(3,3))**0.25d0)
       end if
-c     calculate full LR mixing (non-holomorphic terms set to zero!)
+c     expand LR mixing from dimensionless to dimensionful
+c     (non-holomorphic terms set to zero!)
       if (input_type.eq.1) then
          do k=1,3
             do l=1,3
-               if (k.ne.l) then
-                  ds(k,l) = sqrt(abs(qms(k,k)*dms(l,l)))*sq2/v1*ds(k,l)
-                  us(k,l) = sqrt(abs(qms(k,k)*ums(l,l)))*sq2/v2*us(k,l)
-               end if
+               ds(k,l) = ds(k,l)*abs(qms(k,k)*dms(l,l))**0.25d0
+               us(k,l) = us(k,l)*abs(qms(k,k)*ums(l,l))**0.25d0
             end do
-            ds(k,k) = yd(k)*ds(k,k)*(qms(k,k)*dms(k,k))**0.25d0
-            us(k,k) = yu(k)*us(k,k)*(qms(k,k)*ums(k,k))**0.25d0
          end do
       end if 
 c     if squark input data in SLHA format, rewrite them to

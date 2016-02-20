@@ -26,24 +26,22 @@ c     put into the common below evolution coefficients...
       common/bx_4q/bk(5),bd(5),bb(2,5),amu_k,amu_d,amu_b
 c     running s,b masses at m_t scale
       call init_run_qmass
-c      NLO alpha_s at M_Z
-      al = alfas_nlo(zm)
-c      NLO alpha_s at M_SUSY scale(s)
-c      M_S_{U,D} = (M_gluino + average M_{U,D} mass)/2
+c     NLO alpha_s at M_SUSY scale(s)
+c     M_S_{U,D} = (M_gluino + average M_{U,D} mass)/2
       if (init_alpha_susy) call init_alpha_s_susy
-c      running quark masses (c,b,t)
+c     running quark masses (c,b,t)
       qm(1) = uml(2)
       qm(2) = dml(3)
       qm(3) = umu(3)
-c      evolution from M_SUSY to mu_t
-c      start from M_SUSY = (M_gluino + averaged M_D)/2
+c     evolution from M_SUSY to mu_t
+c     start from M_SUSY = (M_gluino + averaged M_D)/2
       al_s = alfas_nlo(qm(3))/4/pi
       eta = g3d*g3d/al_s/16/pi/pi
 c     define evolution below for V, S and T sectors:
       vx(2) = 1
       sx(2) = 1
       tx(2) = 1
-c      evolution from mu_t to mu_B
+c     evolution from mu_t to mu_B
       al_s = alfas_nlo(amu_b)/4/pi
       eta = alfas_nlo(qm(3))/alfas_nlo(amu_b)
 c     define evolution below for V, S and T sectors:
@@ -104,13 +102,13 @@ c     second index j,i=1 or 2 defines B meson, B_d or B_s respectively
       double complex fs,fp,fv,fa
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/meson_data/dmk,amk,epsk,fk,dmd,amd,fd,
-     $    amb(2),dmb(2),gam_b(2),fb(2)
+     $    amb(2),dmb(2),tau_b(2),fb(2)
       common/fmass/em(3),um(3),dm(3)
       double complex dls_vll,dls_vrr,dls_vlr,dls_vrl,dls_sll,dls_srr,
      $     dls_slr,dls_srl,dls_tl,dls_tr
       common/dl_wil_coeff/dls_vll,dls_vrr,dls_vlr,dls_vrl,
      $     dls_sll,dls_srr,dls_slr,dls_srl,dls_tl,dls_tr
-      common/ph_units/hbar,gev
+      common/ph_units/hbar,gev_cm,gev_s
       external init_4q,init_2q,init_units
       if (max(i,j).ne.3) stop 'No b quark index in b_ll?'
       call dl_wil_run(i,j,k,l)
@@ -131,7 +129,7 @@ c     matrix element
       if (k.ne.l) b_ll = b_ll + del*del*(amb2 - sum*sum)*abs(fv)**2
      $     - 2*del*(amb2 - sum*sum)*dble(fs*dconjg(fv))
 c     branching ratio itself
-      b_ll = b_ll*fb(ii)*fb(ii)*gam_b(ii)/128/pi/amb(ii)/hbar
+      b_ll = b_ll*fb(ii)*fb(ii)*tau_b(ii)/128/pi/amb(ii)/hbar
      $     * sqrt(1 - sum*sum/amb2)*sqrt(1 - del*del/amb2)
       return
       end
@@ -166,6 +164,65 @@ c     Br(K^+ -> pi^+ \bar v v)
       return
       end
 
+ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c     Neutron EDM calculation                                             c
+ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+
+      double precision function edm_n()
+c     complete neutron EDM. Included:
+c       - electric dipole moment of quarks
+c       - chromoelectric dipole moment of quarks
+c       - chromoelectric dipole moment of gluon
+c       - approximate QCD renormalization factors
+      implicit double precision (a-h,o-z)
+      common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
+      common/edm_qcd/eta_e,eta_c,eta_g,alamx
+      common/ph_units/hbar,gev_cm,gev_s
+      external init_units
+      external init_2q
+      edm_n = - (eta_e/3.d0*(4*edm_d(1) - edm_u(1))
+     $     + e/12.d0/pi*eta_c*(4*cdm_d(1) - cdm_u(1))
+     $     + e/4.d0/pi*eta_g*alamx*cdm_g())/e/gev_cm
+      return
+      end
+
+ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c     Br(B^+ -> tau^+ v) and  Br(B^0 -> D tau v)/Br(B^0 -> Dlv)           c
+ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+
+      subroutine b_taunu(br_taunu,dtaunu_rat)
+c     Decays B_u -> tau v and B_u -> D tau v (charged B_u meson)
+      implicit double precision (a-h,o-z)
+      double complex c_np
+      double complex yhl,yhr,ysu,ypu,ysd,ypd
+      double complex yhlr,ysl,ypl
+      double complex ckm_phys,ckm0,udl,udr,uul,uur
+      logical init_yukawa_eff,init_yukawa_l
+      common/ckm_switch/ckm_phys(3,3),ckm0(3,3),udl(3,3),udr(3,3),
+     $     uul(3,3),uur(3,3)
+      common/yukawa_eff/yhl(3,3,2),yhr(3,3,2),ysu(3,3,2),ypu(3,3,2),
+     $     ysd(3,3,2),ypd(3,3,2),init_yukawa_eff
+      common/yukawa_lept/yhlr(3,3,2),ysl(3,3,2),ypl(3,3,2),init_yukawa_l
+      common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
+      common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
+      common/meson_data/dmk,amk,epsk,fk,dmd,amd,fd,
+     $    amb(2),dmb(2),tau_b(2),fb(2)
+      common/fmass/em(3),um(3),dm(3)
+      common/fermi/g_fermi
+      common/ph_units/hbar,gev_cm,gev_s
+      external init_4q
+c     B+ mass and width
+      bm = 5.27917d0
+c     common New Physics contribution
+      c_np = - yhr(3,1,1)*dconjg(yhlr(3,3,1))/sq2/2/cm(1)/cm(1)/g_fermi
+     $     /ckm_phys(1,3)
+      br_taunu = tau_b(1)*gev_s*bm/8/pi*abs(g_fermi*em(3)*fb(1)
+     $     * ckm_phys(1,3)*(1 - em(3)*em(3)/bm/bm)
+     $     * (1 + bm*bm/dm(3)/em(3)*c_np))**2
+      dtaunu_rat = 0.28d0*(1 + 1.38d0*dble(c_np) + 0.88d0*abs(c_np)**2)
+      return
+      end
+
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     Data initialization block                                       c
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -173,6 +230,8 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       block data init_2q
       implicit double precision (a-h,o-z)
       logical init_eta_2q
+c     Neutron EDM QCD correction factors and chiral symmetry breaking scale
+      common/edm_qcd/eta_en,eta_cn,eta_gn,alamx_n
       common/ev_mat_2q/vx(2),sx(2),tx(2),init_eta_2q
       common/kpivv/ak0,del_ak0,akp,del_akp,pc,del_pc,alam
       data init_eta_2q/.true./
@@ -180,4 +239,6 @@ ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       data del_ak0,del_akp/0.013d-10,0.024d-11/
       data pc,del_pc/0.41d0,0.03d0/
       data alam/0.225d0/
+      data eta_en,eta_cn,eta_gn/1.53d0,3.4d0,3.4d0/
+      data alamx_n/1.18d0/
       end 

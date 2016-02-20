@@ -39,9 +39,9 @@ c     Three point scalar function (1 in the numerator)
       if (a.eq.c) then
         cp0 = - 1.d0/2/a
       else if (a.eq.b) then
-        cp0 =  (1  - log(c/a)/(1 - a/c))/(c - a)
+        cp0 =  (1 - log(c/a)/(1 - a/c))/(c - a)
       else if (b.eq.c) then
-        cp0 =  (1  - log(a/c)/(1 - c/a))/(a - c)
+        cp0 =  (1 - log(a/c)/(1 - c/a))/(a - c)
       else
         cp0 = - (log(b/a)/(1 - a/b) - log(c/a)/(1 - a/c))/(b - c)
       end if

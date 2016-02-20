@@ -112,10 +112,11 @@ c     neutralino contributions
       double complex function uu_vll_ng(i,j)
 c     gluino-neutralino contributions
       implicit double precision (a-h,o-z)
-      double complex vl_uun,zn,zu,zd,gm2,gm3
+      double complex vl_uun,zn,zu0,zd0,gm2,gm3
+      double complex zu
       logical init_alpha_susy
       common/alpha_s_susy/g3,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/neut/fnm(4),zn(4,4)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
@@ -139,10 +140,11 @@ c     gluino-neutralino contributions
       double complex function uu_vll_g(i,j)
 c     gluino contributions
       implicit double precision (a-h,o-z)
-      double complex zu,zd,gm2,gm3
+      double complex zu0,zd0,gm2,gm3
+      double complex zu
       logical init_alpha_susy
       common/alpha_s_susy/g3,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
       uu_vll_g = (0.d0,0.d0)
@@ -252,10 +254,11 @@ c     neutralino contributions
       double complex function uu_vrr_ng(i,j)
 c     gluino-neutralino contributions
       implicit double precision (a-h,o-z)
-      double complex vr_uun,zn,zu,zd,gm2,gm3
+      double complex vr_uun,zn,zu0,zd0,gm2,gm3
+      double complex zu
       logical init_alpha_susy
       common/alpha_s_susy/g3,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/neut/fnm(4),zn(4,4)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
@@ -280,10 +283,11 @@ c     gluino-neutralino contributions
       double complex function uu_vrr_g(i,j)
 c      gluino contributions
       implicit double precision (a-h,o-z)
-      double complex zu,zd,gm2,gm3
+      double complex zu0,zd0,gm2,gm3
+      double complex zu
       logical init_alpha_susy
       common/alpha_s_susy/g3,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
       uu_vrr_g = (0.d0,0.d0)
@@ -315,9 +319,10 @@ c     Formfactor A^V_LR                                            c
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
       double complex function uu_vlr_hg(i,j)
-c      Higgs and gauge contributions
+c     Higgs and gauge contributions
       implicit double precision (a-h,o-z)
       double complex ckm
+      double complex yl,yu,yd
       common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
       common/fmass/em(3),um(3),dm(3)
       common/yukawa/yl(3),yu(3),yd(3)
@@ -387,10 +392,11 @@ c     neutralino contributions
       double complex function uu_vlr_ng(i,j)
 c      gluino-neutralino contributions
       implicit double precision (a-h,o-z)
-      double complex vl_uun,vr_uun,zn,zu,zd,gm2,gm3
+      double complex vl_uun,vr_uun,zn,zu0,zd0,gm2,gm3
+      double complex zu
       logical init_alpha_susy
       common/alpha_s_susy/g3,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/neut/fnm(4),zn(4,4)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
@@ -418,10 +424,11 @@ c      gluino-neutralino contributions
       double complex function uu_vlr_g(i,j)
 c      gluino contributions
       implicit double precision (a-h,o-z)
-      double complex zu,zd,gm2,gm3
+      double complex zu0,zd0,gm2,gm3
+      double complex zu
       logical init_alpha_susy
       common/alpha_s_susy/g3,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
       uu_vlr_g = (0.d0,0.d0)
@@ -457,6 +464,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     Higgs and gauge contributions
       implicit double precision (a-h,o-z)
       double complex ckm
+      double complex yl,yu,yd
       common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
       common/fmass/em(3),um(3),dm(3)
       common/yukawa/yl(3),yu(3),yd(3)
@@ -526,10 +534,11 @@ c      neutralino contributions
       double complex function uu_sll_ng(i,j)
 c     gluino-neutralino contributions
       implicit double precision (a-h,o-z)
-      double complex vl_uun,vr_uun,zn,zu,zd,gm2,gm3
+      double complex vl_uun,vr_uun,zn,zu0,zd0,gm2,gm3
+      double complex zu
       logical init_alpha_susy
       common/alpha_s_susy/g3,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/neut/fnm(4),zn(4,4)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
@@ -553,10 +562,11 @@ c     gluino-neutralino contributions
       double complex function uu_sll_g(i,j)
 c     gluino contributions
       implicit double precision (a-h,o-z)
-      double complex zu,zd,gm2,gm3
+      double complex zu0,zd0,gm2,gm3
+      double complex zu
       logical init_alpha_susy
       common/alpha_s_susy/g3,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
       uu_sll_g = (0.d0,0.d0)
@@ -590,6 +600,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     Higgs and gauge contributions
       implicit double precision (a-h,o-z)
       double complex ckm
+      double complex yl,yu,yd
       common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
       common/fmass/em(3),um(3),dm(3)
       common/yukawa/yl(3),yu(3),yd(3)
@@ -659,10 +670,11 @@ c     neutralino contributions
       double complex function uu_srr_ng(i,j)
 c     gluino-neutralino contributions
       implicit double precision (a-h,o-z)
-      double complex vl_uun,vr_uun,zn,zu,zd,gm2,gm3
+      double complex vl_uun,vr_uun,zn,zu0,zd0,gm2,gm3
+      double complex zu
       logical init_alpha_susy
       common/alpha_s_susy/g3,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/neut/fnm(4),zn(4,4)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
@@ -686,10 +698,11 @@ c     gluino-neutralino contributions
       double complex function uu_srr_g(i,j)
 c      gluino contributions
       implicit double precision (a-h,o-z)
-      double complex zu,zd,gm2,gm3
+      double complex zu0,zd0,gm2,gm3
+      double complex zu
       logical init_alpha_susy
       common/alpha_s_susy/g3,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
       uu_srr_g = (0.d0,0.d0)
@@ -723,6 +736,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c     Higgs and gauge contributions
       implicit double precision (a-h,o-z)
       double complex ckm
+      double complex yl,yu,yd
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
       common/fmass/em(3),um(3),dm(3)
@@ -796,10 +810,11 @@ c     neutralino contributions
       double complex function uu_slr_ng(i,j)
 c     gluino-neutralino contributions
       implicit double precision (a-h,o-z)
-      double complex vl_uun,vr_uun,zn,zu,zd,gm2,gm3
+      double complex vl_uun,vr_uun,zn,zu0,zd0,gm2,gm3
+      double complex zu
       logical init_alpha_susy
       common/alpha_s_susy/g3,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/neut/fnm(4),zn(4,4)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
@@ -827,10 +842,11 @@ c     gluino-neutralino contributions
       double complex function uu_slr_g(i,j)
 c      gluino contributions
       implicit double precision (a-h,o-z)
-      double complex zu,zd,gm2,gm3
+      double complex zu0,zd0,gm2,gm3
+      double complex zu
       logical init_alpha_susy
       common/alpha_s_susy/g3,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
       uu_slr_g = (0.d0,0.d0)
@@ -911,10 +927,11 @@ c     neutralino contributions
       double complex function uu_tl_ng(i,j)
 c     gluino-neutralino contributions
       implicit double precision (a-h,o-z)
-      double complex vl_uun,vr_uun,zn,zu,zd,gm2,gm3
+      double complex vl_uun,vr_uun,zn,zu0,zd0,gm2,gm3
+      double complex zu
       logical init_alpha_susy
       common/alpha_s_susy/g3,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/neut/fnm(4),zn(4,4)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
@@ -938,10 +955,11 @@ c     gluino-neutralino contributions
       double complex function uu_tl_g(i,j)
 c     gluino contributions
       implicit double precision (a-h,o-z)
-      double complex zu,zd,gm2,gm3
+      double complex zu0,zd0,gm2,gm3
+      double complex zu
       logical init_alpha_susy
       common/alpha_s_susy/g3,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
       uu_tl_g = (0.d0,0.d0)
@@ -1018,10 +1036,11 @@ c     neutralino contributions
       double complex function uu_tr_ng(i,j)
 c     gluino-neutralino contributions
       implicit double precision (a-h,o-z)
-      double complex vl_uun,vr_uun,zn,zu,zd,gm2,gm3
+      double complex vl_uun,vr_uun,zn,zu0,zd0,gm2,gm3
+      double complex zu
       logical init_alpha_susy
       common/alpha_s_susy/g3,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/neut/fnm(4),zn(4,4)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
@@ -1045,10 +1064,11 @@ c     gluino-neutralino contributions
       double complex function uu_tr_g(i,j)
 c     gluino contributions
       implicit double precision (a-h,o-z)
-      double complex zu,zd,gm2,gm3
+      double complex zu0,zd0,gm2,gm3
+      double complex zu
       logical init_alpha_susy
       common/alpha_s_susy/g3,g3d,init_alpha_susy
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/gmass/gm1,gm2,gm3
       if (init_alpha_susy) call init_alpha_s_susy
       uu_tr_g = (0.d0,0.d0)

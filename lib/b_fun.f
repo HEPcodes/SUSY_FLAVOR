@@ -272,7 +272,7 @@ c     B22 Veltman function
         return
       end if
       if (infstat) then
-        b22 = del*(3*a1*a1 + 3*a2*a2 -s)/12
+        b22 = del*(3*a1*a1 + 3*a2*a2 - s)/12
         return
       end if
       if (s.eq.0.d0) then
@@ -336,6 +336,7 @@ c     Complex dilogarithm
       implicit double precision (a-h,o-z)
       double complex x,y,z,sign
       common/spence/ber(9),pi,pi6,eps
+      external init_spence
       if (x.eq.(0.d0,0.d0)) then
         li2 = 0
         return
@@ -349,9 +350,9 @@ c     Complex dilogarithm
         li2 = pi6/2 - log(2.d0)**2/2
         return
       end if
-      sign = 1
+      sign = (1.d0,0.d0)
       y = x
-      li2 = 0
+      li2 = (0.d0,0.d0)
       if ((abs(y).gt.1)) then
         li2 = - pi6 - log(-y)**2/2
         y = 1/y

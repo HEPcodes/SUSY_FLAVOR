@@ -7,23 +7,23 @@ Z boson mass =  9.1188E+01
 W boson mass =  8.0398E+01
 QCD coupling alpha_s(M_Z) =  1.1720E-01
 
-Higgs mixing parameter mu (complex)   =  2.0000E+02  1.0000E+02
-Higgs soft mixing parameter m_{12}^2  = -3.9604E+03
-Higgs soft masses m_{H_1}^2,m_{H_2}^2 = -6.3208E+03 -5.3679E+04
+Higgs mixing parameter mu (complex)   =  3.0000E+02  1.0000E+02
+Higgs soft mixing parameter m_{12}^2  = -7.9968E+02
+Higgs soft masses m_{H_1}^2,m_{H_2}^2 = -5.5862E+04 -1.0414E+05
 
-U(1)  gaugino mass (complex) = 9.5472E+01  0.0000E+00
-SU(2) gaugino mass (complex) = 2.0000E+02  0.0000E+00
+U(1)  gaugino mass (complex) = 2.0000E+02 -5.0000E+01
+SU(2) gaugino mass (complex) = 3.0000E+02  1.5000E+02
 SU(3) gaugino mass (real)    = 6.0000E+02
 
 Left slepton mass matrix, real part:
- 9.00009E+04  0.00000E+00  0.00000E+00
- 0.00000E+00  9.00018E+04  1.80004E+03
- 0.00000E+00  1.80004E+03  9.00027E+04
+ 9.00009E+04  1.80003E+03  0.00000E+00
+ 1.80003E+03  9.00018E+04  0.00000E+00
+ 0.00000E+00  0.00000E+00  9.00027E+04
 
 Left slepton mass matrix, imaginary part:
- 0.00000E+00  0.00000E+00  0.00000E+00
--0.00000E+00  0.00000E+00  9.00022E+02
--0.00000E+00 -9.00022E+02  0.00000E+00
+ 0.00000E+00  9.00013E+02  0.00000E+00
+-9.00013E+02  0.00000E+00  0.00000E+00
+-0.00000E+00 -0.00000E+00  0.00000E+00
 
 Right slepton mass matrix, real part:
  8.99991E+04  0.00000E+00  0.00000E+00
@@ -31,19 +31,19 @@ Right slepton mass matrix, real part:
  0.00000E+00  0.00000E+00  8.99973E+04
 
 Right slepton mass matrix, imaginary part:
+ 0.00000E+00 -0.00000E+00 -0.00000E+00
+ 0.00000E+00  0.00000E+00 -0.00000E+00
  0.00000E+00  0.00000E+00  0.00000E+00
--0.00000E+00  0.00000E+00  0.00000E+00
--0.00000E+00 -0.00000E+00  0.00000E+00
 
 Slepton LR mixing matrix, real part:
--9.00010E-03  0.00000E+00  0.00000E+00
- 0.00000E+00 -1.86094E+00  0.00000E+00
- 0.00000E+00  0.00000E+00 -3.12978E+01
+ 4.50000E-02  0.00000E+00  0.00000E+00
+ 0.00000E+00  9.00000E+00  0.00000E+00
+ 0.00000E+00  2.99999E+00  1.50000E+02
 
 Slepton LR mixing matrix, imaginary part:
--0.00000E+00  0.00000E+00  0.00000E+00
- 0.00000E+00 -0.00000E+00  0.00000E+00
- 0.00000E+00  0.00000E+00 -0.00000E+00
+ 0.00000E+00  0.00000E+00  0.00000E+00
+ 0.00000E+00  0.00000E+00  0.00000E+00
+ 0.00000E+00  5.99998E+00  0.00000E+00
 
 Left squark mass matrix, real part:
  2.50003E+05  0.00000E+00  0.00000E+00
@@ -61,9 +61,9 @@ Right up-squark mass matrix, real part:
  0.00000E+00  0.00000E+00  3.99988E+04
 
 Right up-squark mass matrix, imaginary part:
+ 0.00000E+00 -0.00000E+00 -0.00000E+00
+ 0.00000E+00  0.00000E+00 -0.00000E+00
  0.00000E+00  0.00000E+00  0.00000E+00
--0.00000E+00  0.00000E+00  0.00000E+00
--0.00000E+00 -0.00000E+00  0.00000E+00
 
 Right down-squark mass matrix, real part:
  3.02497E+05  0.00000E+00  0.00000E+00
@@ -71,46 +71,46 @@ Right down-squark mass matrix, real part:
  0.00000E+00  0.00000E+00  8.99973E+04
 
 Right down-squark mass matrix, imaginary part:
+ 0.00000E+00 -0.00000E+00 -0.00000E+00
+ 0.00000E+00  0.00000E+00 -0.00000E+00
  0.00000E+00  0.00000E+00  0.00000E+00
--0.00000E+00  0.00000E+00  0.00000E+00
--0.00000E+00 -0.00000E+00  0.00000E+00
 
 Up-squark LR mixing matrix, real part:
- 6.18168E-03  0.00000E+00  0.00000E+00
- 0.00000E+00  1.79332E+00  0.00000E+00
- 0.00000E+00  0.00000E+00  2.71002E+02
+-4.74342E-03 -0.00000E+00 -0.00000E+00
+-0.00000E+00 -1.89737E+00 -0.00000E+00
+-0.00000E+00 -3.16227E+00 -2.82843E+02
 
 Up-squark LR mixing matrix, imaginary part:
- 0.00000E+00  0.00000E+00  0.00000E+00
- 0.00000E+00  0.00000E+00  0.00000E+00
- 0.00000E+00  0.00000E+00  0.00000E+00
+-0.00000E+00 -0.00000E+00 -0.00000E+00
+-0.00000E+00 -0.00000E+00 -0.00000E+00
+-0.00000E+00 -6.32454E+00 -0.00000E+00
 
 Down-squark LR mixing matrix, real part:
--1.19597E-01  0.00000E+00  0.00000E+00
- 0.00000E+00 -1.87938E+00  0.00000E+00
- 0.00000E+00  0.00000E+00 -5.56628E+01
+-5.24404E-01  0.00000E+00  0.00000E+00
+ 0.00000E+00 -1.04881E+01  0.00000E+00
+ 0.00000E+00 -1.16189E+01 -2.77128E+02
 
 Down-squark LR mixing matrix, imaginary part:
--0.00000E+00  0.00000E+00  0.00000E+00
- 0.00000E+00 -0.00000E+00  0.00000E+00
- 0.00000E+00  0.00000E+00 -0.00000E+00
+ 0.00000E+00  0.00000E+00  0.00000E+00
+ 0.00000E+00  0.00000E+00  0.00000E+00
+ 0.00000E+00  3.87297E+00  0.00000E+00
 
 ******* Particle masses in GeV: *******
 
 ** Fermion masses **
 Charged lepton masses                 5.110E-04  1.057E-01  1.777E+00
 Running u quark masses at m_t scale  2.220E-03  6.440E-01  1.632E+02
-Running d quark masses at m_t scale  3.885E-03  6.104E-02  2.737E+00
+Running d quark masses at m_t scale  3.885E-03  5.216E-02  2.737E+00
 
 ** Higgs masses **
-Tree level (H,h,A,H+):           2.010E+02  8.893E+01  2.000E+02  2.156E+02
-1-loop, EPA approximation (H,h): 2.005E+02  1.137E+02
+Tree level (H,h,A,H+):           2.000E+02  9.110E+01  2.000E+02  2.156E+02
+1-loop, EPA approximation (H,h): 1.993E+02  1.146E+02
 
 ** Tree level SUSY masses **
-Sneutrino masses    2.897E+02  2.931E+02  2.965E+02
-Slepton masses      2.953E+02  3.028E+02  3.030E+02  3.037E+02  3.038E+02  3.114E+02
-U squark masses     2.178E+02  4.486E+02  4.487E+02  4.489E+02  4.971E+02  4.974E+02
-D squark masses     2.999E+02  4.049E+02  5.035E+02  5.037E+02  5.505E+02  5.505E+02
-Chargino masses     1.552E+02  2.808E+02
-Neutralino masses   8.865E+01  1.584E+02  2.322E+02  2.808E+02
+Sneutrino masses    2.895E+02  2.930E+02  2.964E+02
+Slepton masses      2.539E+02  2.993E+02  3.031E+02  3.034E+02  3.079E+02  3.460E+02
+U squark masses     2.207E+02  4.466E+02  4.486E+02  4.494E+02  4.971E+02  4.973E+02
+D squark masses     2.642E+02  4.291E+02  5.035E+02  5.038E+02  5.506E+02  5.506E+02
+Chargino masses     2.722E+02  3.890E+02
+Neutralino masses   1.986E+02  2.757E+02  3.235E+02  3.893E+02
 Gluino mass         6.000E+02

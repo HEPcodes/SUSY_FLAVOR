@@ -20,18 +20,27 @@ Block MODSEL		     # Select model
     5	 2		     # CP violated
     6	 3		     # Lepton and quark flavor violated
 Block SOFTINP		     # Choose convention for the soft terms
-# convention = 1:
-#   sfermion input parameters in SLHA2 conventions 
-# convention = 2:
-#   sfermion input parameters in conventions of hep-ph/9511250
+#
+# Block SOFTINP is optional - standard SLHA2 used if it is missing,
+# i.e. convention=1, input_type=2, ilev=2. Otherwise:
+#
+# convention = 1(2): input parameters in SLHA2(hep-ph/9511250) conventions 
 # input_type = 1:
 #   sfermion off-diagonal terms given as dimensionless mass insertions
 #   LR diagonal terms given as dimensionless parameters
 # input_type = 2:
-#   sfermion soft terms given as absolute values
+#   sfermion soft terms given as absolute values (default)
+# ilev = 0
+#   no resummation of chirally enhanced corrections
+# ilev = 1
+#   analytical resummation of chirally enhanced corrections 
+#   in the limit v1,v2 << M_SUSY
+# ilev = 2 (default)
+#   numerical iterative resummation of chirally enhanced corrections 
 # See comment in Blocks MSXIN2, TXIN below
-    1	 2		     # iconv (convention choice, SLHA2 or hep-ph/9511250)
+    1	 1		     # iconv (conventions, SLHA2 or hep-ph/9511250)
     2    1		     # input_type (dimension of soft mass entries)
+    3	 2		     # ilev (level of chiral corrections resummation) 
 Block SMINPUTS		     # Standard Model inputs
     1	1.279340000e+02	     # alpha^(-1) SM MSbar(MZ)
     3   1.172000000e-01	     # alpha_s(MZ) SM MSbar
@@ -43,24 +52,25 @@ Block SMINPUTS		     # Standard Model inputs
     13	1.056590000e-01      # mmu(pole)
     21	7.000000000e-03	     # md(2 GeV) MSbar
     22	4.000000000e-03	     # mu(2 GeV) MSbar
-    23	1.100000000e-01	     # ms(2 GeV) MSbar
+    23	9.400000000e-02	     # ms(2 GeV) MSbar
     24	1.279000000e+00	     # mc(mc) MSbar
-    30  8.039800000e+01      # MW (pole), not standard SLHA2 entry G_Fermi!!!
+    30  8.039800000e+01      # MW (pole), not a standard SLHA2 entry !!!
 Block VCKMIN		     # CKM matrix
     1   2.258000000e-01	     # lambda
     2   8.080000000e-01	     # A
     3   1.770000000e-01	     # rho bar
     4   3.600000000e-01	     # eta bar
 Block EXTPAR                 # non-minimal input parameters, real part
-    1   0.000000000e+02      # Re(m1), U(1) gaugino mass
-    2   2.000000000e+02      # Re(m2), SU(2) gaugino mass
+    0  -1.000000000e+00	     # input scale, cannot be modified (input at EW scale only)!!!
+    1   2.000000000e+02      # Re(m1), U(1) gaugino mass
+    2   3.000000000e+02      # Re(m2), SU(2) gaugino mass
     3   6.000000000e+02      # m3, SU(3) gaugino mass
-    23	2.000000000e+02	     # Re(mu) 
-    25	1.000000000e+01	     # tan(beta)
+    23	3.000000000e+02	     # Re(mu) 
+    25	5.000000000e+01	     # tan(beta)
     26	2.000000000e+02	     # MA
 Block IMEXTPAR               # non-minimal input parameters, imaginary part
-    1   0.000000000e+00      # Im(m1), U(1) gaugino mass
-    2   0.000000000e+00      # Im(m2), SU(2) gaugino mass
+    1  -5.000000000e+01      # Im(m1), U(1) gaugino mass
+    2   1.500000000e+02      # Im(m2), SU(2) gaugino mass
     23	1.000000000e+02      # Im(mu)
 # if abs(m1) = 0 SUSY_FLAVOR uses m1=5/3 s_W^2/c_W^2 m2
 #   
@@ -78,12 +88,12 @@ Block MSL2IN                 # left soft slepton mass matrix, real part
  1  1  9.000000000e+04	     # Left slepton diagonal mass^2, 1st generation
  2  2  9.000000000e+04	     # Left slepton diagonal mass^2, 2nd generation
  3  3  9.000000000e+04	     # Left slepton diagonal mass^2, 3rd generation
- 1  2  0.000000000e+00       # Dimensionless left slepton mass insertion 12
- 2  3  2.000000000e-02       # Dimensionless left slepton mass insertion 23
+ 1  2  2.000000000e-02       # Dimensionless left slepton mass insertion 12
+ 2  3  0.000000000e+00       # Dimensionless left slepton mass insertion 23
  1  3  0.000000000e+00       # Dimensionless left slepton mass insertion 13
 Block IMMSL2IN               # left soft slepton mass matrix, imaginary part
- 1  2  0.000000000e+00       # Dimensionless left slepton mass insertion 12
- 2  3  1.000000000e-02       # Dimensionless left slepton mass insertion 23
+ 1  2  1.000000000e-02       # Dimensionless left slepton mass insertion 12
+ 2  3  0.000000000e+00       # Dimensionless left slepton mass insertion 23
  1  3  0.000000000e+00       # Dimensionless left slepton mass insertion 13
 Block MSE2IN                 # right soft slepton mass matrix, real part
  1  1  9.000000000e+04	     # Right selectron diagonal mass^2
@@ -136,78 +146,70 @@ Block IMMSD2IN               # right soft down-squark mass matrix, imaginary par
 # dimensionless diagonal A-terms and dimensionless ff-diagonal mass
 # insertions - see comments at the top of subroutine sflav_input
 #
-# Below we give an example of dimensionless A terms.
+# Below we give an example of dimensionless "A terms".
 #
-# Diagonal entries below are dimensionless "A parameters"
-# Diagonal entries of SLHA2 LR blocks are calculated by SUSY_FLAVOR as
-# TL(I,I) = AL(I,I) Yukawa_L(I) sqrt(ML^2(I,I)*ME^2(I,I))
-# TU(I,I) = AU(I,I) Yukawa_U(I) sqrt(MQ^2(I,I)*MU^2(I,I))
-# TD(I,I) = AD(I,I) Yukawa_D(I) sqrt(MQ^2(I,I)*MD^2(I,I))
+# Entries of SLHA2 LR blocks are calculated by SUSY_FLAVOR as
+# TL(I,J) = AL(I,J) (ML^2(I,I)*ME^2(J,J))**(1/4)
+# TU(I,J) = AU(I,J) (MQ^2(I,I)*MU^2(J,J))**(1/4)
+# TD(I,J) = AD(I,J) (MQ^2(I,I)*MD^2(J,J))**(1/4)
 #
-# Off-diagonal entries are dimensionless "mass insertions"
-# Off-diagonal entries of SLHA2 LR blocks are calculated by SUSY_FLAVOR as
-#
-# TL(I,J) = AL(I,J) sqrt(2 ML^2(I,I)*ME^2(J,J))/v1
-# TU(I,J) = AU(I,J) sqrt(2 MQ^2(I,I)*MU^2(J,J))/v2
-# TD(I,J) = AD(I,J) sqrt(2 MQ^2(I,I)*MD^2(J,J))/v1
-#
-Block TEIN                   # slepton trilinear mixing (dimensionless), real part
- 1  1  1.000000000e+00	     # Diagonal AL term, 1st generation
- 2  2  1.000000000e+00       # Diagonal AL term, 2nd generation
- 3  3  1.000000000e+00       # Diagonal AL term, 3rd generation
+Block TEIN                   # slepton trilinear mixing, real part
+ 1  1  1.500000000e-04	     # Diagonal AL term, 1st generation
+ 2  2  3.000000000e-02       # Diagonal AL term, 2nd generation
+ 3  3  5.000000000e-01       # Diagonal AL term, 3rd generation
  1  2  0.000000000e+00       # Slepton LR mass insertion 12
  2  1  0.000000000e+00       # Slepton LR mass insertion 21
- 2  3  0.000000000e+00       # Slepton LR mass insertion 23
+ 2  3  1.000000000e-02       # Slepton LR mass insertion 23
  3  2  0.000000000e+00       # Slepton LR mass insertion 32
  1  3  0.000000000e+00       # Slepton LR mass insertion 13
  3  1  0.000000000e+00       # Slepton LR mass insertion 31
-Block IMTEIN                 # slepton trilinear mixing (dimensionless), imaginary part
+Block IMTEIN                 # slepton trilinear mixing, imaginary part
  1  1  0.000000000e+00	     # Diagonal AL term, 1st generation
  2  2  0.000000000e+00       # Diagonal AL term, 2nd generation
  3  3  0.000000000e+00       # Diagonal AL term, 3rd generation
  1  2  0.000000000e+00       # Slepton LR mass insertion 12
  2  1  0.000000000e+00       # Slepton LR mass insertion 21
- 2  3  0.000000000e+00       # Slepton LR mass insertion 23
+ 2  3  2.000000000e-02       # Slepton LR mass insertion 23
  3  2  0.000000000e+00       # Slepton LR mass insertion 32
  1  3  0.000000000e+00       # Slepton LR mass insertion 13
  3  1  0.000000000e+00       # Slepton LR mass insertion 31
-Block TUIN                   # up-squark trilinear mixing (dimensionless), real part
- 1  1  1.000000000e+00	     # Diagonal AU term, 1st generation
- 2  2  1.000000000e+00	     # Diagonal AU term, 2nd generation
+Block TUIN                   # up-squark trilinear mixing, real part
+ 1  1  1.000000000e-05	     # Diagonal AU term, 1st generation
+ 2  2  4.000000000e-03	     # Diagonal AU term, 2nd generation
  3  3  1.000000000e+00	     # Diagonal AU term, 3rd generation
  1  2  0.000000000e+00       # Up-squark LR mass insertion 12
  2  1  0.000000000e+00       # Up-squark LR mass insertion 21
- 2  3  0.000000000e+00       # Up-squark LR mass insertion 23
+ 2  3  1.000000000e-02       # Up-squark LR mass insertion 23
  3  2  0.000000000e+00       # Up-squark LR mass insertion 32
  1  3  0.000000000e+00       # Up-squark LR mass insertion 13
  3  1  0.000000000e+00       # Up-squark LR mass insertion 31
-Block IMTUIN                 # up-squark trilinear mixing (dimensionless), imaginary part
+Block IMTUIN                 # up-squark trilinear mixing, imaginary part
  1  1  0.000000000e+00	     # Diagonal AU term, 1st generation
  2  2  0.000000000e+00	     # Diagonal AU term, 2nd generation
  3  3  0.000000000e+00	     # Diagonal AU term, 3rd generation
  1  2  0.000000000e+00       # Up-squark LR mass insertion 12
  2  1  0.000000000e+00       # Up-squark LR mass insertion 21
- 2  3  0.000000000e+00       # Up-squark LR mass insertion 23
+ 2  3  2.000000000e-02       # Up-squark LR mass insertion 23
  3  2  0.000000000e+00       # Up-squark LR mass insertion 32
  1  3  0.000000000e+00       # Up-squark LR mass insertion 13
  3  1  0.000000000e+00       # Up-squark LR mass insertion 31
-Block TDIN                   # down-squark trilinear mixing (dimensionless), real part
- 1  1  1.000000000e+00	     # Diagonal AD term, 1st generation
- 2  2  1.000000000e+00	     # Diagonal AD term, 2nd generation
- 3  3  1.000000000e+00	     # Diagonal AD term, 3rd generation
+Block TDIN                   # down-squark trilinear mixing, real part
+ 1  1 -1.000000000e-03	     # Diagonal AD term, 1st generation
+ 2  2 -2.000000000e-02	     # Diagonal AD term, 2nd generation
+ 3  3 -8.000000000e-01	     # Diagonal AD term, 3rd generation
  1  2  0.000000000e+00       # Down-squark LR mass insertion 12
  2  1  0.000000000e+00       # Down-squark LR mass insertion 21
- 2  3  0.000000000e+00       # Down-squark LR mass insertion 23
+ 2  3 -3.000000000e-02       # Down-squark LR mass insertion 23
  3  2  0.000000000e+00       # Down-squark LR mass insertion 32
  1  3  0.000000000e+00       # Down-squark LR mass insertion 13
  3  1  0.000000000e+00       # Down-squark LR mass insertion 31
-Block IMTDIN                 # down-squark trilinear mixing (dimensionless), imaginary part
+Block IMTDIN                 # down-squark trilinear mixing, imaginary part
  1  1  0.000000000e+00	     # Diagonal AD term, 1st generation
  2  2  0.000000000e+00	     # Diagonal AD term, 2nd generation
  3  3  0.000000000e+00	     # Diagonal AD term, 3rd generation
  1  2  0.000000000e+00       # Down-squark LR mass insertion 12
  2  1  0.000000000e+00       # Down-squark LR mass insertion 21
- 2  3  0.000000000e+00       # Down-squark LR mass insertion 23
+ 2  3  1.000000000e-02       # Down-squark LR mass insertion 23
  3  2  0.000000000e+00       # Down-squark LR mass insertion 32
  1  3  0.000000000e+00       # Down-squark LR mass insertion 13
  3  1  0.000000000e+00       # Down-squark LR mass insertion 31

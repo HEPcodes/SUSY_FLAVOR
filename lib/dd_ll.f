@@ -130,6 +130,7 @@ c     Gauge contribution
 c     Double Higgs contribution
       implicit double precision (a-h,o-z)
       double complex yh_eff_r
+      double complex yl,yu,yd
       common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
       common/fmass/em(3),um(3),dm(3)
       common/yukawa/yl(3),yu(3),yd(3)
@@ -159,6 +160,7 @@ c     W-Higgs contribution
 c     Chargino contribution
       implicit double precision (a-h,o-z)
       double complex vr_duc,zpos,zneg,zu,zd,zv,zl
+      double complex yl,yu,yd
       common/charg/fcm(2),zpos(2,2),zneg(2,2)
       common/slmass/vm(3),slm(6),zv(3,3),zl(6,6)
       common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
@@ -231,6 +233,7 @@ c     Gauge contribution
 c     Double Higgs contribution
       implicit double precision (a-h,o-z)
       double complex yh_eff_l
+      double complex yl,yu,yd
       common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
       common/fmass/em(3),um(3),dm(3)
       common/yukawa/yl(3),yu(3),yd(3)
@@ -260,6 +263,7 @@ c     W-Higgs contribution
 c     Chargino contribution
       implicit double precision (a-h,o-z)
       double complex vl_duc,zpos,zneg,zu,zd,zv,zl
+      double complex yl,yu,yd
       common/charg/fcm(2),zpos(2,2),zneg(2,2)
       common/slmass/vm(3),slm(6),zv(3,3),zl(6,6)
       common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
@@ -432,6 +436,7 @@ c     W-Higgs contribution
 c     Chargino contribution
       implicit double precision (a-h,o-z)
       double complex vl_duc,vr_duc,zpos,zneg,zu,zd,zv,zl
+      double complex yl,yu,yd
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/charg/fcm(2),zpos(2,2),zneg(2,2)
       common/slmass/vm(3),slm(6),zv(3,3),zl(6,6)
@@ -518,6 +523,7 @@ c     W-Higgs contribution
 c     Chargino contribution
       implicit double precision (a-h,o-z)
       double complex vl_duc,vr_duc,zpos,zneg,zu,zd,zv,zl
+      double complex yl,yu,yd
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/charg/fcm(2),zpos(2,2),zneg(2,2)
       common/slmass/vm(3),slm(6),zv(3,3),zl(6,6)
@@ -598,6 +604,7 @@ c     W-Higgs contribution
       implicit double precision (a-h,o-z)
       double complex yh_eff_r
       double complex ckm
+      double complex yl,yu,yd
       common/km_mat/ckm(3,3)
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
@@ -619,6 +626,7 @@ c     W-Higgs contribution
 c     Chargino contribution
       implicit double precision (a-h,o-z)
       double complex vl_duc,vr_duc,zpos,zneg,zu,zd,zv,zl
+      double complex yl,yu,yd
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/charg/fcm(2),zpos(2,2),zneg(2,2)
       common/slmass/vm(3),slm(6),zv(3,3),zl(6,6)
@@ -699,6 +707,7 @@ c     W-Higgs contribution
       implicit double precision (a-h,o-z)
       double complex yh_eff_r
       double complex ckm
+      double complex yl,yu,yd
       common/km_mat/ckm(3,3)
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
@@ -720,6 +729,7 @@ c     W-Higgs contribution
 c     Chargino contribution
       implicit double precision (a-h,o-z)
       double complex vl_duc,vr_duc,zpos,zneg,zu,zd,zv,zl
+      double complex yl,yu,yd
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/charg/fcm(2),zpos(2,2),zneg(2,2)
       common/slmass/vm(3),slm(6),zv(3,3),zl(6,6)
@@ -806,6 +816,7 @@ c     W-Higgs contribution
 c     Chargino contribution
       implicit double precision (a-h,o-z)
       double complex vl_duc,vr_duc,zpos,zneg,zu,zd,zv,zl
+      double complex yl,yu,yd
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/charg/fcm(2),zpos(2,2),zneg(2,2)
       common/slmass/vm(3),slm(6),zv(3,3),zl(6,6)
@@ -892,6 +903,7 @@ c     W-Higgs contribution
 c     Chargino contribution
       implicit double precision (a-h,o-z)
       double complex vl_duc,vr_duc,zpos,zneg,zu,zd,zv,zl
+      double complex yl,yu,yd
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/charg/fcm(2),zpos(2,2),zneg(2,2)
       common/slmass/vm(3),slm(6),zv(3,3),zl(6,6)
@@ -1028,22 +1040,22 @@ c     Full A^V_RL formfactor
       double complex function dl_sll(i,j,k,l)
 c     Full A^S_LL formfactor
       implicit double precision (a-h,o-z)
-      double complex dl_sll_box,form(2)
-      common/yukawa/yl(3),yu(3),yd(3)
+      double complex dl_sll_box
+      double complex yhl,yhr,ysu,ypu,ysd,ypd
+      double complex yhlr,ysl,ypl
+      logical init_yukawa_eff,init_yukawa_l
+      common/yukawa_eff/yhl(3,3,2),yhr(3,3,2),ysu(3,3,2),ypu(3,3,2),
+     $     ysd(3,3,2),ypd(3,3,2),init_yukawa_eff
+      common/yukawa_lept/yhlr(3,3,2),ysl(3,3,2),ypl(3,3,2),init_yukawa_l
       common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
       common/diag_type/ihpeng,izpeng,ifpeng,ibox
-      common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      if (ibox.eq.1) then 
-         dl_sll = dl_sll_box(i,j,k,l)
-      else
-         dl_sll = (0.d0,0.d0)
-      end if
-      if ((k.eq.l).and.(ihpeng.eq.1)) then
+      if (init_yukawa_eff.or.init_yukawa_l) call yukawa_eff_init
+      dl_sll = (0.d0,0.d0)
+      if (ibox.eq.1) dl_sll = dl_sll_box(i,j,k,l)
+      if (ihpeng.eq.1) then
          do m=1,2
-            call sdd_vert_eff(i,j,m,form)
-            dl_sll = dl_sll + yl(k)*zr(1,m)/sq2/rm(m)/rm(m)*form(1)
-            call pdd_vert_eff(i,j,m,form)
-            dl_sll = dl_sll + yl(k)*zh(1,m)/sq2/pm(m)/pm(m)*form(1)
+            dl_sll = dl_sll + dconjg(ysl(k,l,m)*ysd(i,j,m))/rm(m)/rm(m)
+            dl_sll = dl_sll + dconjg(ypl(k,l,m)*ypd(i,j,m))/pm(m)/pm(m)
          end do
       end if
       return
@@ -1052,22 +1064,22 @@ c     Full A^S_LL formfactor
       double complex function dl_srr(i,j,k,l)
 c     Full A^S_RR formfactor
       implicit double precision (a-h,o-z)
-      double complex dl_srr_box,form(2)
-      common/yukawa/yl(3),yu(3),yd(3)
+      double complex dl_srr_box
+      double complex yhl,yhr,ysu,ypu,ysd,ypd
+      double complex yhlr,ysl,ypl
+      logical init_yukawa_eff,init_yukawa_l
+      common/yukawa_eff/yhl(3,3,2),yhr(3,3,2),ysu(3,3,2),ypu(3,3,2),
+     $     ysd(3,3,2),ypd(3,3,2),init_yukawa_eff
+      common/yukawa_lept/yhlr(3,3,2),ysl(3,3,2),ypl(3,3,2),init_yukawa_l
       common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
       common/diag_type/ihpeng,izpeng,ifpeng,ibox
-      common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      if (ibox.eq.1) then 
-         dl_srr = dl_srr_box(i,j,k,l)
-      else
-         dl_srr = (0.d0,0.d0)
-      end if
-      if ((k.eq.l).and.(ihpeng.eq.1)) then
+      if (init_yukawa_eff.or.init_yukawa_l) call yukawa_eff_init
+      dl_srr = (0.d0,0.d0)
+      if (ibox.eq.1) dl_srr = dl_srr_box(i,j,k,l)
+      if (ihpeng.eq.1) then
          do m=1,2
-            call sdd_vert_eff(i,j,m,form)
-            dl_srr = dl_srr + yl(k)*zr(1,m)/sq2/rm(m)/rm(m)*form(2)
-            call pdd_vert_eff(i,j,m,form)
-            dl_srr = dl_srr - yl(k)*zh(1,m)/sq2/pm(m)/pm(m)*form(2)
+            dl_srr = dl_srr + ysd(j,i,m)*ysl(l,k,m)/rm(m)/rm(m)
+            dl_srr = dl_srr + ypd(j,i,m)*ypl(l,k,m)/pm(m)/pm(m)
          end do
       end if
       return
@@ -1076,22 +1088,22 @@ c     Full A^S_RR formfactor
       double complex function dl_slr(i,j,k,l)
 c     Full A^S_LR formfactor
       implicit double precision (a-h,o-z)
-      double complex dl_slr_box,form(2)
-      common/yukawa/yl(3),yu(3),yd(3)
+      double complex dl_slr_box
+      double complex yhl,yhr,ysu,ypu,ysd,ypd
+      double complex yhlr,ysl,ypl
+      logical init_yukawa_eff,init_yukawa_l
+      common/yukawa_eff/yhl(3,3,2),yhr(3,3,2),ysu(3,3,2),ypu(3,3,2),
+     $     ysd(3,3,2),ypd(3,3,2),init_yukawa_eff
+      common/yukawa_lept/yhlr(3,3,2),ysl(3,3,2),ypl(3,3,2),init_yukawa_l
       common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
       common/diag_type/ihpeng,izpeng,ifpeng,ibox
-      common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      if (ibox.eq.1) then 
-         dl_slr = dl_slr_box(i,j,k,l)
-      else
-         dl_slr = (0.d0,0.d0)
-      end if
-      if ((k.eq.l).and.(ihpeng.eq.1)) then
+      if (init_yukawa_eff.or.init_yukawa_l) call yukawa_eff_init
+      dl_slr = (0.d0,0.d0)
+      if (ibox.eq.1) dl_slr = dl_slr_box(i,j,k,l)
+      if (ihpeng.eq.1) then
          do m=1,2
-            call sdd_vert_eff(i,j,m,form)
-            dl_slr = dl_slr + yl(k)*zr(1,m)/sq2/rm(m)/rm(m)*form(1)
-            call pdd_vert_eff(i,j,m,form)
-            dl_slr = dl_slr - yl(k)*zh(1,m)/sq2/pm(m)/pm(m)*form(1)
+            dl_slr = dl_slr + ysl(l,k,m)*dconjg(ysd(i,j,m))/rm(m)/rm(m)
+            dl_slr = dl_slr - ypl(l,k,m)*dconjg(ypd(i,j,m))/pm(m)/pm(m)
          end do
       end if
       return
@@ -1100,22 +1112,22 @@ c     Full A^S_LR formfactor
       double complex function dl_srl(i,j,k,l)
 c     Full A^S_RL formfactor
       implicit double precision (a-h,o-z)
-      double complex dl_srl_box,form(2)
-      common/yukawa/yl(3),yu(3),yd(3)
+      double complex dl_srl_box
+      double complex yhl,yhr,ysu,ypu,ysd,ypd
+      double complex yhlr,ysl,ypl
+      logical init_yukawa_eff,init_yukawa_l
+      common/yukawa_eff/yhl(3,3,2),yhr(3,3,2),ysu(3,3,2),ypu(3,3,2),
+     $     ysd(3,3,2),ypd(3,3,2),init_yukawa_eff
+      common/yukawa_lept/yhlr(3,3,2),ysl(3,3,2),ypl(3,3,2),init_yukawa_l
       common/hmass/cm(2),rm(2),pm(2),zr(2,2),zh(2,2)
       common/diag_type/ihpeng,izpeng,ifpeng,ibox
-      common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      if (ibox.eq.1) then 
-         dl_srl = dl_srl_box(i,j,k,l)
-      else
-         dl_srl = (0.d0,0.d0)
-      end if
-      if ((k.eq.l).and.(ihpeng.eq.1)) then
+      if (init_yukawa_eff.or.init_yukawa_l) call yukawa_eff_init
+      dl_srl = (0.d0,0.d0)
+      if (ibox.eq.1) dl_srl = dl_srl_box(i,j,k,l)
+      if (ihpeng.eq.1) then
          do m=1,2
-            call sdd_vert_eff(i,j,m,form)
-            dl_srl = dl_srl + yl(k)*zr(1,m)/sq2/rm(m)/rm(m)*form(2)
-            call pdd_vert_eff(i,j,m,form)
-            dl_srl = dl_srl + yl(k)*zh(1,m)/sq2/pm(m)/pm(m)*form(2)
+            dl_srl = dl_srl + dconjg(ysl(k,l,m))*ysd(j,i,m)/rm(m)/rm(m)
+            dl_srl = dl_srl - dconjg(ypl(k,l,m))*ypd(j,i,m)/pm(m)/pm(m)
          end do
       end if
       return

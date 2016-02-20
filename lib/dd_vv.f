@@ -172,20 +172,23 @@ c     Penguins
       double complex function dd_vv_l_gl(i,j,k,l)
 c     gluino contributions
       implicit double precision (a-h,o-z)
-      double complex zu,zd,gm2,gm3,ztmp
+      double complex zu0,zd0,gm2,gm3,ztmp
+      double complex zd
+      logical init_alpha_susy
+      common/alpha_s_susy/g3u,g3d,init_alpha_susy
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/gmass/gm1,gm2,gm3
+      if (init_alpha_susy) call init_alpha_s_susy
       dd_vv_l_gl = (0.d0,0.d0)
       if (k.ne.l) return
-      g3 = 4*pi*alfas(zm)
       do mm=1,6
          do nn=1,6
             ztmp = (0.d0,0.d0)
             do m=1,3
                ztmp = ztmp + zd(m+3,nn)*dconjg(zd(m+3,mm))
             end do
-            dd_vv_l_gl = dd_vv_l_gl - e2*g3/3/st2/wm2*ztmp
+            dd_vv_l_gl = dd_vv_l_gl - e2*g3d*g3d/3/st2/wm2*ztmp
      $           * zd(i,mm)*dconjg(zd(j,nn))*cp1(gm1,sdm(mm),sdm(nn))
          end do
       end do
@@ -344,20 +347,23 @@ c     Penguins
       double complex function dd_vv_r_gl(i,j,k,l)
 c     gluino contributions
       implicit double precision (a-h,o-z)
-      double complex zu,zd,ztmp,gm2,gm3
+      double complex zu0,zd0,ztmp,gm2,gm3
+      double complex zd
+      logical init_alpha_susy
+      common/alpha_s_susy/g3u,g3d,init_alpha_susy
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/gmass/gm1,gm2,gm3
+      if (init_alpha_susy) call init_alpha_s_susy
       dd_vv_r_gl = (0.d0,0.d0)
       if (k.ne.l) return
-      g3 = 4*pi*alfas(zm)
       do mm=1,6
          do nn=1,6
             ztmp = (0.d0,0.d0)
             do m=1,3
                ztmp = ztmp + zd(m,nn)*dconjg(zd(m,mm))
             end do
-            dd_vv_r_gl = dd_vv_r_gl + e2*g3/3/st2/wm2*ztmp
+            dd_vv_r_gl = dd_vv_r_gl + e2*g3d*g3d/3/st2/wm2*ztmp
      $           * zd(i+3,mm)*dconjg(zd(j+3,nn))
      $           * cp1(gm1,sdm(mm),sdm(nn))
          end do

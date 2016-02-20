@@ -194,17 +194,17 @@ c     initialization of QCD factors finished:
 c     Full A^V_LL SM formfactor at low energy
       implicit double precision (a-h,o-z)
       double complex vc,vt
-      double complex ckm_e,ckm_0,ydl,ydr,yul,yur
+      double complex ckm_phys,ckm0,udl,udr,uul,uur
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/fmass_high/umu(3),uml(3),amuu(3),dmu(3),dml(3),amud(3)
       common/sm_4q/eta_cc,eta_ct,eta_tt,eta_b,bk_sm,bd_sm,bb_sm(2)
       common/fermi/g_fermi
-      common/ckm_switch/ckm_e(3,3),ckm_0(3,3),
-     $     ydl(3,3),ydr(3,3),yul(3,3),yur(3,3),iswitch
+      common/ckm_switch/ckm_phys(3,3),ckm0(3,3),udl(3,3),udr(3,3),
+     $     uul(3,3),uur(3,3)
       xt = umu(3)*umu(3)/wm2
       xc = uml(2)*uml(2)/wm2
-      vc = dconjg(ckm_e(i,2))*ckm_e(j,2)
-      vt = dconjg(ckm_e(i,3))*ckm_e(j,3)
+      vc = dconjg(ckm_phys(2,j))*ckm_phys(2,i)
+      vt = dconjg(ckm_phys(3,j))*ckm_phys(3,i)
 c      check if we calculate K or B meson mixing, i.e. if we are
 c      at m_s or at m_b mass scale
       if (max(i,j).lt.3) then
@@ -240,12 +240,12 @@ c     CAUTION: SM contribution calculated SEPARATELY in dd_vll_sm_wil
       double complex dd_vll,dd_vrr,dd_sll,dd_srr,dd_vlr,dd_slr,dd_tl,
      $     dd_tr
 c      double complex dd_vll_sm_wil
-c      double complex dd_sll_yuk,dd_srr_yuk,dd_slr_yuk
+      double complex dd_sll_yuk,dd_srr_yuk,dd_slr_yuk
       double complex dds_vll,dds_vrr,dds_lr,dds_sll,dds_srr
       common/dd_wil_coeff/dds_vll,dds_vrr,dds_lr(2),
      $    dds_sll(2),dds_srr(2)
       common/ev_mat_4q/vxx(4),sxx(4,2,2),sxy(4,2,2),init_eta
-c      common/diag_type/ihpeng,izpeng,ifpeng,ibox
+      common/diag_type/ihpeng,izpeng,ifpeng,ibox
       if (init_eta) call eta_4q_evol()
 c      check if we calculate K or B meson mixing, i.e. if we are
 c      at mu=2 GeV (k=1) or at mu=m_b (k=3) mass scale
@@ -265,11 +265,11 @@ c      tensor operator: ours O_{L,R}^T = (-1) x their O_2^{SLL,SRR}
       dds_srr(2) = - dd_tr(i,j)
       dds_lr(1)  = dd_vlr(i,j)
       dds_lr(2)  = dd_slr(i,j)
-c      if (ihpeng.eq.1) then
-c         dds_sll(1) = dds_sll(1) + ihpeng*dd_sll_yuk(i,j)
-c         dds_srr(1) = dds_srr(1) + ihpeng*dd_srr_yuk(i,j)
-c         dds_lr(2)  = dds_lr(2) + ihpeng*dd_slr_yuk(i,j)
-c      end if
+      if (ihpeng.eq.1) then
+         dds_sll(1) = dds_sll(1) + ihpeng*dd_sll_yuk(i,j)
+         dds_srr(1) = dds_srr(1) + ihpeng*dd_srr_yuk(i,j)
+         dds_lr(2)  = dds_lr(2) + ihpeng*dd_slr_yuk(i,j)
+      end if
 c      NLO evolution of the MSSM part
 c      First step: from mu = M_SUSY = (M_gluino + aver M_D)/2 to mu = m_t
       dds_vll  = vxx(3)*dds_vll
@@ -375,7 +375,7 @@ c      value of eps_K (with exp(i pi/4) removed) and of delta_mk
      $    dds_sll(2),dds_srr(2)
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/meson_data/dmk,amk,epsk,fk,dmd,amd,fd,
-     $    amb(2),dmb(2),gam_b(2),fb(2)
+     $    amb(2),dmb(2),tau_b(2),fb(2)
       common/bx_4q/bk(5),bd(5),bb(2,5),amu_k,amu_d,amu_b
       common/sm_4q/eta_cc,eta_ct,eta_tt,eta_b,bk_sm,bd_sm,bb_sm(2)
       common/fmass_high/umu(3),uml(3),amuu(3),dmu(3),dml(3),amud(3)
@@ -399,7 +399,7 @@ c      value of eps_K (with exp(i pi/4) removed) and of delta_mk
       common/uu_wil_coeff/uus_vll,uus_vrr,uus_lr(2),
      $    uus_sll(2),uus_srr(2)
       common/meson_data/dmk,amk,epsk,fk,dmd,amd,fd,
-     $    amb(2),dmb(2),gam_b(2),fb(2)
+     $    amb(2),dmb(2),tau_b(2),fb(2)
       common/bx_4q/bk(5),bd(5),bb(2,5),amu_k,amu_d,amu_b
       common/fmass_high/umu(3),uml(3),amuu(3),dmu(3),dml(3),amud(3)
       call uu_wil_run(1,2)
@@ -413,28 +413,38 @@ c      value of eps_K (with exp(i pi/4) removed) and of delta_mk
       return
       end
 
-      subroutine dd_bmeson(i,delta_mb)
+      subroutine dd_bmeson(i,delta_mb,dmb_re,dmb_im)
 c      i = 1: Bd mesons; i=2: Bs mesons
       implicit double precision (a-h,o-z)
-      double complex heff_mat
+      double complex heff_mat,heff_mat_sm,heff_mat_np
       double complex dd_vll_sm_wil
       double complex dds_vll,dds_vrr,dds_lr,dds_sll,dds_srr
       common/dd_wil_coeff/dds_vll,dds_vrr,dds_lr(2),
      $    dds_sll(2),dds_srr(2)
       common/meson_data/dmk,amk,epsk,fk,dmd,amd,fd,
-     $    amb(2),dmb(2),gam_b(2),fb(2)
+     $    amb(2),dmb(2),tau_b(2),fb(2)
       common/bx_4q/bk(5),bd(5),bb(2,5),amu_k,amu_d,amu_b
       common/sm_4q/eta_cc,eta_ct,eta_tt,eta_b,bk_sm,bd_sm,bb_sm(2)
       common/fmass_high/umu(3),uml(3),amuu(3),dmu(3),dml(3),amud(3)
+c     in the common /heff_bmeson/ below:
+c       heff_mat is full matrix element, \Delta M_12 
+c       heff_mat_sm is SM matrix element, \Delta M_12^SM 
+c       heff_mat_np is "new physics" matrix element, \Delta M_12^NP
+c       iq = 1: Bd mesons; iq=2: Bs mesons
+      common/heff_bmeson/heff_mat,heff_mat_sm,heff_mat_np,iq
+      iq = i
       call dd_wil_run(i,3)
       rm = (amb(i)/(qmass_nlo(dml(i),amud(i),amu_b)
      $     + qmass_nlo(dml(3),amud(3),amu_b)))**2
-      heff_mat = amb(i)*fb(i)*fb(i)/24*(8*bb_sm(i)*dd_vll_sm_wil(i,3)
-     $    + 8*bb(i,1)*(dds_vll + dds_vrr)
-     $    - 5*bb(i,2)*rm*(dds_sll(1) + dds_srr(1))
-     $    - 12*bb(i,3)*rm*(dds_sll(2) + dds_srr(2))
-     $    - 4*bb(i,4)*rm*dds_lr(1) + 6*bb(i,5)*rm*dds_lr(2))
+      heff_mat_sm = amb(i)*fb(i)*fb(i)/3*bb_sm(i)*dd_vll_sm_wil(i,3)
+      heff_mat_np = amb(i)*fb(i)*fb(i)/24*(8*bb(i,1)*(dds_vll + dds_vrr)
+     $     - 5*bb(i,2)*rm*(dds_sll(1) + dds_srr(1)) 
+     $     - 12*bb(i,3)*rm*(dds_sll(2) + dds_srr(2)) 
+     $     - 4*bb(i,4)*rm*dds_lr(1) + 6*bb(i,5)*rm*dds_lr(2))
+      heff_mat = heff_mat_sm + heff_mat_np
       delta_mb = 2*abs(heff_mat)
+      dmb_re = dble(heff_mat)
+      dmb_im = dimag(heff_mat)
       return
       end
 
@@ -449,7 +459,7 @@ c      SM part only!
       double complex heff_mat,dd_vll_sm_wil
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/meson_data/dmk,amk,epsk,fk,dmd,amd,fd,
-     $    amb(2),dmb(2),gam_b(2),fb(2)
+     $    amb(2),dmb(2),tau_b(2),fb(2)
       common/sm_4q/eta_cc,eta_ct,eta_tt,eta_b,bk_sm,bd_sm,bb_sm(2)
       heff_mat = amk*fk*fk*bk_sm/3*dd_vll_sm_wil(1,2)
       eps_k = - dimag(heff_mat)/dmk/sq2
@@ -462,7 +472,7 @@ c      SM part only!
       logical init_eta
       double complex uu_vll
       common/meson_data/dmk,amk,epsk,fk,dmd,amd,fd,
-     $    amb(2),dmb(2),gam_b(2),fb(2)
+     $    amb(2),dmb(2),tau_b(2),fb(2)
       common/ev_mat_4q/vxx(4),sxx(4,2,2),sxy(4,2,2),init_eta
       common/sm_4q/eta_cc,eta_ct,eta_tt,eta_b,bk_sm,bd_sm,bb_sm(2)
       if (init_eta) call eta_4q_evol()
@@ -470,16 +480,18 @@ c      SM part only!
       return
       end
 
-      subroutine dd_bmeson_sm(i,delta_mb)
+      subroutine dd_bmeson_sm(i,delta_mb,dmb_re,dmb_im)
 c      i = 1: Bd mesons; i=2: Bs mesons
 c      SM part only!
       implicit double precision (a-h,o-z)
-      double complex dd_vll_sm_wil
+      double complex dd_vll_sm_wil,heff_mat
       common/meson_data/dmk,amk,epsk,fk,dmd,amd,fd,
-     $    amb(2),dmb(2),gam_b(2),fb(2)
+     $    amb(2),dmb(2),tau_b(2),fb(2)
       common/sm_4q/eta_cc,eta_ct,eta_tt,eta_b,bk_sm,bd_sm,bb_sm(2)
-      delta_mb = 2/3.d0*amb(i)*fb(i)*fb(i)*bb_sm(i)
-     $    *abs(dd_vll_sm_wil(i,3))
+      heff_mat = amb(i)*fb(i)*fb(i)*bb_sm(i)/3*dd_vll_sm_wil(i,3)
+      delta_mb = 2*abs(heff_mat)
+      dmb_re = dble(heff_mat)
+      dmb_im = dimag(heff_mat)
       return
       end
 
@@ -515,7 +527,7 @@ c      SM part only!
       common/sm_4q/eta_cc,eta_ct,eta_tt,eta_b,bk_sm,bd_sm,bb_sm(2)
       common/ev_mat_4q/vxx(4),sxx(4,2,2),sxy(4,2,2),init_eta
       common/meson_data/dmk,amk,epsk,fk,dmd,amd,fd,
-     $    amb(2),dmb(2),gam_b(2),fb(2)
+     $    amb(2),dmb(2),tau_b(2),fb(2)
       common/bx_4q/bk(5),bd(5),bb(2,5),amu_k,amu_d,amu_b
       common/debug_4q/ih,ic,in,ing,ig
       common/eff_yuk_4q/eps_d(3),eff_yuk,init_eff_yuk
@@ -526,7 +538,7 @@ c     inclusion of eps,eps' terms in 4q box calculations
       data eff_yuk,init_eff_yuk/.false.,.true./
       data eps_d/3*0.d0/
 c      K mesons
-      data dmk,amk,fk,epsk/3.49d-15,0.497672d0,0.1598d0,2.26d-3/
+      data dmk,amk,fk,epsk/3.49d-15,0.497672d0,0.1598d0,2.229d-3/
 c      B_K ordering: VLL, SLL(2), LR(2)
       data bk/0.61d0,0.76d0,0.51d0,0.96d0,1.30d0/
       data bk_sm/0.724d0/
@@ -535,10 +547,9 @@ c      D mesons
       data bd/5*1.d0/
       data bd_sm/1.d0/
 c      B_d,B_s mesons
-      data amb/5.2794d0,5.368d0/
-c      Delta_m_Bs quite approximate only
-      data dmb/3.01d-13,1.2d-11/
-      data gam_b/1.53d-12,1.466d-12/
+      data amb/5.2795d0,5.3663d0/
+      data dmb/3.337d-13,1.17d-11/
+      data tau_b/1.525d-12,1.472d-12/
       data fb/0.2d0,0.245d0/
       data bb/2*0.87d0,2*0.8d0,2*0.71d0,2*1.71d0,2*1.16d0/
       data bb_sm/1.22d0,1.22d0/

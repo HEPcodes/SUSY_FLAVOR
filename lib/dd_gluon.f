@@ -23,7 +23,7 @@ c     W and u quark contributions (SM like)
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/fmass/em(3),um(3),dm(3)
       common/km_mat/ckm(3,3)
-      qf = - 1
+      qf = - 1.d0
       do k=1,3
         ai = e/sq2/st*ckm(i,k)
         aj = e/sq2/st*dconjg(ckm(j,k))
@@ -43,7 +43,7 @@ c     Higgs and Goldstone contributions
       common/fmass/em(3),um(3),dm(3)
       common/km_mat/ckm(3,3)
       common/hangle/ca,sa,cb,sb
-      qf = - 1
+      qf = - 1.d0
       do k=1,3
         do l=1,2
           ai = e/sq2/st*um(k)/wm*zh(2,l)/sb*ckm(i,k)
@@ -64,7 +64,7 @@ c     chargino/up squark contributions
       double complex vl_duc,vr_duc,zpos,zneg,zu,zd
       common/charg/fcm(2),zpos(2,2),zneg(2,2)
       common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
-      qs = 1
+      qs = 1.d0
       do k=1,6
         do l=1,2
           ai = dconjg(vl_duc(i,k,l))
@@ -85,7 +85,7 @@ c     neutralino-down squark contributions
       double complex vl_ddn,vr_ddn,zn,zu,zd
       common/neut/fnm(4),zn(4,4)
       common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
-      qs = 1
+      qs = 1.d0
       do k=1,6
         do l=1,4
           ai = dconjg(vl_ddn(i,k,l))
@@ -103,20 +103,22 @@ c     gluino-down squark contributions
       implicit double precision (a-h,o-z)
       double complex cfl(5),cfr(5)
       double complex ai,aj,bi,bj
-      double complex zu,zd,gm2,gm3
-      common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      double complex zu0,zd0,gm2,gm3
+      double complex zd
+      logical init_alpha_susy
+      common/alpha_s_susy/g3u,g3d,init_alpha_susy
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/gmass/gm1,gm2,gm3
+      if (init_alpha_susy) call init_alpha_s_susy
+      qs = g3d*g3d/3
+      qf = - 3*g3d*g3d
       do k=1,6
          ai = - dconjg(zd(i,k))
          bi =   dconjg(zd(i+3,k))
          aj = - zd(j,k)
          bj =   zd(j+3,k)
-         g3 = 4*pi*alfas((gm1 + sdm(k))/2)
-         qs = g3/3
          call dd_ssf(ai,aj,bi,bj,qs,gm1,sdm(k),cfl,cfr)
-         qf = - 3*g3
-         call dd_ssf(ai,aj,bi,bj,qf,gm1,sdm(k),cfl,cfr)
+         call dd_ffs(ai,aj,bi,bj,qf,gm1,sdm(k),cfl,cfr)
       end do
       return
       end

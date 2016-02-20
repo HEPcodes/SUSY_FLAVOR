@@ -27,16 +27,20 @@ c     Definition of VEGAS integrand
       double precision function cdm_g()
 c     Full gluon CDM (only stops contribution for now...)
       implicit double precision (a-h,o-z)
-      double complex zu,zd
+      double complex zu0,zd0
+      double complex zu
       double complex gm2,gm3
       double precision cdm_g_vegas
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      logical init_alpha_susy
+      common/alpha_s_susy/g3u,g3d,init_alpha_susy
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/cdm_g_aux/z1,z2,z3,errin,eps,npoint,itmax
       common/vegas_result/avgi,sd,ti,tsi,nnew
       common/gmass/gm1,gm2,gm3
       common/fmass/em(3),um(3),dm(3)
       external cdm_g_vegas,init_cdm_g
+      if (init_alpha_susy) call init_alpha_s_susy
 c     identify left and right stop
       zlmax = 0
       zrmax = 0
@@ -54,7 +58,7 @@ c     identify left and right stop
       z2 = (sum(ir)/gm1)**2
       z3 = (um(3)/gm1)**2
       call vegas(cdm_g_vegas,errin,3,npoint,itmax,nprn,igraph)
-      cdm_g = 3.d0*pi/8*um(3)*(alfas(zm)/pi)**2.5d0/gm1/gm1/gm1
+      cdm_g = 3.d0*pi/8*um(3)*(g3u/2/pi)**5/gm1/gm1/gm1
      $    *(z1 - z2)*dimag(zu(6,ir)*dconjg(zu(3,ir)))*avgi
       return
       end
@@ -67,13 +71,14 @@ c     separate stop mass matrix diagonalization
       double complex zst(2,2),h,tmp(2,2)
       double complex lms,rms,ums,dms,qms
       double complex ls,ks,ds,es,us,ws
+      double complex yl,yu,yd
       double precision au(2,2),bu(2,2),zu1(2,2),zu2(2,2),work(4),stm(2)
+      double precision cdm_g_vegas
       common/soft/ls(3,3),ks(3,3),ds(3,3),es(3,3),us(3,3),ws(3,3)
       common/msoft/lms(3,3),rms(3,3),ums(3,3),dms(3,3),qms(3,3)
       common/hpar/hm1,hm2,hs,h
       common/vev/v1,v2
       common/yukawa/yl(3),yu(3),yd(3)
-      double precision cdm_g_vegas
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
       common/cdm_g_aux/z1,z2,z3,errin,eps,npoint,itmax
       common/vegas_result/avgi,sd,ti,tsi,nnew

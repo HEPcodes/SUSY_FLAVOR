@@ -24,7 +24,7 @@ c     in case of problems, use generator defined below, it is
       real temp(1)
       len = 1
       call RANMAR(temp, len)
-      veg_rand = temp(1)
+      veg_rand = dble(temp(1))
       return
       end
 
@@ -79,9 +79,10 @@ C                                                    0 <= KL <= 30081
 3        continue
          U(ii) = s
 2     continue
-      C = 362436.0 / 16777216.0
-      CD = 7654321.0 / 16777216.0
-      CM = 16777213.0 /16777216.0
+      C =  362436.0  / 16777216
+      CD = 7654321.0 / 16777216
+c      CM = 16777213.0 /16777216
+      CM = 1.0 - 3.0 / 16777216
       I97 = 97
       J97 = 33
       TEST = .TRUE.

@@ -1,7 +1,7 @@
 all: sflav
 
-# FOPT = -O0 -g -fno-automatic -fbounds-check -Wall
-FOPT = -O -fno-automatic -Wall
+FOPT = -O0 -g -fno-automatic -fbounds-check -Wall -fbacktrace
+#FOPT = -O -fno-automatic -Wall
 F77 = gfortran
 COMP = $(F77) $(FOPT)
 
@@ -32,27 +32,27 @@ obj/dd_mix.o: lib/dd_mix.f
 obj/uu_mix.o: lib/uu_mix.f
 	$(COMP) -c lib/uu_mix.f
 	mv uu_mix.o obj
-obj/sff_fun0.o: lib/sff_fun0.f
-	$(COMP) -c lib/sff_fun0.f
-	mv sff_fun0.o obj
-obj/sdd_vert0.o: lib/sdd_vert0.f
-	$(COMP) -c lib/sdd_vert0.f
-	mv sdd_vert0.o obj
-obj/pdd_vert0.o: lib/pdd_vert0.f
-	$(COMP) -c lib/pdd_vert0.f
-	mv pdd_vert0.o obj
+#obj/sff_fun0.o: lib/sff_fun0.f
+#	$(COMP) -c lib/sff_fun0.f
+#	mv sff_fun0.o obj
+#obj/sdd_vert0.o: lib/sdd_vert0.f
+#	$(COMP) -c lib/sdd_vert0.f
+#	mv sdd_vert0.o obj
+#obj/pdd_vert0.o: lib/pdd_vert0.f
+#	$(COMP) -c lib/pdd_vert0.f
+#	mv pdd_vert0.o obj
 obj/zdd_vert0.o: lib/zdd_vert0.f
 	$(COMP) -c lib/zdd_vert0.f
 	mv zdd_vert0.o obj
 obj/d_self0.o: lib/d_self0.f
 	$(COMP) -c lib/d_self0.f
 	mv d_self0.o obj
-obj/suu_vert0.o: lib/suu_vert0.f
-	$(COMP) -c lib/suu_vert0.f
-	mv suu_vert0.o obj
-obj/puu_vert0.o: lib/puu_vert0.f
-	$(COMP) -c lib/puu_vert0.f
-	mv puu_vert0.o obj
+#obj/suu_vert0.o: lib/suu_vert0.f
+#	$(COMP) -c lib/suu_vert0.f
+#	mv suu_vert0.o obj
+#obj/puu_vert0.o: lib/puu_vert0.f
+#	$(COMP) -c lib/puu_vert0.f
+#	mv puu_vert0.o obj
 obj/u_self0.o: lib/u_self0.f
 	$(COMP) -c lib/u_self0.f
 	mv u_self0.o obj
@@ -97,70 +97,71 @@ obj/mh_init.o: lib/mh_init.f
 	$(COMP) -c lib/mh_init.f
 	mv mh_init.o obj
 #
-obj/cdm_d.o: lib/cdm_d.f
-	$(COMP) -c lib/cdm_d.f
-	mv cdm_d.o obj
-obj/cdm_u.o: lib/cdm_u.f
-	$(COMP) -c lib/cdm_u.f
-	mv cdm_u.o obj
-obj/edm_d.o: lib/edm_d.f 
-	$(COMP) -c lib/edm_d.f
-	mv edm_d.o obj
-obj/edm_u.o: lib/edm_u.f 
-	$(COMP) -c lib/edm_u.f
-	mv edm_u.o obj
-obj/edm_l.o: lib/edm_l.f
-	$(COMP) -c lib/edm_l.f
-	mv edm_l.o obj
+obj/cdm_q.o: lib/cdm_q.f
+	$(COMP) -c lib/cdm_q.f
+	mv cdm_q.o obj
+obj/edm_q.o: lib/edm_q.f 
+	$(COMP) -c lib/edm_q.f
+	mv edm_q.o obj
 obj/vegas.o: lib/vegas.f
 	$(COMP) -c lib/vegas.f
 	mv vegas.o obj
 obj/cdm_g.o: lib/cdm_g.f
 	$(COMP) -c lib/cdm_g.f
 	mv cdm_g.o obj
-obj/edm_n.o: lib/edm_n.f
-	$(COMP) -c lib/edm_n.f
-	mv edm_n.o obj
-#
 obj/sflav_io.o: lib/sflav_io.f
 	$(COMP) -c lib/sflav_io.f
 	mv sflav_io.o obj
-
+obj/yuk_ren.o: lib/yuk_ren.f
+	$(COMP) -c lib/yuk_ren.f
+	mv yuk_ren.o obj
+obj/q_self0_dlim.o: lib/q_self0_dlim.f
+	$(COMP) -c lib/q_self0_dlim.f
+	mv q_self0_dlim.o obj
+obj/l_self0_dlim.o: lib/l_self0_dlim.f
+	$(COMP) -c lib/l_self0_dlim.f
+	mv l_self0_dlim.o obj
+obj/ll_gamma.o: lib/ll_gamma.f
+	$(COMP) -c lib/ll_gamma.f
+	mv ll_gamma.o obj
+obj/phen_2l.o: lib/phen_2l.f
+	$(COMP) -c lib/phen_2l.f
+	mv phen_2l.o obj
 
 libfcnc.a: obj/bsg_nl.o obj/ddg_fun.o obj/dd_gamma.o obj/dd_gluon.o	\
 	obj/dd_vv.o obj/dd_ll.o obj/dd_mix.o obj/uu_mix.o		\
-	obj/sff_fun0.o obj/zdd_vert0.o obj/sdd_vert0.o obj/pdd_vert0.o	\
-	obj/d_self0.o obj/suu_vert0.o obj/puu_vert0.o obj/phen_4q.o	\
-	obj/phen_2q.o obj/mh_diag.o obj/cd_fun.o obj/b_fun.o		\
-	obj/db_fun.o obj/c_fun.o obj/qcd_fun.o obj/vg_def.o		\
-	obj/vf_def.o obj/vh_def.o obj/mh_init.o obj/eisch1.o		\
-	obj/rombint.o obj/cdm_d.o obj/cdm_u.o obj/cdm_g.o obj/vegas.o	\
-	obj/edm_d.o obj/edm_l.o obj/edm_n.o obj/edm_u.o obj/sflav_io.o
+	obj/zdd_vert0.o obj/d_self0.o obj/phen_4q.o obj/phen_2q.o	\
+	obj/mh_diag.o obj/cd_fun.o obj/b_fun.o obj/db_fun.o		\
+	obj/c_fun.o obj/qcd_fun.o obj/vg_def.o obj/vf_def.o		\
+	obj/mh_init.o obj/eisch1.o obj/rombint.o obj/cdm_q.o		\
+	obj/cdm_g.o obj/vegas.o obj/edm_q.o obj/sflav_io.o		\
+	obj/yuk_ren.o obj/u_self0.o obj/q_self0_dlim.o			\
+	obj/l_self0_dlim.o obj/ll_gamma.o obj/phen_2l.o
 
 	ar crs libfcnc.a obj/bsg_nl.o obj/ddg_fun.o obj/dd_gamma.o	\
 	obj/dd_gluon.o obj/dd_vv.o obj/dd_ll.o obj/dd_mix.o		\
-	obj/uu_mix.o obj/sff_fun0.o obj/zdd_vert0.o obj/sdd_vert0.o	\
-	obj/pdd_vert0.o obj/d_self0.o obj/suu_vert0.o obj/puu_vert0.o	\
-	obj/phen_4q.o obj/phen_2q.o obj/mh_diag.o obj/cd_fun.o		\
-	obj/b_fun.o obj/db_fun.o obj/c_fun.o obj/qcd_fun.o		\
-	obj/vg_def.o obj/vf_def.o obj/vh_def.o obj/mh_init.o		\
-	obj/eisch1.o obj/rombint.o obj/cdm_d.o obj/cdm_u.o obj/cdm_g.o	\
-	obj/vegas.o obj/edm_d.o obj/edm_l.o obj/edm_n.o obj/edm_u.o	\
-	obj/sflav_io.o
+	obj/uu_mix.o obj/zdd_vert0.o obj/d_self0.o obj/phen_4q.o	\
+	obj/phen_2q.o obj/mh_diag.o obj/cd_fun.o obj/b_fun.o		\
+	obj/db_fun.o obj/c_fun.o obj/qcd_fun.o obj/vg_def.o		\
+	obj/vf_def.o obj/mh_init.o obj/eisch1.o obj/rombint.o		\
+	obj/cdm_q.o obj/cdm_g.o obj/vegas.o obj/edm_q.o obj/sflav_io.o	\
+	obj/yuk_ren.o obj/u_self0.o obj/q_self0_dlim.o			\
+	obj/l_self0_dlim.o obj/ll_gamma.o obj/phen_2l.o
 #
 #	Useful but cause problems on BSD systems:
 #	ar ts libfcnc.a
 #
 
-sflav:	susy_flavor.f libfcnc.a
-	$(COMP) -o sflav susy_flavor.f -L. -lfcnc
+sflav:	susy_flavor.f libfcnc.a 
+	$(COMP) -o sflav susy_flavor.f  -L. -lfcnc
 	@echo "Executing SUSY_FLAVOR..."
 	./sflav
 
 clean:
-	rm -rf *.o obj/*.o *.a *~ lib/*~ sflav
+	rm -rf *.o obj/*.o *.a *~ lib/*~ sflav 
 
 tar:	
 	rm -rf obj/*
-	tar zcvf susy_flavor.tgz susy_flavor* *sample* obj lib/*.f Makefile
+	tar zcvf susy_flavor.tgz susy_flavor*  obj lib/*.f Makefile
 	mv susy_flavor.tgz $(HOME)
+

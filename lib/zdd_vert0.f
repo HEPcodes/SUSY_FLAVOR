@@ -31,11 +31,9 @@ c     Gauge contribution
       zdd_vl_g = (0.d0,0.d0)
       do m=1,3
          zdd_vl_g = zdd_vl_g + dconjg(ckm(i,m))*ckm(j,m)
-c     Wuu contribution
      $        * ((1 - 4.d0/3*st2)*(cp1(wm,um(m),um(m)) - 0.5d0)
-     $        + 8.d0/3*st2*um(m)*um(m)*cp0(wm,um(m),um(m))
-c     WWu contribution
-     $        + ct2*(6*cp1(wm,wm,um(m)) - 1))
+     $        + 8.d0/3*st2*um(m)*um(m)*cp0(wm,um(m),um(m)) ! Wuu 
+     $        + ct2*(6*cp1(wm,wm,um(m)) - 1)) ! WWu 
       end do
       zdd_vl_g = e*e2/4/sct/st2*zdd_vl_g
       return
@@ -68,12 +66,10 @@ c     Higgs contribution
       do m=1,3
          do l=1,2
            zdd_vl_h = zdd_vl_h - yh_eff_l(i,m,l)*dconjg(yh_eff_l(j,m,l))
-c     Huu contribution
      $           * (2*st2/3.d0*(cp1(cm(l),um(m),um(m)) - 0.5d0)
-     $           + (1 - 4*st2/3.d0)*um(m)*um(m)*cp0(cm(l),um(m),um(m))
-c     HHu contribution
-     $           + (ct2 - st2)/2*(cp1(cm(l),cm(l),um(m)) + 0.5d0))
-        end do
+     $           + (1 - 4*st2/3.d0)*um(m)*um(m)*cp0(cm(l),um(m),um(m)) ! Huu
+     $           + (ct2 - st2)/2*(cp1(cm(l),cm(l),um(m)) + 0.5d0)) ! HHu 
+         end do
       end do
       zdd_vl_h = e/2/sct*zdd_vl_h
       return
@@ -148,12 +144,15 @@ c     NDD contribution
       double complex function zdd_vl_gl(i,j)
 c     Gluino contribution
       implicit double precision (a-h,o-z)
-      double complex zu,zd,gm2,gm3,v_ddz
+      double complex zu0,zd0,gm2,gm3,v_ddz
+      double complex zd
+      logical init_alpha_susy
+      common/alpha_s_susy/g3u,g3d,init_alpha_susy
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/gmass/gm1,gm2,gm3
+      if (init_alpha_susy) call init_alpha_s_susy
       zdd_vl_gl = (0.d0,0.d0)
-      g3 = 4*pi*alfas(gm1)
 c     DDG contribution only
       do mm=1,6
          do nn=1,6
@@ -161,7 +160,7 @@ c     DDG contribution only
      $           * dconjg(zd(j,nn))*(cp1(gm1,sdm(mm),sdm(nn)) + 0.5d0)
          end do
       end do
-      zdd_vl_gl = 2*e*g3/3.d0/sct*zdd_vl_gl
+      zdd_vl_gl = 2*e*g3d*g3d/3.d0/sct*zdd_vl_gl
       return
       end
 
@@ -208,11 +207,9 @@ c     Higgs contribution
       do m=1,3
          do l=1,2
            zdd_vr_h = zdd_vr_h + yh_eff_r(i,m,l)*dconjg(yh_eff_r(j,m,l))
-c     Huu contribution
      $           * (((1 - 4*st2/3.d0)*(cp1(cm(l),um(m),um(m)) - 0.5d0)
-     $           + 2*st2/3.d0*um(m)*um(m)*cp0(cm(l),um(m),um(m)))
-c     HHu contribution
-     $           - (ct2 - st2)*(cp1(cm(l),cm(l),um(m)) + 0.5d0))
+     $           + 2*st2/3.d0*um(m)*um(m)*cp0(cm(l),um(m),um(m))) ! Huu
+     $           - (ct2 - st2)*(cp1(cm(l),cm(l),um(m)) + 0.5d0)) ! HHu
         end do
       end do
       zdd_vr_h = e/4/sct*zdd_vr_h
@@ -286,12 +283,15 @@ c     NDD contribution
       double complex function zdd_vr_gl(i,j)
 c     Gluino contribution
       implicit double precision (a-h,o-z)
-      double complex zu,zd,v_ddz,gm2,gm3
+      double complex zu0,zd0,v_ddz,gm2,gm3
+      double complex zd
+      logical init_alpha_susy
+      common/alpha_s_susy/g3u,g3d,init_alpha_susy
       common/vpar/st,ct,st2,ct2,sct,sct2,e,e2,alpha,wm,wm2,zm,zm2,pi,sq2
-      common/sqmass/sum(6),sdm(6),zu(6,6),zd(6,6)
+      common/sqmass/sum(6),sdm(6),zu0(6,6),zd0(6,6)
       common/gmass/gm1,gm2,gm3
+      if (init_alpha_susy) call init_alpha_s_susy
       zdd_vr_gl = (0.d0,0.d0)
-      g3 = 4*pi*alfas(gm1)
 c     DDG contribution only
       do mm=1,6
          do nn=1,6
@@ -299,7 +299,7 @@ c     DDG contribution only
      $           * dconjg(zd(j+3,nn))*(cp1(gm1,sdm(mm),sdm(nn)) + 0.5d0)
          end do
       end do
-      zdd_vr_gl = 2*e*g3/3.d0/sct*zdd_vr_gl
+      zdd_vr_gl = 2*e*g3d*g3d/3.d0/sct*zdd_vr_gl
       return
       end
       
