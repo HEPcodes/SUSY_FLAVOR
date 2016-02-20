@@ -1,0 +1,7 @@
+/libfcnc.a
+/obj/*.o
+/sflav
+/sfile
+/mssm_data.txt
+/susy_flavor.out
+/*.dSYM
